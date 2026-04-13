@@ -188,7 +188,6 @@ function ModifierFormation() {
             <p className="page-subtitle">Mettez à jour les informations de la formation sélectionnée.</p>
           </div>
 
-          {chargement && <p className="status-banner">Chargement de la formation...</p>}
           {erreur && <p className="error">{erreur}</p>}
 
           {!chargement && !erreur && (

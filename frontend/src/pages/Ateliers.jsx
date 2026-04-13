@@ -17,6 +17,7 @@ function Ateliers() {
   const [chargement, setChargement] = useState(true);
   const [erreurChargement, setErreurChargement] = useState("");
   const utilisateur = recupererUtilisateur();
+  const estFormateur = utilisateur?.role === "formateur";
 
   useEffect(() => {
     // Le formateur voit uniquement ses propres formations
@@ -46,14 +47,17 @@ function Ateliers() {
 
         <section className="page-content">
           <div className="page-head">
-            <h2 className="page-title">Mes formations</h2>
-            <p className="page-subtitle">Retrouvez toutes vos formations.</p>
+            <h2 className="page-title">{estFormateur ? "Mes ateliers" : "Mes formations suivies"}</h2>
+            <p className="page-subtitle">
+              {estFormateur
+                ? "Retrouvez toutes les formations que vous avez publiées."
+                : "Retrouvez les formations que vous suivez actuellement."}
+            </p>
           </div>
 
-          {chargement && <p className="status-banner">Chargement des formations...</p>}
           {erreurChargement && <p className="error">{erreurChargement}</p>}
           {!chargement && !erreurChargement && ateliersLocaux.length === 0 && (
-            <p className="status-banner">Aucune formation publiée pour le moment.</p>
+            <p>{estFormateur ? "Aucune formation publiée pour le moment." : "Aucune formation suivie pour le moment."}</p>
           )}
 
           <div className="atelier-list">

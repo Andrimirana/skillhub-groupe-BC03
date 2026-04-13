@@ -10,6 +10,13 @@ import "../styles/layout.css";
 import "../styles/Bouton.css";
 import "../styles/atelierCard.css";
 
+const IMAGES_FORMATIONS = [
+  "/assets/images/learning/learning-hero.jpg",
+  "/assets/images/learning/learning-laptop.jpg",
+  "/assets/images/learning/learning-notes.jpg",
+  "/assets/images/learning/learning-team.jpg",
+];
+
 function Apprenant() {
   const navigate = useNavigate();
   const [recherche, setRecherche] = useState("");
@@ -127,14 +134,13 @@ function Apprenant() {
             <Link to="/formations" className="btn-secondary">Découvrir des formations</Link>
           </div>
 
-          {chargement && <p className="status-banner">Chargement des formations...</p>}
           {erreurChargement && <p className="error">{erreurChargement}</p>}
 
           {!chargement && !erreurChargement && (
             <>
               <div className="dashboard-panel">
                 <h3>Mes formations</h3>
-                {formationsFiltrees.length === 0 && <p className="status-banner">Aucune formation suivie pour le moment.</p>}
+                {formationsFiltrees.length === 0 && <p>Aucune formation suivie pour le moment.</p>}
 
                 <div className="atelier-list">
                   {formationsFiltrees.map((formation) => (
@@ -175,9 +181,10 @@ function Apprenant() {
               <div className="dashboard-panel">
                 <h3>Suggestions</h3>
                 <div className="atelier-list">
-                  {suggestions.map((formation) => (
+                  {suggestions.map((formation, index) => (
                     <AtelierCard
                       key={formation.id}
+                      image={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
                       titre={formation.titre}
                       description={formation.description}
                       date={formation.date}

@@ -51,7 +51,7 @@ function DetailFormation() {
   };
 
   if (chargement) {
-    return <main className="public-page"><p className="status-banner">Chargement de la formation...</p></main>;
+    return null;
   }
 
   if (!formation) {

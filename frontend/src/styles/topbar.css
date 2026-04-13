@@ -1,42 +1,80 @@
 .topbar {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(8px);
-  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  padding: 10px 24px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid #e7e9f4;
-}
-
-.topbar_gauche {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.welcome {
-  color: #2a2f45;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.profile_section {
-  display: flex;
-  gap: 14px;
   align-items: center;
-  color: #666f8f;
+  border-bottom: 1px solid #e7e9f4;
+  min-height: 74px;
 }
 
-@media (max-width: 920px) {
+.topbar-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-logo-img {
+  height: 52px;
+  width: auto;
+}
+
+.topbar-links {
+  display: flex;
+  gap: 1.4rem;
+  align-items: center;
+}
+
+.topbar-links a {
+  text-decoration: none;
+  color: #0a1f44;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.topbar-links a:hover {
+  color: #0066cc;
+  transform: translateY(-1px);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.topbar-username {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #243867;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 980px) {
   .topbar {
-    flex-direction: column;
-    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 16px;
   }
 
-  .profile_section {
+  .topbar-links {
+    order: 3;
     width: 100%;
+    justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .topbar-actions {
+    justify-content: center;
   }
 }
 
@@ -76,20 +114,6 @@
   background: #e9e1ff;
 }
 
-.icon {
-  font-size: 20px;
-  cursor: pointer;
-  color: #4e44ad;
-}
-
-.photo_profil {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #dbdeeb;
-}
-
 .logout_btn {
   background: #ffffff;
   color: #623cde;
@@ -112,12 +136,16 @@
   border-bottom: 1px solid #363f5b;
 }
 
-[data-theme="dark"] .welcome {
-  color: #eef1ff;
+[data-theme="dark"] .topbar-links a {
+  color: #e8eeff;
 }
 
-[data-theme="dark"] .profile_section {
-  color: #c1c8e2;
+[data-theme="dark"] .topbar-links a:hover {
+  color: #8fb4ff;
+}
+
+[data-theme="dark"] .topbar-username {
+  color: #d7deff;
 }
 
 [data-theme="dark"] .theme_btn {
@@ -138,14 +166,6 @@
 
 [data-theme="dark"] .back_btn:hover {
   background: rgba(98, 60, 222, 0.32);
-}
-
-[data-theme="dark"] .icon {
-  color: #b7bef0;
-}
-
-[data-theme="dark"] .photo_profil {
-  border-color: #4a5477;
 }
 
 [data-theme="dark"] .logout_btn {

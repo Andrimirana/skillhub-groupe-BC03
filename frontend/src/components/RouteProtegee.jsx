@@ -34,7 +34,7 @@ function RouteProtegee({ rolesAutorises = [] }) {
   }, []);
 
   if (etatSession.chargement) {
-    return <p className="status-banner">Vérification de la session...</p>;
+    return null;
   }
 
   if (!etatSession.estAuthentifie) {

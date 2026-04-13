@@ -265,10 +265,12 @@ function Formateur() {
               ]}
             />
 
-            <button type="button" className="btn-create" onClick={ouvrirModalAjout}>
-              Ajouter une formation
-            </button>
-            <Link to="/mes-ateliers" className="btn-secondary">Mes ateliers</Link>
+            <div className="toolbar-actions">
+              <button type="button" className="btn-create" onClick={ouvrirModalAjout}>
+                Ajouter une formation
+              </button>
+              <Link to="/mes-ateliers" className="btn-secondary">Mes ateliers</Link>
+            </div>
           </div>
 
           {modalAjoutOuvert && (
@@ -417,7 +419,6 @@ function Formateur() {
           )}
 
           <div className="dashboard-panel">
-            {chargement && <p className="status-banner">Chargement des formations...</p>}
             {suppressionEnCours !== null && <p className="status-banner">Suppression de la formation en cours...</p>}
             {erreurChargement && <p className="error">{erreurChargement}</p>}
             {!chargement && !erreurChargement && formationsFiltrees.length === 0 && (

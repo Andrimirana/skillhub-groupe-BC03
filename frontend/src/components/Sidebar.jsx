@@ -1,6 +1,6 @@
 import logo from "../assets/logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faCog, faFileLines, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { deconnecter } from "../services/authApi";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
@@ -11,7 +11,6 @@ function Sidebar() {
   const location = useLocation();
   const utilisateur = recupererUtilisateur();
   const routeTableauDeBord = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
-  const urlSwagger = import.meta.env.VITE_URL_SWAGGER || "http://127.0.0.1:8000/swagger.html";
 
   const gererDeconnexion = async () => {
     try {
@@ -19,7 +18,7 @@ function Sidebar() {
     } catch {
     } finally {
       supprimerSession();
-      navigate("/connexion", { replace: true });
+      navigate("/", { replace: true });
     }
   };
 
@@ -46,18 +45,6 @@ function Sidebar() {
         </li>
 
         <li>
-          <a
-            className="sidebar-item"
-            href={urlSwagger}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <FontAwesomeIcon icon={faFileLines} aria-hidden="true" />
-            <span>Documentation API</span>
-          </a>
-        </li>
-
-        <li>
           <Link
             to="/mes-ateliers"
             className={`sidebar-item ${location.pathname === "/mes-ateliers" ? "active" : ""}`}
@@ -69,11 +56,6 @@ function Sidebar() {
       </ul>
 
       <ul className="menu-bottom">
-        <li className="sidebar-item">
-          <FontAwesomeIcon icon={faCog} aria-hidden="true" />
-          <span>Paramètres</span>
-        </li>
-
         <li className="sidebar-item">
           <button type="button" className="sidebar-btn" onClick={gererDeconnexion}>
             <FontAwesomeIcon icon={faSignOutAlt} aria-hidden="true" />

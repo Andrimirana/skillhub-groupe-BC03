@@ -26,7 +26,7 @@ function SuiviFormation() {
   const progressionStyle = useMemo(() => ({ width: `${Math.min(100, Math.max(0, formation?.progression ?? 0))}%` }), [formation]);
 
   if (chargement) {
-    return <main className="public-page"><p className="status-banner">Chargement du suivi...</p></main>;
+    return null;
   }
 
   if (!formation) {

@@ -1,76 +1,40 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { recupererUtilisateur } from "../services/auth";
+import { recupererUtilisateur, supprimerSession } from "../services/auth";
+import { deconnecter } from "../services/authApi";
 import { listerFormations } from "../services/formationsApi";
+import logoSkillHub from "../assets/logo.svg";
+import "../styles/accueil.css";
 
 const TEMOIGNAGES = [
   {
     nom: "Nandrianina",
-    photo: "/ec03/assets/images/profile1.jfif",
+    photo: "/assets/images/profile1.jfif",
     texte: "SkillHub m'a permis d'avancer rapidement.",
   },
   {
     nom: "Maholy",
-    photo: "/ec03/assets/images/profile1.jfif",
+    photo: "/assets/images/profile1.jfif",
     texte: "J'ai adoré la progression module par module.",
   },
   {
     nom: "Irene",
-    photo: "/ec03/assets/images/profile1.jfif",
+    photo: "/assets/images/profile1.jfif",
     texte: "Les ateliers sont très bien structurés.",
   },
   {
     nom: "Mathieu",
-    photo: "/ec03/assets/images/profile1.jfif",
+    photo: "/assets/images/profile1.jfif",
     texte: "Une plateforme claire et efficace.",
   },
 ];
 
 const IMAGES_APPRENTISSAGE = [
-  "/ec03/assets/images/learning/learning-hero.jpg",
-  "/ec03/assets/images/learning/learning-laptop.jpg",
-  "/ec03/assets/images/learning/learning-notes.jpg",
-  "/ec03/assets/images/learning/learning-team.jpg",
+  "/assets/images/learning/learning-hero.jpg",
+  "/assets/images/learning/learning-laptop.jpg",
+  "/assets/images/learning/learning-notes.jpg",
+  "/assets/images/learning/learning-team.jpg",
 ];
-
-const URLS_STYLES = [
-  {
-    id: "ec03-home-style",
-    rel: "stylesheet",
-    href: "/ec03/css/styles.css",
-  },
-  {
-    id: "ec03-fa-style",
-    rel: "stylesheet",
-    href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css",
-  },
-  {
-    id: "ec03-font-style",
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap",
-  },
-];
-
-function ajouterStylesPage() {
-  const ajoutes = [];
-
-  URLS_STYLES.forEach((style) => {
-    if (document.getElementById(style.id)) {
-      return;
-    }
-
-    const link = document.createElement("link");
-    link.id = style.id;
-    link.rel = style.rel;
-    link.href = style.href;
-    document.head.appendChild(link);
-    ajoutes.push(link);
-  });
-
-  return () => {
-    ajoutes.forEach((element) => element.remove());
-  };
-}
 
 function niveauAffichage(level) {
   if (level === "advanced") {
@@ -110,6 +74,8 @@ function Accueil() {
   const [messageEnvoi, setMessageEnvoi] = useState("");
 
   const utilisateur = recupererUtilisateur();
+  const lienHeroFormateur = utilisateur?.role === "formateur" ? "/dashboard/formateur" : "/connexion";
+  const lienHeroApprenant = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/formations";
 
   const profil = useMemo(() => {
     if (!utilisateur) {
@@ -127,7 +93,6 @@ function Accueil() {
 
   useEffect(() => {
     document.title = "SkillHub";
-    return ajouterStylesPage();
   }, []);
 
   useEffect(() => {
@@ -245,40 +210,6 @@ function Accueil() {
   }, [formationsMisesEnAvant]);
 
   useEffect(() => {
-    const hero = document.querySelector(".hero");
-    const illustrations = hero?.querySelectorAll(".illustration");
-
-    if (!hero || !illustrations?.length || window.innerWidth < 992) {
-      return;
-    }
-
-    const mousemove = (event) => {
-      const rect = hero.getBoundingClientRect();
-      const offsetX = (event.clientX - rect.left) / rect.width - 0.5;
-      const offsetY = (event.clientY - rect.top) / rect.height - 0.5;
-
-      illustrations.forEach((illustration, index) => {
-        const intensite = (index + 1) * 6;
-        illustration.style.transform = `translate(${offsetX * intensite}px, ${offsetY * intensite}px)`;
-      });
-    };
-
-    const mouseleave = () => {
-      illustrations.forEach((illustration) => {
-        illustration.style.transform = "translate(0, 0)";
-      });
-    };
-
-    hero.addEventListener("mousemove", mousemove);
-    hero.addEventListener("mouseleave", mouseleave);
-
-    return () => {
-      hero.removeEventListener("mousemove", mousemove);
-      hero.removeEventListener("mouseleave", mouseleave);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!TEMOIGNAGES.length) {
       return;
     }
@@ -291,6 +222,16 @@ function Accueil() {
       window.clearTimeout(timer);
     };
   }, [pointActif]);
+
+  const gererDeconnexion = async () => {
+    try {
+      await deconnecter();
+    } catch {
+    } finally {
+      supprimerSession();
+      navigate("/connexion", { replace: true });
+    }
+  };
 
   const ouvrirModal = () => {
     lastFocusedRef.current = document.activeElement;
@@ -368,7 +309,7 @@ function Accueil() {
       <header className="header">
         <nav className="navbar" aria-label="Navigation principale">
           <div className="logo">
-            <img src="/ec03/assets/images/logo.svg" alt="Logo SkillHub" />
+            <img src={logoSkillHub} alt="Logo SkillHub" />
           </div>
           <button
             className="menuburger"
@@ -388,12 +329,20 @@ function Accueil() {
             <li><Link to="/formations">Formations</Link></li>
             <li><a href="#">À propos</a></li>
             <li><a href="#footer">Contact</a></li>
-            <li><Link id="userLink" to={profil.href}>{profil.libelle}</Link></li>
+            {!utilisateur && (
+              <li><Link to="/connexion">Se connecter</Link></li>
+            )}
           </ul>
           <div className="bouton-inscription">
-            <button id="openModal" className="btn-login" aria-haspopup="dialog" type="button" onClick={ouvrirModal}>
-              S'inscrire
-            </button>
+            {utilisateur ? (
+              <button className="btn-login btn-logout" type="button" onClick={gererDeconnexion}>
+                Se déconnecter
+              </button>
+            ) : (
+              <button id="openModal" className="btn-login" aria-haspopup="dialog" type="button" onClick={ouvrirModal}>
+                S'inscrire
+              </button>
+            )}
           </div>
         </nav>
       </header>
@@ -401,10 +350,10 @@ function Accueil() {
       <main id="contenu">
         <section className="hero" aria-labelledby="hero-title">
           <div className="illustration illu1">
-            <img src="/ec03/assets/images/learning/learning-laptop.jpg" alt="" aria-hidden="true" />
+            <img src="/assets/images/learning/learning-laptop.jpg" alt="" aria-hidden="true" />
           </div>
           <div className="illustration illu2">
-            <img src="/ec03/assets/images/learning/learning-notes.jpg" alt="" aria-hidden="true" />
+            <img src="/assets/images/learning/learning-notes.jpg" alt="" aria-hidden="true" />
           </div>
           <h1 className="hero-titre" id="hero-title">
             Apprends. <span className="progresse">Progresse</span>. Réussis.
@@ -415,9 +364,9 @@ function Accueil() {
             SkillHub rend ton chemin plus fluide et inspirant.
           </p>
           <div className="hero-boutons">
-            <Link to="/connexion" className="btn btn-formateur" role="button"><i className="fa-solid fa-chalkboard-user"></i>
+            <Link to={lienHeroFormateur} className="btn btn-formateur" role="button"><i className="fa-solid fa-chalkboard-user"></i>
               Formateurs</Link>
-            <Link to="/formations" className="btn btn-apprenant" role="button"><i className="fa-solid fa-book-open-reader"></i>
+            <Link to={lienHeroApprenant} className="btn btn-apprenant" role="button"><i className="fa-solid fa-book-open-reader"></i>
               Apprenants</Link>
           </div>
         </section>
@@ -432,7 +381,7 @@ function Accueil() {
             <p className="guide-role">Formateurs</p>
             <article className="guide-carte">
               <div className="carte-header">
-                <img src="/ec03/assets/images/icon_profile.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <img src="/assets/images/icon_profile.svg" alt="" className="guide-icon" aria-hidden="true" />
                 <h3 className="guide-titre">Créez votre cours</h3>
               </div>
               <div className="guide-texte">
@@ -444,7 +393,7 @@ function Accueil() {
             </article>
             <article className="guide-carte">
               <div className="carte-header">
-                <img src="/ec03/assets/images/icon-robot.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <img src="/assets/images/icon-robot.svg" alt="" className="guide-icon" aria-hidden="true" />
                 <h3 className="guide-titre">Publiez et atteignez vos élèves</h3>
               </div>
               <div className="guide-texte">
@@ -460,7 +409,7 @@ function Accueil() {
             <p className="guide-role">Apprenants</p>
             <article className="guide-carte">
               <div className="carte-header">
-                <img src="/ec03/assets/images/icon-search.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <img src="/assets/images/icon-search.svg" alt="" className="guide-icon" aria-hidden="true" />
                 <h3 className="guide-titre">Explorez et choisissez</h3>
               </div>
               <div className="guide-texte">
@@ -472,7 +421,7 @@ function Accueil() {
             </article>
             <article className="guide-carte">
               <div className="carte-header">
-                <img src="/ec03/assets/images/icons_book.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <img src="/assets/images/icons_book.svg" alt="" className="guide-icon" aria-hidden="true" />
                 <h3 className="guide-titre">Apprenez à votre rythme</h3>
               </div>
               <div className="guide-texte">
@@ -623,31 +572,36 @@ function Accueil() {
         hidden={!modalOuverte}
         ref={modalRef}
       >
-        <h2 id="title">Formulaire d’inscription</h2>
+        <h2 id="title">Rejoindre SkillHub</h2>
+        <p className="modal-subtitle">Créez votre compte gratuitement</p>
         <form onSubmit={soumettreModal}>
           <div className="champ">
             <label htmlFor="modal-nom">Nom</label>
-            <input id="modal-nom" type="text" required />
+            <input id="modal-nom" type="text" placeholder="Votre nom" required />
           </div>
           <div className="champ">
             <label htmlFor="modal-email">Email</label>
-            <input id="modal-email" type="email" required />
+            <input id="modal-email" type="email" placeholder="votre@email.com" required />
           </div>
           <div className="champ">
             <label htmlFor="modal-mdp">Mot de passe</label>
-            <input id="modal-mdp" type="password" required />
+            <input id="modal-mdp" type="password" placeholder="••••••••" required />
           </div>
           <div className="modal-actions">
             <button type="submit">Créer le compte</button>
-            <button type="button" id="closeModal" onClick={fermerModal}>Fermer</button>
+            <button type="button" id="closeModal" onClick={fermerModal}>Annuler</button>
           </div>
         </form>
+        <p className="modal-login-link">
+          Déjà inscrit ?{" "}
+          <Link to="/connexion" onClick={fermerModal}>Se connecter</Link>
+        </p>
       </div>
 
       <footer className="footer" id="footer">
         <div className="footer-container">
           <div className="footer_logo-p">
-            <img src="/ec03/assets/images/logo.svg" alt="Logo de SkillHub" className="footer-logo" />
+            <img src="/assets/images/logo.svg" alt="Logo de SkillHub" className="footer-logo" />
             <p className="footer-texte">Apprendre, partager et progresser ensemble.</p>
           </div>
           <nav className="footer-nav" aria-label="Navigation du footer">
@@ -672,15 +626,15 @@ function Accueil() {
             <h2 className="footer-titre">Réseaux</h2>
             <div className="footer-social-liens">
               <a href="https://facebook.com" aria-label="Facebook" className="lien">
-                <img src="/ec03/assets/images/facebook.svg" alt="" className="footer-icone" aria-hidden="true" />
+                <img src="/assets/images/facebook.svg" alt="" className="footer-icone" aria-hidden="true" />
                 Facebook
               </a>
               <a href="https://linkedin.com" aria-label="LinkedIn" className="lien">
-                <img src="/ec03/assets/images/linkedin.svg" alt="" className="footer-icone" aria-hidden="true" />
+                <img src="/assets/images/linkedin.svg" alt="" className="footer-icone" aria-hidden="true" />
                 Linkedin
               </a>
               <a href="https://gmail.com" aria-label="Gmail" className="lien">
-                <img src="/ec03/assets/images/gmail.svg" alt="" className="footer-icone" aria-hidden="true" />
+                <img src="/assets/images/gmail.svg" alt="" className="footer-icone" aria-hidden="true" />
                 Mail
               </a>
             </div>

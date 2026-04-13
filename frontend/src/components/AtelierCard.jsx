@@ -1,7 +1,7 @@
 import "../styles/atelierCard.css";
 
 //afichage des ateliers une par une
-function AtelierCard({ titre, description, date, statut, inscrits, price, duration, level, actions = null }) {
+function AtelierCard({ image = null, titre, description, date, statut, inscrits, price, duration, level, actions = null }) {
   const dateAffichee = new Date(date).toLocaleDateString("fr-FR");
   const prixAffiche = `${new Intl.NumberFormat("fr-FR", {
     minimumFractionDigits: 2,
@@ -15,6 +15,12 @@ function AtelierCard({ titre, description, date, statut, inscrits, price, durati
 
   return (
     <div className="atelier-card" tabIndex="0">
+      {image && (
+        <div className="atelier-card-image-wrap">
+          <img src={image} alt="" className="atelier-card-image" aria-hidden="true" />
+        </div>
+      )}
+
       <div className="atelier-card-header">
         <h3>{titre}</h3>
         <span className={`atelier-badge ${statut === "Terminé" ? "atelier-badge-termine" : "atelier-badge-avenir"}`}>

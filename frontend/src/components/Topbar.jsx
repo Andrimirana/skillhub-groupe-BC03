@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faBell, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
-import { useLocation, useNavigate } from "react-router-dom";
-import profile from "../assets/profile.jpg";
+import { faArrowLeft, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "../assets/logo.svg";
 import { deconnecter } from "../services/authApi";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import "../styles/topbar.css";
@@ -46,23 +46,30 @@ function Topbar() {
     } catch {
     } finally {
       supprimerSession();
-      navigate("/connexion", { replace: true });
+      navigate("/", { replace: true });
     }
   };
 
   return (
     <header className="topbar">
-      <div className="topbar_gauche">
-        <h1 className="welcome">Bienvenue, {nomUtilisateur} !</h1>
+      <Link to={routeDashboard} className="topbar-logo" aria-label="Retour au dashboard">
+        <img src={logo} alt="Logo SkillHub" className="topbar-logo-img" />
+      </Link>
+
+      <nav className="topbar-links" aria-label="Navigation principale">
+        <Link to={routeDashboard}>Dashboard</Link>
+        <Link to="/">Accueil</Link>
+        <Link to="/formations">Formations</Link>
+      </nav>
+
+      <div className="topbar-actions">
+        <span className="topbar-username">{nomUtilisateur}</span>
         {afficherBoutonRetour && (
           <button type="button" className="back_btn" onClick={gererRetour}>
             <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" />
             <span>Retour</span>
           </button>
         )}
-      </div>
-
-      <div className="profile_section">
         <button
           type="button"
           className="theme_btn"
@@ -73,20 +80,6 @@ function Topbar() {
           <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} aria-hidden="true" />
           <span>{theme === "dark" ? "Clair" : "Sombre"}</span>
         </button>
-
-        <FontAwesomeIcon
-          icon={faBell}
-          aria-label="Notifications"
-        />
-
-        <img
-          src={profile}
-          alt="Photo de profil"
-          className="photo_profil"
-          width="40"
-          height="40"
-        />
-
         <button type="button" className="logout_btn" onClick={gererDeconnexion}>
           Déconnexion
         </button>

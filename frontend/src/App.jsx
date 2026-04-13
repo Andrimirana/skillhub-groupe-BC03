@@ -47,7 +47,7 @@ function RedirectionAccueil() {
   }, []);
 
   if (resultatSession.chargement) {
-    return <p className="status-banner">Vérification de la session...</p>;
+    return null;
   }
 
   if (!resultatSession.estAuthentifie) {
@@ -90,7 +90,7 @@ function RouteInvite() {
   }, []);
 
   if (resultatSession.chargement) {
-    return <p className="status-banner">Vérification de la session...</p>;
+    return null;
   }
 
   if (resultatSession.estAuthentifie) {

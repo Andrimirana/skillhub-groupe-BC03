@@ -114,6 +114,22 @@
   align-items: flex-end;
 }
 
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .toolbar-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 .dashboard-panel {
   background: var(--surface);
   border: 1px solid var(--border-soft);

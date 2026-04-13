@@ -1,25 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { recupererUtilisateur } from "../services/auth";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { recupererUtilisateur, supprimerSession } from "../services/auth";
+import { deconnecter } from "../services/authApi";
 import { listerFormations } from "../services/formationsApi";
-
-const URLS_STYLES = [
-  {
-    id: "ec03-formations-style",
-    rel: "stylesheet",
-    href: "/ec03/css/formations.css",
-  },
-  {
-    id: "ec03-fa-formations-style",
-    rel: "stylesheet",
-    href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css",
-  },
-  {
-    id: "ec03-font-formations-style",
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@400;700&display=swap",
-  },
-];
+import logoSkillHub from "../assets/logo.svg";
+import "../styles/formations-page.css";
 
 const CATEGORIES = ["", "dev", "design", "business", "marketing"];
 const LABELS_CATEGORIES = {
@@ -31,32 +16,11 @@ const LABELS_CATEGORIES = {
 };
 
 const IMAGES_FORMATIONS = [
-  "/ec03/assets/images/learning/learning-hero.jpg",
-  "/ec03/assets/images/learning/learning-laptop.jpg",
-  "/ec03/assets/images/learning/learning-notes.jpg",
-  "/ec03/assets/images/learning/learning-team.jpg",
+  "/assets/images/learning/learning-hero.jpg",
+  "/assets/images/learning/learning-laptop.jpg",
+  "/assets/images/learning/learning-notes.jpg",
+  "/assets/images/learning/learning-team.jpg",
 ];
-
-function ajouterStylesPage() {
-  const ajoutes = [];
-
-  URLS_STYLES.forEach((style) => {
-    if (document.getElementById(style.id)) {
-      return;
-    }
-
-    const link = document.createElement("link");
-    link.id = style.id;
-    link.rel = style.rel;
-    link.href = style.href;
-    document.head.appendChild(link);
-    ajoutes.push(link);
-  });
-
-  return () => {
-    ajoutes.forEach((element) => element.remove());
-  };
-}
 
 function mapperCategorie(category) {
   const valeur = (category || "").toLowerCase();
@@ -93,7 +57,11 @@ function niveauAffichage(level) {
 }
 
 function Formations() {
+  const navigate = useNavigate();
+  const modalRef = useRef(null);
+  const lastFocusedRef = useRef(null);
   const [menuOuvert, setMenuOuvert] = useState(false);
+  const [modalOuverte, setModalOuverte] = useState(false);
   const [recherche, setRecherche] = useState("");
   const [categorie, setCategorie] = useState("");
   const [niveau, setNiveau] = useState("");
@@ -123,7 +91,6 @@ function Formations() {
 
   useEffect(() => {
     document.title = "Formations";
-    return ajouterStylesPage();
   }, []);
 
   useEffect(() => {
@@ -171,6 +138,39 @@ function Formations() {
     };
   }, []);
 
+  useEffect(() => {
+    const temporisation = window.setTimeout(() => {
+      const query = recherche.trim().toLowerCase();
+      const minH = Number.isNaN(parseFloat(minHeures)) ? 0 : parseFloat(minHeures);
+      const maxH = Number.isNaN(parseFloat(maxHeures)) ? Number.POSITIVE_INFINITY : parseFloat(maxHeures);
+      const minP = Number.isNaN(parseFloat(minPrix)) ? 0 : parseFloat(minPrix);
+      const maxP = Number.isNaN(parseFloat(maxPrix)) ? Number.POSITIVE_INFINITY : parseFloat(maxPrix);
+
+      const resultat = formations.filter((formation) => {
+        const matchQuery =
+          formation.nom.toLowerCase().includes(query)
+          || formation.description.toLowerCase().includes(query)
+          || formation.categorie.toLowerCase().includes(query);
+
+        const matchFiltres =
+          (categorie === "" || formation.categorie === categorie)
+          && (niveau === "" || formation.level === niveau)
+          && formation.duree >= minH
+          && formation.duree <= maxH
+          && formation.prix >= minP
+          && formation.prix <= maxP;
+
+        return matchQuery && matchFiltres;
+      });
+
+      setFormationsFiltrees(resultat);
+    }, 180);
+
+    return () => {
+      window.clearTimeout(temporisation);
+    };
+  }, [recherche, categorie, niveau, minHeures, maxHeures, minPrix, maxPrix, formations]);
+
   const appliquerRechercheEtFiltres = () => {
     const query = recherche.trim().toLowerCase();
     const minH = Number.isNaN(parseFloat(minHeures)) ? 0 : parseFloat(minHeures);
@@ -198,9 +198,21 @@ function Formations() {
     setFormationsFiltrees(resultat);
   };
 
+  const gererDeconnexion = async () => {
+    try { await deconnecter(); } catch {}
+    finally { supprimerSession(); navigate("/connexion", { replace: true }); }
+  };
+
+  const ouvrirModal = () => {
+    lastFocusedRef.current = document.activeElement;
+    setModalOuverte(true);
+  };
+
+  const fermerModal = () => setModalOuverte(false);
+  const soumettreModal = (e) => { e.preventDefault(); navigate("/inscription"); };
+
   const rechercher = (event) => {
     event.preventDefault();
-    appliquerRechercheEtFiltres();
   };
 
   return (
@@ -208,7 +220,7 @@ function Formations() {
       <header className="header">
         <nav className="navbar" aria-label="Navigation principale">
           <div className="logo">
-            <img src="/ec03/assets/images/logo.svg" alt="Logo SkillHub" />
+            <img src={logoSkillHub} alt="Logo SkillHub" />
           </div>
           <button
             className="menuburger"
@@ -227,10 +239,20 @@ function Formations() {
             <li><Link to="/">Accueil</Link></li>
             <li><a href="#">À propos</a></li>
             <li><a href="#footer">Contact</a></li>
-            <li><Link id="userLink" to={profil.href}>{profil.libelle}</Link></li>
+            {!utilisateur && (
+              <li><Link to="/connexion">Se connecter</Link></li>
+            )}
           </ul>
           <div className="bouton-inscription">
-            <button id="openModal" className="btn-login" aria-haspopup="dialog" type="button">S'inscrire</button>
+            {utilisateur ? (
+              <button className="btn-login btn-logout" type="button" onClick={gererDeconnexion}>
+                Se déconnecter
+              </button>
+            ) : (
+              <button id="openModal" className="btn-login" aria-haspopup="dialog" type="button" onClick={ouvrirModal}>
+                S'inscrire
+              </button>
+            )}
           </div>
         </nav>
       </header>
@@ -239,34 +261,29 @@ function Formations() {
         <section className="hero" aria-labelledby="hero-title">
           <div className="illustration_2">
             <div className="ill2">
-              <img src="/ec03/assets/images/learning/learning-hero.jpg" alt="" />
+              <img src="/assets/images/learning/learning-hero.jpg" alt="" />
             </div>
           </div>
           <div className="title">
             <h1 id="hero-title">Découvre nos formations</h1>
             <p>Explore des parcours modernes, orientés pratique et progression continue.</p>
           </div>
-          <div className="barre-recherche">
-            <form className="search" aria-label="Recherche sur le site" role="search" onSubmit={rechercher}>
-              <label htmlFor="search-bar">Qu'est-ce qui vous intéresse ?</label>
-              <div className="search-input">
-                <img src="/ec03/assets/images/icon-search.svg" alt="" aria-hidden="true" />
-                <input
-                  type="text"
-                  id="search-bar"
-                  name="search"
-                  placeholder="Rechercher une formation..."
-                  value={recherche}
-                  onChange={(event) => setRecherche(event.target.value)}
-                />
-                <button type="submit">Chercher</button>
-              </div>
-            </form>
-          </div>
+          <form className="search barre-recherche" aria-label="Recherche sur le site" role="search" onSubmit={rechercher}>
+            <div className="search-input">
+              <input
+                type="text"
+                id="search-bar"
+                name="search"
+                placeholder="Rechercher une formation..."
+                value={recherche}
+                onChange={(event) => setRecherche(event.target.value)}
+              />
+              <button type="submit">Chercher</button>
+            </div>
+          </form>
         </section>
 
-        <section className="formations" aria-labelledby="formations-title">
-          <h2 id="formations-title" className="visually-hidden">Liste des formations</h2>
+        <section className="formations" aria-label="Formations disponibles">
           <aside className="filtre" aria-labelledby="filtre-title">
             <h2 id="filtre-title">Filtrer par :</h2>
             <label htmlFor="categoryFilter">Catégorie</label>
@@ -347,10 +364,42 @@ function Formations() {
         </section>
       </main>
 
+      {modalOuverte && (
+        <div id="modalOverlay" className="overlay" onClick={fermerModal}></div>
+      )}
+      {modalOuverte && (
+        <div id="modal" className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-formations" ref={modalRef}>
+          <h2 id="modal-title-formations">Rejoindre SkillHub</h2>
+          <p className="modal-subtitle">Créez votre compte gratuitement</p>
+          <form onSubmit={soumettreModal}>
+            <div className="champ">
+              <label htmlFor="f-modal-nom">Nom</label>
+              <input id="f-modal-nom" type="text" placeholder="Votre nom" required />
+            </div>
+            <div className="champ">
+              <label htmlFor="f-modal-email">Email</label>
+              <input id="f-modal-email" type="email" placeholder="votre@email.com" required />
+            </div>
+            <div className="champ">
+              <label htmlFor="f-modal-mdp">Mot de passe</label>
+              <input id="f-modal-mdp" type="password" placeholder="••••••••" required />
+            </div>
+            <div className="modal-actions">
+              <button type="submit">Créer le compte</button>
+              <button type="button" onClick={fermerModal}>Annuler</button>
+            </div>
+          </form>
+          <p className="modal-login-link">
+            Déjà inscrit ?{" "}
+            <Link to="/connexion" onClick={fermerModal}>Se connecter</Link>
+          </p>
+        </div>
+      )}
+
       <footer className="footer" id="footer">
         <div className="footer-container">
           <div className="footer_logo-p">
-            <img src="/ec03/assets/images/logo.svg" alt="Logo de SkillHub" className="footer-logo" />
+            <img src="/assets/images/logo.svg" alt="Logo de SkillHub" className="footer-logo" />
             <p className="footer-texte">Apprendre, partager et progresser ensemble.</p>
           </div>
           <nav className="footer-nav" aria-label="Navigation du footer">
@@ -375,15 +424,15 @@ function Formations() {
             <h2 className="footer-titre">Réseaux</h2>
             <div className="footer-social-liens">
               <a href="https://facebook.com" aria-label="Facebook" className="lien">
-                <img src="/ec03/assets/images/facebook.svg" alt="" className="footer-icone" />
+                <img src="/assets/images/facebook.svg" alt="" className="footer-icone" />
                 Facebook
               </a>
               <a href="https://linkedin.com" aria-label="LinkedIn" className="lien">
-                <img src="/ec03/assets/images/linkedin.svg" alt="" className="footer-icone" />
+                <img src="/assets/images/linkedin.svg" alt="" className="footer-icone" />
                 Linkedin
               </a>
               <a href="https://gmail.com" aria-label="Gmail" className="lien">
-                <img src="/ec03/assets/images/gmail.svg" alt="" className="footer-icone" />
+                <img src="/assets/images/gmail.svg" alt="" className="footer-icone" />
                 Mail
               </a>
             </div>
