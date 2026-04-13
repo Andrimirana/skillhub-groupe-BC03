@@ -1,0 +1,332 @@
+﻿<!--
+  Cartouche:
+  Module Formation: Projet fil rouge EC01 - Licence MCCI
+  Description: Page d'accueil de la plateforme SkillHub, présentant la page d'accueil d'ou les valeurs et les témoignages des utilisateurs.
+  Date de création: 30/11/25
+  Date de révision: 23/01/26
+-->
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="SkillHub : Apprends, progresse et réussis grâce à nos formations et notre communauté d'apprenants et formateurs.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <title>SkillHub</title>
+</head>
+
+<body>
+
+
+  <!-- header-->
+  <header class="header">
+    <nav class="navbar" aria-label="Navigation principale">
+      <div class="logo">
+        <img src="assets/images/logo.svg" alt="Logo SkillHub">
+      </div>
+      <button class="menuburger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false"
+        aria-controls="menu-principal">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="liens-navigation" id="menu-principal">
+        <li><a href="index.html" aria-current="page">Accueil</a></li>
+        <li><a href="formations.html">Formations</a></li>
+        <li><a href="#">À propos</a></li>
+        <li><a href="#footer">Contact</a></li>
+        <li><a id="userLink" href="/connexion">Se connecter</a></li>
+      </ul>
+      <div class="bouton-inscription">
+        <button id="openModal" class="btn-login" aria-haspopup="dialog">S'inscrire</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- hero-->
+  <main id="contenu">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-badge-row">
+        <span class="hero-badge"><i class="fa-solid fa-bolt"></i> Plateforme interactive</span>
+        <span class="hero-badge"><i class="fa-solid fa-users"></i> Apprenants & formateurs</span>
+        <span class="hero-badge"><i class="fa-solid fa-graduation-cap"></i> Formations structurées</span>
+      </div>
+      <div class="illustration illu1">
+        <img src="assets/images/Illustrations/livre.png" alt="" aria-hidden="true">
+      </div>
+      <div class="illustration illu2">
+        <img src="assets/images/Illustrations/ampoule.png" alt="" aria-hidden="true">
+      </div>
+      <h1 class="hero-titre" id="hero-title">
+        Apprends. <span class="progresse">Progresse</span>. Réussis.
+      </h1>
+      <p class="hero-texte">
+        Ici, chaque effort compte. Tu apprends, tu pratiques,
+        et tu vois tes progrès se transformer en vraies victoires. <br>
+        SkillHub rend ton chemin plus fluide et inspirant.
+      </p>
+      <div class="hero-boutons">
+        <a href="/connexion" class="btn btn-formateur" role="button"><i class="fa-solid fa-chalkboard-user"></i>
+          Formateurs</a>
+        <a href="formations.html" class="btn btn-apprenant" role="button"><i class="fa-solid fa-book-open-reader"></i>
+          Apprenants</a>
+      </div>
+      <div class="hero-highlights" aria-label="Points forts de la plateforme">
+        <div class="hero-highlight-card">
+          <span class="hero-highlight-icon"><i class="fa-solid fa-layer-group"></i></span>
+          <strong>Modules guidés</strong>
+          <p>Des parcours découpés clairement pour avancer étape par étape.</p>
+        </div>
+        <div class="hero-highlight-card">
+          <span class="hero-highlight-icon"><i class="fa-solid fa-chart-line"></i></span>
+          <strong>Progression visible</strong>
+          <p>Suivi d'apprentissage et montée en compétences en continu.</p>
+        </div>
+        <div class="hero-highlight-card">
+          <span class="hero-highlight-icon"><i class="fa-solid fa-shield-heart"></i></span>
+          <strong>Expérience rassurante</strong>
+          <p>Une interface claire, pédagogique et facile à prendre en main.</p>
+        </div>
+      </div>
+      <div class="hero-stats" aria-label="Indicateurs de la plateforme">
+        <article class="hero-stat-card">
+          <span class="hero-stat-icon"><i class="fa-solid fa-video"></i></span>
+          <h3>+50</h3>
+          <p>ateliers immersifs</p>
+        </article>
+        <article class="hero-stat-card">
+          <span class="hero-stat-icon"><i class="fa-solid fa-user-graduate"></i></span>
+          <h3>+1 200</h3>
+          <p>apprenants accompagnés</p>
+        </article>
+        <article class="hero-stat-card">
+          <span class="hero-stat-icon"><i class="fa-solid fa-star"></i></span>
+          <h3>4.9/5</h3>
+          <p>satisfaction moyenne</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- section comment ça marche -->
+  <section class="guide" id="guide" aria-labelledby="guide-title">
+    <div class="guide-header">
+      <h2 id="guide-title">Comment <br>ça marche ?</h2>
+    </div>
+    <div class="guide-cartes">
+      <div class="guide-column partie-droite">
+        <article class="guide-carte">
+          <div class="carte-header">
+            <img src="assets/images/icon_profile.svg" alt="" class="guide-icon" aria-hidden="true">
+            <h3 class="guide-titre">Créez votre cours</h3>
+          </div>
+          <div class="guide-texte">
+            <p>
+              Déposez facilement vos formations en ligne, ajoutez vidéos, documents et quiz,
+              et configurez vos modules selon votre style d’enseignement.
+            </p>
+          </div>
+        </article>
+        <article class="guide-carte">
+          <div class="carte-header">
+            <img src="assets/images/icon-robot.svg" alt="" class="guide-icon" aria-hidden="true">
+            <h3 class="guide-titre">Publiez et atteignez vos élèves</h3>
+          </div>
+          <div class="guide-texte">
+            <p>
+              Une fois votre cours prêt, publiez-le et touchez une
+              communauté d’apprenants motivés. Suivez les progrès et
+              récoltez des avis pour améliorer votre impact.
+            </p>
+          </div>
+        </article>
+      </div>
+      <div class="guide-column partie-droite">
+        <article class="guide-carte">
+          <div class="carte-header">
+            <img src="assets/images/icon-search.svg" alt="" class="guide-icon" aria-hidden="true">
+            <h3 class="guide-titre">Explorez et choisissez</h3>
+          </div>
+          <div class="guide-texte">
+            <p>
+              Parcourez notre catalogue de formations par catégorie ou niveau,
+              comparez les cours et sélectionnez celui qui correspond à vos objectifs.
+            </p>
+          </div>
+        </article>
+        <article class="guide-carte">
+          <div class="carte-header">
+            <img src="assets/images/icons_book.svg" alt="" class="guide-icon" aria-hidden="true">
+            <h3 class="guide-titre">Apprenez à votre rythme</h3>
+          </div>
+          <div class="guide-texte">
+            <p>
+              Accédez à vos cours en ligne depuis n’importe quel appareil,
+              avancez à votre rythme, faites des quiz et suivez votre progression facilement.
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- nos valeurs -->
+  <section class="valeurs" aria-labelledby="valeurs-title">
+    <div class="valeurs-header">
+      <h2 id="valeurs-title">Nos valeurs</h2>
+    </div>
+    <div class="valeurs_container">
+      <article class="valeur-carte">
+        <img src="assets/images/Illustrations/ill2.png" alt="" class="icon-carte" aria-hidden="true">
+        <h3>Clarté</h3>
+        <p class="texte-carte">
+          Des contenus transparents et faciles à comprendre, pour que chaque formation soit limpide
+          et accessible.
+        </p>
+      </article>
+      <article class="valeur-carte">
+        <img src="assets/images/Illustrations/ill1.png" alt="" class="icon-carte" aria-hidden="true">
+        <h3>Progression</h3>
+        <p class="texte-carte">
+          Un apprentissage structuré qui vous permet d’avancer pas à pas et d’atteindre vos
+          objectifs efficacement.
+        </p>
+      </article>
+      <article class="valeur-carte">
+        <img src="assets/images/Illustrations/ill3.png" alt="" class="icon-carte" aria-hidden="true">
+        <h3>Accompagnement</h3>
+        <p class="texte-carte">
+          Un soutien constant, que ce soit via nos formateurs ou notre plateforme, pour ne jamais
+          se sentir perdu dans son parcours.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- section témoignages -->
+  <section class="temoignages" aria-labelledby="temoignages-title">
+    <h2 id="temoignages-title">Témoignages</h2>
+    <div class="temoignage-container" id="temoignageCarte" aria-live="polite"></div>
+    <div class="temoignage-dots" id="temoignagePoints" role="tablist"></div>
+  </section>
+
+  <section class="valeurs" aria-labelledby="formations-mises-en-avant-title">
+    <div class="valeurs-header">
+      <h2 id="formations-mises-en-avant-title">Formations mises en avant</h2>
+    </div>
+    <div class="valeurs_container" id="featuredFormations" aria-live="polite"></div>
+    <div style="text-align:center; margin-top: 20px;">
+      <a href="formations.html" class="btn btn-apprenant" role="button">Voir toutes les formations</a>
+    </div>
+  </section>
+
+  <!-- formulaire inscription -->
+  <section class="inscription" aria-labelledby="inscription-title">
+    <form id="inscription" novalidate>
+      <h2 id="inscription-title">Inscription</h2>
+      <div class="champ">
+        <label for="nom-form">Nom</label>
+        <input type="text" id="nom-form" name="nom" required>
+        <small class="error" aria-live="assertive"></small>
+      </div>
+      <div class="champ">
+        <label for="email-form">Email</label>
+        <input type="email" id="email-form" name="email" required>
+        <small class="error" aria-live="assertive"></small>
+      </div>
+      <div class="champ">
+        <label for="mdp-form">Mot de passe</label>
+        <input type="password" id="mdp-form" name="mdp" required>
+        <small class="error" aria-live="assertive"></small>
+      </div>
+      <div class="champ">
+        <label for="confirmer-form">Confirmer mot de passe</label>
+        <input type="password" id="confirmer-form" name="confirmer" required>
+        <small class="error" aria-live="assertive"></small>
+      </div>
+      <button type="submit">S'inscrire</button>
+      <p id="envoiReussi" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- modal inscription -->
+  <div id="modalOverlay" class="overlay" hidden></div>
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="title" hidden>
+    <h2 id="title">Formulaire d’inscription</h2>
+    <form>
+      <div class="champ">
+        <label for="modal-nom">Nom</label>
+        <input id="modal-nom" type="text" required>
+      </div>
+      <div class="champ">
+        <label for="modal-email">Email</label>
+        <input id="modal-email" type="email" required>
+      </div>
+      <div class="champ">
+        <label for="modal-mdp">Mot de passe</label>
+        <input id="modal-mdp" type="password" required>
+      </div>
+      <button type="submit">Créer le compte</button>
+      <button type="button" id="closeModal">Fermer</button>
+    </form>
+  </div>
+
+  <!--footer-->
+  <footer class="footer" id="footer">
+    <div class="footer-container">
+      <div class="footer_logo-p">
+        <img src="assets/images/logo.svg" alt="Logo de SkillHub" class="footer-logo">
+        <p class="footer-texte">Apprendre, partager et progresser ensemble.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Navigation du footer">
+        <h2 class="footer-titre">Navigation</h2>
+        <ul class="footer-liste">
+          <li><a href="#">Accueil</a></li>
+          <li><a href="#">Cours</a></li>
+          <li><a href="#">Communauté</a></li>
+          <li><a href="#">À propos</a></li>
+        </ul>
+      </nav>
+      <div class="footer_categ">
+        <h2 class="footer-titre">Catégories</h2>
+        <ul class="footer-liste">
+          <li><a href="#">Développement web</a></li>
+          <li><a href="#">Design</a></li>
+          <li><a href="#">Marketing</a></li>
+          <li><a href="#">Management</a></li>
+        </ul>
+      </div>
+      <div class="footer-social">
+        <h2 class="footer-titre">Réseaux</h2>
+        <div class="footer-social-liens">
+          <a href="https://facebook.com" aria-label="Facebook" class="lien">
+            <img src="./assets/images/facebook.svg" alt="" class="footer-icone" aria-hidden="true">
+            Facebook
+          </a>
+          <a href="https://linkedin.com" aria-label="LinkedIn" class="lien">
+            <img src="./assets/images/linkedin.svg" alt="" class="footer-icone" aria-hidden="true">
+            Linkedin
+          </a>
+          <a href="https://gmail.com" aria-label="Gmail" class="lien">
+            <img src="./assets/images/gmail.svg" alt="" class="footer-icone" aria-hidden="true">
+            Mail
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SkillHub MCCI - Projet fil rouge Licence. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+
+</html>

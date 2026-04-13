@@ -1,0 +1,156 @@
+<!--
+  Cartouche:
+  Module Formation: Projet fil rouge EC01 - Licence MCCI
+  Description: Page de formation SkillHub, présentant les formations existants avec filtre et recherche
+  Date de création: 09/12/25
+  Date de révision: 23/01/26
+-->
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formations</title>
+  <link rel="stylesheet" href="css/formations.css">
+  <meta name="description"
+    content="SkillHub : Apprends, progresse et réussis grâce à nos formations et notre communauté d'apprenants et formateurs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+
+  <header class="header">
+    <nav class="navbar" aria-label="Navigation principale">
+      <div class="logo">
+        <img src="assets/images/logo.svg" alt="Logo SkillHub">
+      </div>
+      <button class="menuburger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false"
+        aria-controls="navigation-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="liens-navigation" id="navigation-menu">
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="#">À propos</a></li>
+        <li><a href="#footer">Contact</a></li>
+        <li><a id="userLink" href="/connexion">Se connecter</a></li>
+      </ul>
+      <div class="bouton-inscription">
+        <button id="openModal" class="btn-login" aria-haspopup="dialog">S'inscrire</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="contenu">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="illustration_2">
+        <div class="ill2">
+          <img src="assets/images/Illustrations/diplome.png" alt="">
+        </div>
+      </div>
+      <div class="title">
+        <h1 id="hero-title">Découvre nos formations</h1>
+      </div>
+      <div class="barre-recherche">
+        <form class="search" aria-label="Recherche sur le site" role="search">
+          <label for="search-bar">Qu'est-ce qui vous intéresse ?</label>
+          <div class="search-input">
+            <img src="assets/images/icon-search.svg" alt="" aria-hidden="true">
+            <input type="text" id="search-bar" name="search" placeholder="Rechercher une formation...">
+            <button type="submit">Chercher</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="formations" aria-labelledby="formations-title">
+      <h2 id="formations-title" class="visually-hidden">Liste des formations</h2>
+      <aside class="filtre" aria-labelledby="filtre-title">
+        <h2 id="filtre-title">Filtrer par :</h2>
+        <label for="categoryFilter">Catégorie</label>
+        <select id="categoryFilter" name="category">
+          <option value="">Toutes</option>
+          <option value="dev">Développement</option>
+          <option value="design">Design</option>
+          <option value="business">Business</option>
+          <option value="marketing">Marketing</option>
+        </select>
+        <label for="levelFilter">Niveau</label>
+        <select id="levelFilter" name="level">
+          <option value="">Tous</option>
+          <option value="beginner">Débutant</option>
+          <option value="intermediaire">Intermédiaire</option>
+          <option value="advanced">Avancé</option>
+        </select>
+        <label for="minHours">Durée minimum (heures)</label>
+        <input type="number" id="minHours" name="minHours" placeholder="Heure min" min="0">
+        <label for="maxHours">Durée maximum (heures)</label>
+        <input type="number" id="maxHours" name="maxHours" placeholder="Heure max" min="0">
+        <label for="minPrice">Prix minimum (Rs)</label>
+        <input type="number" id="minPrice" name="minPrice" placeholder="Prix min" min="0">
+        <label for="maxPrice">Prix maximum (Rs)</label>
+        <input type="number" id="maxPrice" name="maxPrice" placeholder="Prix max" min="0">
+        <button id="filterBtn">Filtrer</button>
+      </aside>
+      <div class="cards-container" id="cardsContainer" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer" id="footer">
+    <div class="footer-container">
+      <div class="footer_logo-p">
+        <img src="assets/images/logo.svg" alt="Logo de SkillHub" class="footer-logo">
+        <p class="footer-texte">Apprendre, partager et progresser ensemble.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Navigation du footer">
+        <h2 class="footer-titre">Navigation</h2>
+        <ul class="footer-liste">
+          <li><a href="#">Accueil</a></li>
+          <li><a href="#">Cours</a></li>
+          <li><a href="#">Communauté</a></li>
+          <li><a href="#">À propos</a></li>
+        </ul>
+      </nav>
+      <div class="footer_categ">
+        <h2 class="footer-titre">Catégories</h2>
+        <ul class="footer-liste">
+          <li><a href="#">Développement web</a></li>
+          <li><a href="#">Design</a></li>
+          <li><a href="#">Marketing</a></li>
+          <li><a href="#">Management</a></li>
+        </ul>
+      </div>
+      <div class="footer-social">
+        <h2 class="footer-titre">Réseaux</h2>
+        <div class="footer-social-liens">
+          <a href="https://facebook.com" aria-label="Facebook" class="lien">
+            <img src="./assets/images/facebook.svg" alt="" class="footer-icone">
+            Facebook
+          </a>
+          <a href="https://linkedin.com" aria-label="LinkedIn" class="lien">
+            <img src="./assets/images/linkedin.svg" alt="" class="footer-icone">
+            Linkedin
+          </a>
+          <a href="https://gmail.com" aria-label="Gmail" class="lien">
+            <img src="./assets/images/gmail.svg" alt="" class="footer-icone">
+            Mail
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SkillHub MCCI - Projet fil rouge Licence. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <script src="js/formations.js"></script>
+</body>
+
+</html>
