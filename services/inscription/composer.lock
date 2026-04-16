@@ -1398,16 +1398,16 @@
         },
         {
             "name": "laravel/tinker",
-            "version": "v3.0.0",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/tinker.git",
-                "reference": "cc74081282ba2e3dae1f0068ccb330370d24634e"
+                "reference": "4faba77764bd33411735936acdf30446d058c78b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/tinker/zipball/cc74081282ba2e3dae1f0068ccb330370d24634e",
-                "reference": "cc74081282ba2e3dae1f0068ccb330370d24634e",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/4faba77764bd33411735936acdf30446d058c78b",
+                "reference": "4faba77764bd33411735936acdf30446d058c78b",
                 "shasum": ""
             },
             "require": {
@@ -1461,9 +1461,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/tinker/issues",
-                "source": "https://github.com/laravel/tinker/tree/v3.0.0"
+                "source": "https://github.com/laravel/tinker/tree/v3.0.2"
             },
-            "time": "2026-03-17T14:53:17+00:00"
+            "time": "2026-03-17T14:54:13+00:00"
         },
         {
             "name": "league/commonmark",
@@ -6925,16 +6925,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.19",
+            "version": "12.5.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "92f7744ca5f5701c9e4b4a60d9e143f2d84956da"
+                "reference": "c2364520611caa03567a8a020f2d59f3f90b115a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/92f7744ca5f5701c9e4b4a60d9e143f2d84956da",
-                "reference": "92f7744ca5f5701c9e4b4a60d9e143f2d84956da",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c2364520611caa03567a8a020f2d59f3f90b115a",
+                "reference": "c2364520611caa03567a8a020f2d59f3f90b115a",
                 "shasum": ""
             },
             "require": {
@@ -6954,7 +6954,7 @@
                 "phpunit/php-text-template": "^5.0.0",
                 "phpunit/php-timer": "^8.0.0",
                 "sebastian/cli-parser": "^4.2.0",
-                "sebastian/comparator": "^7.1.5",
+                "sebastian/comparator": "^7.1.6",
                 "sebastian/diff": "^7.0.0",
                 "sebastian/environment": "^8.0.4",
                 "sebastian/exporter": "^7.0.2",
@@ -7003,7 +7003,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.19"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.20"
             },
             "funding": [
                 {
@@ -7011,7 +7011,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-04-13T05:38:19+00:00"
+            "time": "2026-04-15T05:05:59+00:00"
         },
         {
             "name": "sebastian/cli-parser",
