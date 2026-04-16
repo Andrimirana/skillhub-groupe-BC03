@@ -1,4 +1,25 @@
+import axios from "axios";
 import api from "./api";
+import { recupererJeton, supprimerSession } from "./auth";
+
+const apiInscription = axios.create({
+  baseURL: import.meta.env.VITE_INSCRIPTION_URL || "http://127.0.0.1:8003/api",
+  headers: { "Content-Type": "application/json" },
+});
+
+apiInscription.interceptors.request.use((config) => {
+  const jeton = recupererJeton();
+  if (jeton) config.headers.Authorization = `Bearer ${jeton}`;
+  return config;
+});
+
+apiInscription.interceptors.response.use(
+  (reponse) => reponse,
+  (erreur) => {
+    if (erreur.response?.status === 401) supprimerSession();
+    return Promise.reject(erreur);
+  },
+);
 
 export async function listerFormations(filtres = {}) {
   const reponse = await api.get("/formations", { params: filtres });
@@ -51,16 +72,16 @@ export async function supprimerFormation(idFormation) {
 }
 
 export async function inscrireFormation(idFormation) {
-  const reponse = await api.post(`/formations/${idFormation}/inscription`);
+  const reponse = await apiInscription.post(`/formations/${idFormation}/inscription`);
   return reponse.data;
 }
 
 export async function desinscrireFormation(idFormation) {
-  const reponse = await api.delete(`/formations/${idFormation}/inscription`);
+  const reponse = await apiInscription.delete(`/formations/${idFormation}/inscription`);
   return reponse.data;
 }
 
 export async function listerFormationsApprenant() {
-  const reponse = await api.get("/apprenant/formations");
+  const reponse = await apiInscription.get("/apprenant/formations");
   return reponse.data;
 }
