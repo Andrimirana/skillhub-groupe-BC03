@@ -1,0 +1,30 @@
+# skillhub-groupe-X/
+# │
+# ├── frontend/
+# │   ├── Dockerfile          ← frontend/Dockerfile
+# │   ├── nginx.conf          ← frontend/nginx.conf
+# │   ├── .dockerignore       ← frontend/.dockerignore
+# │   ├── src/
+# │   └── ...
+# │
+# ├── backend/
+# │   ├── Dockerfile          ← backend/Dockerfile
+# │   ├── .dockerignore       ← backend/.dockerignore
+# │   ├── src/
+# │   └── ...
+# │
+# ├── docker-compose.yml
+# ├── .env.example
+# ├── .gitignore
+# ├── CONTRIBUTING.md
+# └── README.md
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile

@@ -1,0 +1,40 @@
+# Dépendances — reconstruites dans les stages
+node_modules/
+
+# Build local
+dist/
+build/
+
+# Fichiers d'environnement sensibles — jamais dans l'image
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Outils de développement
+.vscode/
+.idea/
+*.swp
+*.swo
+nodemon.json
+
+# Tests (inutiles dans l'image de production)
+coverage/
+__tests__/
+tests/
+*.test.*
+*.spec.*
+
+# CI / VCS
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# Divers
+README.md
+Dockerfile
+.dockerignore

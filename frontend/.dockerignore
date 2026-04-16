@@ -1,0 +1,38 @@
+# Dépendances — reconstruites dans le builder
+node_modules/
+
+# Build local (le builder crée son propre dist/)
+dist/
+build/
+
+# Fichiers d'environnement sensibles
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Outils de développement
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Tests et couverture (inutiles dans l'image)
+coverage/
+__tests__/
+*.test.*
+*.spec.*
+
+# CI / VCS
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# Divers
+README.md
+Dockerfile
+.dockerignore
