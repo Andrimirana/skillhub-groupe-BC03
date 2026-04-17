@@ -26,7 +26,12 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
         ];
+    }
+    
+    public function setPasswordAttribute($value)
+    {
+    // On enregistre la valeur telle qu'elle arrive sans laisser Laravel la hacher
+    $this->attributes['password'] = $value;
     }
 }
