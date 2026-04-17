@@ -1,57 +1,45 @@
-import axios from 'axios';
-import { getSecurityHeaders } from '../utils/security';
-import { recupererJeton } from './auth';
+import axios from "axios";
+import { getSecurityHeaders } from "../utils/security";
+import { recupererJeton, supprimerSession } from "./auth";
 
-const API_URL = import.meta.env.VITE_AUTH_URL;
+const apiAuth = axios.create({
+  baseURL: import.meta.env.VITE_AUTH_URL || "http://127.0.0.1:8001/api",
+  headers: { "Content-Type": "application/json" },
+});
 
-export const connecter = async (email, mot_de_passe) => {
-    const data = { email, mot_de_passe };
-    const { headers, body } = getSecurityHeaders(data);
+apiAuth.interceptors.request.use((config) => {
+  const jeton = recupererJeton();
+  if (jeton) config.headers.Authorization = `Bearer ${jeton}`;
+  return config;
+});
 
-    const response = await axios.post(`${API_URL}/login`, body, { headers });
-    
-    return response.data;
-};
+apiAuth.interceptors.response.use(
+  (reponse) => reponse,
+  (erreur) => {
+    if (erreur.response?.status === 401) supprimerSession();
+    return Promise.reject(erreur);
+  },
+);
 
-export const inscrire = async (nom, email, mot_de_passe, role) => {
-    const data = { nom, email, mot_de_passe, role };
-    const { headers, body } = getSecurityHeaders(data);
+export async function inscrire(nom, email, motDePasse, role) {
+  const data = { nom, email, mot_de_passe: motDePasse, role };
+  const { headers, body } = getSecurityHeaders(data);
+  const reponse = await apiAuth.post("/register", body, { headers });
+  return reponse.data;
+}
 
-    const response = await axios.post(`${API_URL}/register`, body, { headers });
-    
-    return response.data;
-};
+export async function connecter(email, motDePasse) {
+  const data = { email, mot_de_passe: motDePasse };
+  const { headers, body } = getSecurityHeaders(data);
+  const reponse = await apiAuth.post("/login", body, { headers });
+  return reponse.data;
+}
 
-export const deconnecter = async () => {
-    // On récupère le token stocké
-    const token = recupererJeton();
-    if (token) {
-        try {
-            // On prévient le backend pour qu'il place le token sur la Blacklist
-            await axios.post(`${API_URL}/logout`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-        } catch (error) {
-            console.error("Erreur lors de la déconnexion côté serveur", error);
-        }
-    }
-};
+export async function profilConnecte() {
+  const reponse = await apiAuth.get("/profil");
+  return reponse.data;
+}
 
-export const profilConnecte = async () => {
-    const token = recupererJeton();
-    if (!token) {
-        throw new Error("Aucun jeton d'authentification trouvé.");
-    }
-
-    const response = await axios.get(`${API_URL}/profil`, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
-        }
-    });
-    
-    return response.data;
-};
+export async function deconnecter() {
+  await apiAuth.post("/logout");
+}
