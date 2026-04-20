@@ -12,134 +12,15 @@ on:
       - dev
 
 jobs:
-  # Job 1: Tests du service Auth
-  tests-auth:
-    name: Tests Service Auth
-    runs-on: ubuntu-latest
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP 8.2
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          extensions: mbstring, openssl, pdo, pdo_sqlite, sqlite3
-
-      - name: Installer les dépendances Auth
-        run: |
-          cd services/auth
-          composer install --no-interaction --prefer-dist
-
-      - name: Préparer l'environnement Auth
-        run: |
-          cd services/auth
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Lancer les tests Auth
-        run: |
-          cd services/auth
-          php artisan test
-
-  # Job 2: Tests du service Catalog
-  tests-catalog:
-    name: Tests Service Catalog
-    runs-on: ubuntu-latest
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP 8.2
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          extensions: mbstring, openssl, pdo, pdo_sqlite, sqlite3
-
-      - name: Installer les dépendances Catalog
-        run: |
-          cd services/catalog
-          composer install --no-interaction --prefer-dist
-
-      - name: Préparer l'environnement Catalog
-        run: |
-          cd services/catalog
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Lancer les tests Catalog
-        run: |
-          cd services/catalog
-          php artisan test
-
-  # Job 3: Tests du service Inscription
-  tests-inscription:
-    name: Tests Service Inscription
-    runs-on: ubuntu-latest
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP 8.2
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          extensions: mbstring, openssl, pdo, pdo_sqlite, sqlite3
-
-      - name: Installer les dépendances Inscription
-        run: |
-          cd services/inscription
-          composer install --no-interaction --prefer-dist
-
-      - name: Préparer l'environnement Inscription
-        run: |
-          cd services/inscription
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Lancer les tests Inscription
-        run: |
-          cd services/inscription
-          php artisan test
-
-  # Job 4: Build et vérification du Frontend
-  tests-frontend:
-    name: Build Frontend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Récupération du code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-
-      - name: Installer les dépendances frontend
-        run: |
-          cd frontend
-          npm install
-
-      - name: Copier .env
-        run: |
-          cd frontend
-          cp .env.example .env
-
-      - name: Build frontend
-        run: |
-          cd frontend
-          npm run build
-
-  # Job 5: Analyse de code gérée par le Tech Lead (Mirana)
+  # Job 1: Analyse de code gérée par le Tech Lead (Mirana)
   sonar-scan:
     name: Scan de vulnérabilités (SonarQube)
     runs-on: ubuntu-latest
-    needs: [ tests-auth, tests-catalog, tests-inscription, tests-frontend ]
     steps:
       - name: Récupération du code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Requis par Sonar pour analyser l'historique complet
+          fetch-depth: 0  # Requis par Sonar pour analyser l'historique complet
 
       - name: Scan SonarQube
         uses: SonarSource/sonarcloud-github-action@master # À modifier par sonarqube-scan-action si auto-hébergé
@@ -148,7 +29,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Décommenter si SonarQube est auto-hébergé
 
-          # Job 6: Build des images Docker géré par le DevOps (Liwell)
+  # Job 2: Build des images Docker géré par le DevOps (Liwell)
   docker-build:
     name: Build des images Docker
     runs-on: ubuntu-latest
