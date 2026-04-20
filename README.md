@@ -13,6 +13,7 @@
 9. Dépannage & FAQ
 10. Contribution
 11. Références & documentation
+12. Pages et routes principales (Frontend)
 
 ---
 
@@ -105,9 +106,8 @@ Objectifs Bloc 03 : industrialisation, conteneurisation, automatisation, quali
 /services/inscription    # Microservice Inscriptions (Laravel)
 /docker-compose.yml      # Orchestration multi-conteneurs
 /DOCUMENTATION_TECHNIQUE.md # Doc technique détaillée
-/rule.md                # Cahier des charges
 /contributing.md        # Guide de contribution
-/sonar-project.properties# Configuration SonarCloud
+/sonar-project.properties# Configurtion SonarCloud
 ```
 
 Chaque microservice contient :
@@ -230,6 +230,50 @@ docker compose logs auth_api
 
 ---
 
+## Pages et routes principales (Frontend)
+
+### Pages React
+
+- **/ (Accueil)** : Page d’accueil publique, présentation de la plateforme, témoignages, accès rapide aux formations.
+- **/formations** : Liste filtrable de toutes les formations disponibles.
+- **/formation/:id** : Détail d’une formation (description, modules, inscription).
+- **/connexion** : Page de connexion utilisateur (formateur ou apprenant).
+- **/inscription** : Page d’inscription avec validation locale et serveur.
+- **/dashboard/formateur** : Tableau de bord du formateur (création, gestion, suppression de formations).
+- **/dashboard/apprenant** : Tableau de bord de l’apprenant (formations suivies, inscription, progression).
+- **/creer-atelier** : Création d’une nouvelle formation (formateur).
+- **/modifier-formation/:idFormation** : Modification d’une formation existante (formateur).
+- **/apprendre/:id** : Suivi détaillé d’une formation par l’apprenant (progression, modules).
+- **/mes-ateliers** : Liste des ateliers/formations de l’utilisateur connecté (formateur ou apprenant).
+
+### Routing (React Router)
+
+| Route                     | Accès       | Composant/Page     | Description principale                               |
+| ------------------------- | ----------- | ------------------ | ---------------------------------------------------- |
+| `/`                       | Public      | Accueil            | Page d’accueil, présentation, accès rapide           |
+| `/formations`             | Public      | Formations         | Catalogue filtrable de toutes les formations         |
+| `/formation/:id`          | Public      | DetailFormation    | Détail d’une formation, bouton inscription           |
+| `/connexion`              | Invité      | Connexion          | Authentification, redirection selon rôle             |
+| `/inscription`            | Invité      | Inscription        | Création de compte, validation locale/serveur        |
+| `/dashboard/formateur`    | Formateur   | Formateur          | Dashboard formateur, gestion formations/modules      |
+| `/dashboard/apprenant`    | Apprenant   | Apprenant          | Dashboard apprenant, formations suivies              |
+| `/creer-atelier`          | Formateur   | CreerAtelier       | Création d’une formation (formateur)                 |
+| `/modifier-formation/:id` | Formateur   | ModifierFormation  | Modification d’une formation (formateur)             |
+| `/apprendre/:id`          | Apprenant   | SuiviFormation     | Suivi détaillé d’une formation (apprenant)           |
+| `/mes-ateliers`           | Authentifié | Ateliers           | Liste des ateliers/formations de l’utilisateur       |
+| `/dashboard`              | Authentifié | RedirectionAccueil | Redirige selon le rôle connecté                      |
+| `*`                       | Public      | Redirect           | Redirection vers l’accueil pour toute route inconnue |
+
+**Remarque** : Les accès sont contrôlés par des guards (RouteProtegee, RouteInvite) selon le rôle et la session.
+
+---
+
 ## Auteurs & Encadrement
 
 Projet réalisé par le groupe BC03 dans le cadre du Bachelor CDWFS, sous la supervision de l’équipe pédagogique.
+
+---
+
+## Licence
+
+Usage pédagogique interne uniquement.
