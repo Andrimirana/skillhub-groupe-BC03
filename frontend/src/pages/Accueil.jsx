@@ -259,7 +259,7 @@ function Accueil() {
     }));
   };
 
-  const emailValide = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValide = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
   const soumettreInscription = (event) => {
     event.preventDefault();

@@ -8,7 +8,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Hash;
 use Throwable;
 
 class AuthController extends Controller
@@ -17,6 +16,9 @@ class AuthController extends Controller
     {
     }
 
+    /**
+     * Inscription d'un utilisateur avec chiffrement AES-GCM.
+     */
     public function inscription(Request $requete): JsonResponse
     {
         $donneesValidees = $requete->validate([
@@ -29,7 +31,8 @@ class AuthController extends Controller
         $utilisateur = User::query()->create([
             'name'     => $donneesValidees['nom'],
             'email'    => $donneesValidees['email'],
-            'password' => Hash::make($donneesValidees['mot_de_passe']),
+            // Chiffrement réversible pour conformité TP
+            'password' => $this->chiffrerAesGcm($donneesValidees['mot_de_passe']),
             'role'     => $donneesValidees['role'],
         ]);
 
@@ -56,6 +59,9 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Connexion : déchiffre le mot de passe stocké pour comparaison.
+     */
     public function connexion(Request $requete): JsonResponse
     {
         $donneesValidees = $requete->validate([
@@ -65,8 +71,13 @@ class AuthController extends Controller
 
         $utilisateur = User::query()->where('email', $donneesValidees['email'])->first();
 
-        if (! $utilisateur || ! Hash::check($donneesValidees['mot_de_passe'], $utilisateur->password)) {
-            return response()->json(['message' => 'Identifiants invalides.'], 401);
+        // On déchiffre le mot de passe stocké pour comparer avec la saisie
+
+        $motDePasseClairEnBase = $utilisateur ? $this->dechiffrerAesGcm($utilisateur->password) : null;
+
+        // On utilise trim() pour ignorer les espaces accidentels et on vérifie si c'est null
+        if (! $utilisateur || $motDePasseClairEnBase === null || trim((string)$motDePasseClairEnBase) !== trim((string)$donneesValidees['mot_de_passe'])) {
+           return response()->json(['message' => 'Identifiants invalides.'], 401);
         }
 
         $expiration = CarbonImmutable::now()->addHours(8)->timestamp;
@@ -121,10 +132,33 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Déconnexion effectuée.']);
     }
-
+    
     /**
-     * Endpoint interne — appelé par les autres services pour valider un token.
+     * Modification du mot de passe avec déchiffrement de l'ancien.
      */
+    public function modifierMotDePasse(Request $requete): JsonResponse
+    {
+        $utilisateur = $requete->user();
+
+        $donneesValidees = $requete->validate([
+            'ancien_mot_de_passe' => ['required', 'string'],
+            'nouveau_mot_de_passe' => ['required', 'string', 'min:8', 'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/', 'different:ancien_mot_de_passe'],
+        ]);
+
+        // Vérification du mot de passe actuel
+        $ancienMotDePasseClair = $this->dechiffrerAesGcm($utilisateur->password);
+
+        if ($ancienMotDePasseClair !== $donneesValidees['ancien_mot_de_passe']) {
+            return response()->json(['message' => 'L\'ancien mot de passe est incorrect.'], 403);
+        }
+
+        // Chiffrement du nouveau mot de passe
+        $utilisateur->password = $this->chiffrerAesGcm($donneesValidees['nouveau_mot_de_passe']);
+        $utilisateur->save();
+
+        return response()->json(['message' => 'Mot de passe modifié avec succès.']);
+    }
+
     public function validateToken(Request $requete): JsonResponse
     {
         $jeton = $requete->bearerToken();
@@ -165,4 +199,54 @@ class AuthController extends Controller
     {
         return 'jwt_blacklist:'.hash('sha256', $jeton);
     }
+    
+    /**
+     * Chiffre en AES-256-GCM. 
+     * Format : base64(iv):base64(ciphertext):base64(tag)
+     */
+    private function chiffrerAesGcm(string $motDePasseClair): string
+    {
+        $cle = hash('sha256', env('APP_MASTER_KEY', 'cle_par_defaut'), true);
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-gcm'));
+        $tag = "";
+        
+        $ciphertext = openssl_encrypt($motDePasseClair, 'aes-256-gcm', $cle, OPENSSL_RAW_DATA, $iv, $tag);
+        
+        return base64_encode($iv) . ':' . base64_encode($ciphertext) . ':' . base64_encode($tag);
+    }
+
+    /**
+     * Déchiffre une chaîne AES-256-GCM.
+     */
+    private function dechiffrerAesGcm($motDePasseChiffre): ?string
+{
+    // 1. On vérifie que c'est bien une chaîne de caractères non vide
+    if (!is_string($motDePasseChiffre) || empty($motDePasseChiffre)) {
+        return null;
+    }
+
+    // 2. On vérifie la présence des 3 parties (iv:ciphertext:tag)
+    $parties = explode(':', $motDePasseChiffre);
+    if (count($parties) !== 3) {
+        return null;
+    }
+
+    $cle = hash('sha256', env('APP_MASTER_KEY', 'cle_par_defaut'), true);
+
+    try {
+        // 3. On force le cast en string pour éviter l'erreur "array given"
+        $iv         = base64_decode((string)$parties[0], true);
+        $ciphertext = base64_decode((string)$parties[1], true);
+        $tag        = base64_decode((string)$parties[2], true);
+
+        // 4. Si un des decodages base64 a échoué
+        if ($iv === false || $ciphertext === false || $tag === false) {
+            return null;
+        }
+
+        return openssl_decrypt($ciphertext, 'aes-256-gcm', $cle, OPENSSL_RAW_DATA, $iv, $tag);
+    } catch (\Throwable $e) {
+        return null;
+    }
+}
 }
