@@ -10,7 +10,7 @@ Plateforme de formation en ligne réunissant une interface publique statique (EC
 skillhub-final/
 ├── backend/          → API REST Laravel 12 (PHP 8.2+)
 ├── frontend/         → Application React 19 + pages publiques EC03
-│   └── public/ec03/  → Interface publique statique (accueil, formations)
+│   └── public/ec03/  → Interface publique statique (accueil, formations, dashboard)
 ├── skillhub.sql      → Dump de la base de données MySQL
 ├── openapi.yaml      → Documentation OpenAPI / Swagger
 └── README.md
