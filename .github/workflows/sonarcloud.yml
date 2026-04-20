@@ -42,7 +42,9 @@ jobs:
   sonar-scan:
     name: Scan de vulnérabilités (SonarQube)
     runs-on: ubuntu-latest
-    needs: tests-unitaires # <-- NOUVEAU: Attend que les tests soient au vert !
+    needs: tests-unitaires
+    # NOUVEAU : L'analyse Sonar ne se lance QUE sur la branche dev (en direct ou via Pull Request)
+    if: github.ref == 'refs/heads/dev' || github.base_ref == 'dev'
     steps:
       - name: Récupération du code
         uses: actions/checkout@v3
@@ -61,7 +63,10 @@ jobs:
   docker-build:
     name: Build des images Docker
     runs-on: ubuntu-latest
-    needs: sonar-scan # <-- Attend que Sonar valide la qualité du code !
+    needs: [tests-unitaires, sonar-scan]
+    # NOUVEAU : Comme Sonar est ignoré sur 'main', on force l'exécution du build Docker 
+    # à condition que les tests aient réussi ET que Sonar n'ait pas planté (s'il s'est exécuté).
+    if: always() && needs.tests-unitaires.result == 'success' && needs.sonar-scan.result != 'failure'
     steps:
       - name: Récupération du code
         uses: actions/checkout@v3
