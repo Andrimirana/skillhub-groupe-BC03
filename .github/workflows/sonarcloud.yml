@@ -43,6 +43,7 @@ jobs:
     name: Analyse SonarCloud
     runs-on: ubuntu-latest
     needs: tests-unitaires
+    if: github.event_name == 'push'
     steps:
       - name: Récupération du code
         uses: actions/checkout@v4
