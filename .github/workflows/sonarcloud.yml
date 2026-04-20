@@ -42,12 +42,13 @@ jobs:
       - name: Scan SonarCloud
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Permet à SonarCloud de commenter la PR
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: ./services/auth
-          # On dit à SonarCloud où trouver le rapport généré par Laravel
           args: >
+            -Dsonar.projectKey=Andrimirana_skillhub-groupe-BC03
+            -Dsonar.organization=andrimirana
             -Dsonar.php.coverage.reportPaths=coverage.xml
             -Dsonar.sources=app,routes
             -Dsonar.tests=tests
