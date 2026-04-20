@@ -18,5 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+    $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
+        return response()->json([
+            'message' => 'Erreur de validation',
+            'errors'  => $e->errors(),
+        ], 422, [], JSON_UNESCAPED_UNICODE);
+    });
+})->create();

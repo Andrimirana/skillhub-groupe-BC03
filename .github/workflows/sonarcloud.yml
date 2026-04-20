@@ -1,0 +1,72 @@
+name: CI/CD Pipeline - SkillHub BC03
+
+# Le pipeline se déclenche selon votre stratégie de branches
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  # Job 1: Analyse de code gérée par le Tech Lead (Mirana)
+  sonar-scan:
+    name: Scan de vulnérabilités (SonarQube)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Requis par Sonar pour analyser l'historique complet
+
+      - name: Scan SonarQube
+        uses: SonarSource/sonarcloud-github-action@master # À modifier par sonarqube-scan-action si auto-hébergé
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Décommenter si SonarQube est auto-hébergé
+
+  # Job 2: Build des images Docker géré par le DevOps (Liwell)
+  docker-build:
+    name: Build des images Docker
+    runs-on: ubuntu-latest
+    needs: sonar-scan # S'assure que le scan passe avant de builder
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v3
+
+      - name: Configuration de Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # --- BUILD DU FRONTEND ---
+      - name: Build image Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: false # Mettre à true lors de la phase de déploiement (vers Docker Hub ou un registre Cloud)
+          tags: skillhub-frontend:latest
+
+      # --- BUILD DES SERVICES ---
+      - name: Build image Service Auth
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/auth
+          push: false
+          tags: skillhub-auth:latest
+
+      - name: Build image Service Catalog
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/catalog
+          push: false
+          tags: skillhub-catalog:latest
+
+      - name: Build image Service Inscription
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/inscription
+          push: false
+          tags: skillhub-inscription:latest

@@ -13,8 +13,8 @@ class MongoActivityLogger
             return;
         }
 
-        $uri = (string) env('MONGODB_URI', '');
-        $database = (string) env('MONGODB_DATABASE', 'skillhub');
+        $uri        = (string) env('MONGODB_URI', '');
+        $database   = (string) env('MONGODB_DATABASE', 'skillhub');
         $collection = (string) env('MONGODB_COLLECTION', 'activity_logs');
 
         if ($uri === '') {
@@ -27,7 +27,7 @@ class MongoActivityLogger
                 ->selectDatabase($database)
                 ->selectCollection($collection)
                 ->insertOne([
-                    'event' => $event,
+                    'event'     => $event,
                     ...$payload,
                     'timestamp' => CarbonImmutable::now()->toIso8601String(),
                 ]);
