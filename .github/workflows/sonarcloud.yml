@@ -20,14 +20,14 @@ jobs:
       - name: Récupération du code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Requis par SonarCloud pour lire tout l'historique Git
+          fetch-depth: 0  # Requis par SonarCloud pour lire tout l'historique de Git
 
       - name: Configuration de PHP avec PCOV (pour le coverage)
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           extensions: mbstring, pdo_mysql, bcmath, gd
-          coverage: pcov # Extrêmement rapide pour générer le coverage !
+          coverage: pcov
 
       - name: Installation et Tests du Service Auth
         working-directory: ./services/auth
