@@ -14,22 +14,23 @@ on:
 jobs:
   # Job 1: Analyse de code gérée par le Tech Lead (Mirana)
   sonar-scan:
+
     name: Scan de vulnérabilités (SonarQube)
     runs-on: ubuntu-latest
     steps:
       - name: Récupération du code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Requis par Sonar pour analyser l'historique complet
+          fetch-depth: 0 # Requis par Sonar pour analyser l'historique complet
 
-      - name: Scan SonarQube
-        uses: SonarSource/sonarcloud-github-action@master # À modifier par sonarqube-scan-action si auto-hébergé
+      - name: Scan SonarQube (nouvelle action)
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Décommenter si SonarQube est auto-hébergé
 
-  # Job 2: Build des images Docker géré par le DevOps (Liwell)
+          # Job 2: Build des images Docker géré par le DevOps (Liwell)
   docker-build:
     name: Build des images Docker
     runs-on: ubuntu-latest
