@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js';
 
 export const getSecurityHeaders = (data) => {
     const timestamp = Math.floor(Date.now() / 1000);
-    const nonce = 'front_' + Math.random().toString(36).substr(2, 9);
+    const nonce = 'front_' + Math.random().toString(36).substring(2, 11);
     
     // ✅ On fixe le body en string UNE SEULE FOIS
     const bodyString = JSON.stringify(data);

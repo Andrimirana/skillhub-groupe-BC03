@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
+    private const ROLE_FORMATEUR = 'formateur';
+
     public function __construct(private MongoActivityLogger $mongoLogger)
     {
     }
@@ -25,7 +27,7 @@ class ModuleController extends Controller
     {
         $authUser = $requete->get('auth_user');
 
-        if (($authUser['role'] ?? '') !== 'formateur') {
+        if (($authUser['role'] ?? '') !== self::ROLE_FORMATEUR) {
             return response()->json(['message' => 'Seuls les formateurs peuvent gérer les modules.'], 403);
         }
 
@@ -62,7 +64,7 @@ class ModuleController extends Controller
         $authUser = $requete->get('auth_user');
         $formation = $module->formation;
 
-        if (($authUser['role'] ?? '') !== 'formateur') {
+        if (($authUser['role'] ?? '') !== self::ROLE_FORMATEUR) {
             return response()->json(['message' => 'Seuls les formateurs peuvent gérer les modules.'], 403);
         }
 
@@ -92,7 +94,7 @@ class ModuleController extends Controller
         $authUser  = $requete->get('auth_user');
         $formation = $module->formation;
 
-        if (($authUser['role'] ?? '') !== 'formateur') {
+        if (($authUser['role'] ?? '') !== self::ROLE_FORMATEUR) {
             return response()->json(['message' => 'Seuls les formateurs peuvent gérer les modules.'], 403);
         }
 

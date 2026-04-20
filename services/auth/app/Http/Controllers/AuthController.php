@@ -126,7 +126,8 @@ class AuthController extends Controller
                 $secondesRestantes = max(1, $expiration - CarbonImmutable::now()->timestamp);
 
                 Cache::put($this->cleBlacklist($jeton), true, now()->addSeconds($secondesRestantes));
-            } catch (Throwable) {
+            } catch (Throwable $e) {
+                error_log('[Auth] Erreur blacklist jeton : ' . $e->getMessage());
             }
         }
 

@@ -364,10 +364,8 @@ function Accueil() {
             SkillHub rend ton chemin plus fluide et inspirant.
           </p>
           <div className="hero-boutons">
-            <Link to={lienHeroFormateur} className="btn btn-formateur" role="button"><i className="fa-solid fa-chalkboard-user"></i>
-              Formateurs</Link>
-            <Link to={lienHeroApprenant} className="btn btn-apprenant" role="button"><i className="fa-solid fa-book-open-reader"></i>
-              Apprenants</Link>
+            <Link to={lienHeroFormateur} className="btn btn-formateur" role="button"><i className="fa-solid fa-chalkboard-user"></i>{' '}Formateurs</Link>
+            <Link to={lienHeroApprenant} className="btn btn-apprenant" role="button"><i className="fa-solid fa-book-open-reader"></i>{' '}Apprenants</Link>
           </div>
         </section>
       </main>
@@ -473,6 +471,9 @@ function Accueil() {
               key={`${temoignage.nom}-dot`}
               className={`temoignage-point ${index === pointActif ? "active" : ""}`}
               onClick={() => setPointActif(index)}
+              onKeyDown={(e) => e.key === 'Enter' && setPointActif(index)}
+              role="tab"
+              tabIndex={0}
             ></span>
           ))}
         </div>
@@ -562,7 +563,7 @@ function Accueil() {
         </form>
       </section>
 
-      <div id="modalOverlay" className="overlay" hidden={!modalOuverte} onClick={fermerModal}></div>
+      <div id="modalOverlay" className="overlay" role="presentation" hidden={!modalOuverte} onClick={fermerModal} onKeyDown={fermerModal}></div>
       <div
         id="modal"
         className="modal"
