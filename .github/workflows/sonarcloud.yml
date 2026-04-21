@@ -53,13 +53,13 @@ jobs:
           tools: phpcs
 
       - name: Lint Service Auth
-        run: find services/auth/app -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+        run: find services/auth/app -name "*.php" | xargs php -l 2>&1 | grep -E "^(Parse|Fatal) error" && exit 1 || true
 
       - name: Lint Service Catalog
-        run: find services/catalog/app -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+        run: find services/catalog/app -name "*.php" | xargs php -l 2>&1 | grep -E "^(Parse|Fatal) error" && exit 1 || true
 
       - name: Lint Service Inscription
-        run: find services/inscription/app -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+        run: find services/inscription/app -name "*.php" | xargs php -l 2>&1 | grep -E "^(Parse|Fatal) error" && exit 1 || true
 
   # ==========================================
   # Job 3: Tests Service Auth

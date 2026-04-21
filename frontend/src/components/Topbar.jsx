@@ -43,8 +43,7 @@ function Topbar() {
   const gererDeconnexion = async () => {
     try {
       await deconnecter();
-    } catch {
-    } finally {
+    } catch { /* ignore */ } finally {
       supprimerSession();
       navigate("/", { replace: true });
     }

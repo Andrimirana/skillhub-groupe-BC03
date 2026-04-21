@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import { deconnecter } from "../services/authApi";
@@ -76,20 +76,6 @@ function Accueil() {
   const utilisateur = recupererUtilisateur();
   const lienHeroFormateur = utilisateur?.role === "formateur" ? "/dashboard/formateur" : "/connexion";
   const lienHeroApprenant = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/formations";
-
-  const profil = useMemo(() => {
-    if (!utilisateur) {
-      return {
-        libelle: "Se connecter",
-        href: "/connexion",
-      };
-    }
-
-    return {
-      libelle: utilisateur.nom || "Profil",
-      href: utilisateur.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur",
-    };
-  }, [utilisateur]);
 
   useEffect(() => {
     document.title = "SkillHub";
@@ -226,8 +212,7 @@ function Accueil() {
   const gererDeconnexion = async () => {
     try {
       await deconnecter();
-    } catch {
-    } finally {
+    } catch { /* ignore */ } finally {
       supprimerSession();
       navigate("/connexion", { replace: true });
     }

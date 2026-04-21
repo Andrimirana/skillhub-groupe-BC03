@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import { deconnecter } from "../services/authApi";
@@ -74,20 +74,6 @@ function Formations() {
   const [erreur, setErreur] = useState(false);
 
   const utilisateur = recupererUtilisateur();
-
-  const profil = useMemo(() => {
-    if (!utilisateur) {
-      return {
-        libelle: "Se connecter",
-        href: "/connexion",
-      };
-    }
-
-    return {
-      libelle: utilisateur.nom || "Profil",
-      href: utilisateur.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur",
-    };
-  }, [utilisateur]);
 
   useEffect(() => {
     document.title = "Formations";
@@ -199,7 +185,7 @@ function Formations() {
   };
 
   const gererDeconnexion = async () => {
-    try { await deconnecter(); } catch {}
+    try { await deconnecter(); } catch { /* ignore */ }
     finally { supprimerSession(); navigate("/connexion", { replace: true }); }
   };
 
