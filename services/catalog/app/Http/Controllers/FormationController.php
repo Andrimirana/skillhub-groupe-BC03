@@ -97,19 +97,7 @@ class FormationController extends Controller
             return response()->json(['message' => 'Seuls les formateurs peuvent créer une formation.'], 403);
         }
 
-        $donneesValidees = $requete->validate([
-            'titre'              => ['required', 'string', 'max:255'],
-            'description'        => ['required', 'string'],
-            'category'           => ['required', 'string', 'max:100'],
-            'date'               => ['required', 'date'],
-            'statut'             => ['nullable', 'string', 'max:60'],
-            'price'              => ['required', 'numeric', 'min:0'],
-            'duration'           => ['required', 'integer', 'min:1'],
-            'level'              => ['required', 'in:beginner,intermediaire,advanced'],
-            'modules'            => ['nullable', 'array', 'min:3'],
-            'modules.*.titre'    => ['required_with:modules', 'string', 'max:255'],
-            'modules.*.contenu'  => ['required_with:modules', 'string'],
-        ]);
+        $donneesValidees = $requete->validate($this->reglesFormation(true));
 
         $formation = Formation::query()->create([
             'titre'         => $donneesValidees['titre'],
@@ -148,19 +136,7 @@ class FormationController extends Controller
             return response()->json(['message' => 'Cette formation ne vous appartient pas.'], 403);
         }
 
-        $donneesValidees = $requete->validate([
-            'titre'             => ['required', 'string', 'max:255'],
-            'description'       => ['required', 'string'],
-            'category'          => ['required', 'string', 'max:100'],
-            'date'              => ['required', 'date'],
-            'statut'            => ['nullable', 'string', 'max:60'],
-            'price'             => ['nullable', 'numeric', 'min:0'],
-            'duration'          => ['nullable', 'integer', 'min:1'],
-            'level'             => ['nullable', 'in:beginner,intermediaire,advanced'],
-            'modules'           => ['nullable', 'array', 'min:3'],
-            'modules.*.titre'   => ['required_with:modules', 'string', 'max:255'],
-            'modules.*.contenu' => ['required_with:modules', 'string'],
-        ]);
+        $donneesValidees = $requete->validate($this->reglesFormation(false));
 
         $formation->update([
             'titre'       => $donneesValidees['titre'],
@@ -206,6 +182,25 @@ class FormationController extends Controller
         ]);
 
         return response()->json(['message' => 'Formation supprimée avec succès.']);
+    }
+
+    private function reglesFormation(bool $creation): array
+    {
+        $requis   = $creation ? 'required' : 'nullable';
+
+        return [
+            'titre'             => ['required', 'string', 'max:255'],
+            'description'       => ['required', 'string'],
+            'category'          => ['required', 'string', 'max:100'],
+            'date'              => ['required', 'date'],
+            'statut'            => ['nullable', 'string', 'max:60'],
+            'price'             => [$requis, 'numeric', 'min:0'],
+            'duration'          => [$requis, 'integer', 'min:1'],
+            'level'             => [$requis, 'in:beginner,intermediaire,advanced'],
+            'modules'           => ['nullable', 'array', 'min:3'],
+            'modules.*.titre'   => ['required_with:modules', 'string', 'max:255'],
+            'modules.*.contenu' => ['required_with:modules', 'string'],
+        ];
     }
 
     private function presenterFormation(Formation $formation, bool $inclureUserId): array

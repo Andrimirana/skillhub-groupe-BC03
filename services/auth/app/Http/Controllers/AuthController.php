@@ -46,17 +46,7 @@ class AuthController extends Controller
             'exp'   => $expiration,
         ]);
 
-        return response()->json([
-            'token'      => $jeton,
-            'token_type' => 'Bearer',
-            'expires_at' => $expiration,
-            'utilisateur' => [
-                'id'    => $utilisateur->id,
-                'nom'   => $utilisateur->name,
-                'email' => $utilisateur->email,
-                'role'  => $utilisateur->role,
-            ],
-        ], 201);
+        return response()->json($this->construireReponseJwt($utilisateur, $jeton, $expiration), 201);
     }
 
     /**
@@ -90,29 +80,12 @@ class AuthController extends Controller
             'exp'   => $expiration,
         ]);
 
-        return response()->json([
-            'token'      => $jeton,
-            'token_type' => 'Bearer',
-            'expires_at' => $expiration,
-            'utilisateur' => [
-                'id'    => $utilisateur->id,
-                'nom'   => $utilisateur->name,
-                'email' => $utilisateur->email,
-                'role'  => $utilisateur->role,
-            ],
-        ]);
+        return response()->json($this->construireReponseJwt($utilisateur, $jeton, $expiration));
     }
 
     public function profil(Request $requete): JsonResponse
     {
-        $utilisateur = $requete->user();
-
-        return response()->json([
-            'id'    => $utilisateur->id,
-            'nom'   => $utilisateur->name,
-            'email' => $utilisateur->email,
-            'role'  => $utilisateur->role,
-        ]);
+        return response()->json($this->presenterUtilisateur($requete->user()));
     }
 
     public function deconnexion(Request $requete): JsonResponse
@@ -184,16 +157,31 @@ class AuthController extends Controller
 
             return response()->json([
                 'valid' => true,
-                'user'  => [
-                    'id'    => $utilisateur->id,
-                    'nom'   => $utilisateur->name,
-                    'email' => $utilisateur->email,
-                    'role'  => $utilisateur->role,
-                ],
+                'user'  => $this->presenterUtilisateur($utilisateur),
             ]);
         } catch (Throwable) {
             return response()->json(['valid' => false, 'message' => 'Jeton invalide ou expiré.'], 401);
         }
+    }
+
+    private function presenterUtilisateur(User $utilisateur): array
+    {
+        return [
+            'id'    => $utilisateur->id,
+            'nom'   => $utilisateur->name,
+            'email' => $utilisateur->email,
+            'role'  => $utilisateur->role,
+        ];
+    }
+
+    private function construireReponseJwt(User $utilisateur, string $jeton, int $expiration): array
+    {
+        return [
+            'token'       => $jeton,
+            'token_type'  => 'Bearer',
+            'expires_at'  => $expiration,
+            'utilisateur' => $this->presenterUtilisateur($utilisateur),
+        ];
     }
 
     private function cleBlacklist(string $jeton): string
