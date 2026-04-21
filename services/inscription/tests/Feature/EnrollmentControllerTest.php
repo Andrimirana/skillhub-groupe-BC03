@@ -42,7 +42,7 @@ class EnrollmentControllerTest extends TestCase
         ]);
     }
 
-    public function test_apprenant_peut_sinscrire_a_une_formation(): void
+    public function test_learner_can_enroll(): void
     {
         $this->simulerFormationDisponible();
 
@@ -51,7 +51,7 @@ class EnrollmentControllerTest extends TestCase
         $this->assertDatabaseHas('enrollments', ['utilisateur_id' => 1, 'formation_id' => $this->idFormation]);
     }
 
-    public function test_inscription_doublon_retourne_meme_enregistrement(): void
+    public function test_duplicate_enrollment_returns_same(): void
     {
         $this->simulerFormationDisponible();
 
@@ -62,7 +62,7 @@ class EnrollmentControllerTest extends TestCase
         $this->assertDatabaseCount('enrollments', 1);
     }
 
-    public function test_formateur_ne_peut_pas_sinscrire(): void
+    public function test_trainer_cannot_enroll(): void
     {
         $this->simulerConnexion($this->profilFormateur);
 
@@ -70,7 +70,7 @@ class EnrollmentControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_inscription_formation_introuvable_retourne_404(): void
+    public function test_enroll_not_found_returns_404(): void
     {
         Http::fake([
             '*/api/validate-token'              => Http::response(['valid' => true, 'user' => $this->profilApprenant], 200),
@@ -81,7 +81,7 @@ class EnrollmentControllerTest extends TestCase
         $reponse->assertNotFound();
     }
 
-    public function test_apprenant_peut_se_desinscrire(): void
+    public function test_learner_can_unenroll(): void
     {
         $this->simulerConnexion($this->profilApprenant);
 
@@ -95,7 +95,7 @@ class EnrollmentControllerTest extends TestCase
         $this->assertDatabaseMissing('enrollments', ['utilisateur_id' => 1, 'formation_id' => $this->idFormation]);
     }
 
-    public function test_formateur_ne_peut_pas_se_desinscrire(): void
+    public function test_trainer_cannot_unenroll(): void
     {
         $this->simulerConnexion($this->profilFormateur);
 
@@ -103,7 +103,7 @@ class EnrollmentControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_apprenant_voit_ses_formations_inscrites(): void
+    public function test_learner_sees_enrollments(): void
     {
         Http::fake([
             '*/api/validate-token'   => Http::response(['valid' => true, 'user' => $this->profilApprenant], 200),
@@ -116,7 +116,7 @@ class EnrollmentControllerTest extends TestCase
         $reponse->assertOk()->assertJsonCount(1);
     }
 
-    public function test_apprenant_sans_inscription_retourne_liste_vide(): void
+    public function test_learner_no_enrollment_returns_empty(): void
     {
         $this->simulerConnexion($this->profilApprenant);
 
@@ -124,7 +124,7 @@ class EnrollmentControllerTest extends TestCase
         $reponse->assertOk()->assertJson([]);
     }
 
-    public function test_formateur_ne_peut_pas_voir_formations_apprenant(): void
+    public function test_trainer_cannot_view_enrollments(): void
     {
         $this->simulerConnexion($this->profilFormateur);
 
@@ -132,7 +132,7 @@ class EnrollmentControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_requete_sans_jeton_retourne_401(): void
+    public function test_no_token_returns_401(): void
     {
         $reponse = $this->postJson("/api/formations/{$this->idFormation}/inscription");
         $reponse->assertUnauthorized();

@@ -33,28 +33,28 @@ class FormationControllerTest extends TestCase
         ]);
     }
 
-    public function test_liste_formations_accessible_sans_connexion(): void
+    public function test_list_formations_public(): void
     {
         Formation::factory()->count(3)->create();
         $reponse = $this->getJson('/api/formations');
         $reponse->assertOk()->assertJsonCount(3);
     }
 
-    public function test_afficher_une_formation_incremente_les_vues(): void
+    public function test_show_formation_increments_views(): void
     {
         $formation = Formation::factory()->create(['vues' => 0]);
         $this->getJson("/api/formations/{$formation->id}")->assertOk();
         $this->assertDatabaseHas('formations', ['id' => $formation->id, 'vues' => 1]);
     }
 
-    public function test_afficher_formation_retourne_les_bonnes_donnees(): void
+    public function test_show_formation_returns_data(): void
     {
         $formation = Formation::factory()->create(['titre' => 'Cours de test']);
         $reponse = $this->getJson("/api/formations/{$formation->id}");
         $reponse->assertOk()->assertJsonPath('titre', 'Cours de test');
     }
 
-    public function test_creer_formation_en_tant_que_formateur(): void
+    public function test_create_formation_as_trainer(): void
     {
         $this->simulerConnexion($this->profilFormateur);
 
@@ -73,14 +73,14 @@ class FormationControllerTest extends TestCase
         $this->assertDatabaseHas('formations', ['titre' => 'Formation Laravel']);
     }
 
-    public function test_creer_formation_interdit_pour_apprenant(): void
+    public function test_create_formation_forbidden_for_learner(): void
     {
         $this->simulerConnexion($this->profilApprenant);
         $reponse = $this->withToken('jeton-test')->postJson('/api/formations', []);
         $reponse->assertForbidden();
     }
 
-    public function test_modifier_sa_propre_formation(): void
+    public function test_update_own_formation(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formation = Formation::factory()->create(['user_id' => 1]);
@@ -96,7 +96,7 @@ class FormationControllerTest extends TestCase
         $reponse->assertOk()->assertJsonPath('titre', 'Titre mis à jour');
     }
 
-    public function test_modifier_formation_dun_autre_formateur_interdit(): void
+    public function test_update_other_formation_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formationAutre = Formation::factory()->create(['user_id' => 99]);
@@ -111,7 +111,7 @@ class FormationControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_supprimer_sa_formation(): void
+    public function test_delete_own_formation(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formation = Formation::factory()->create(['user_id' => 1]);
@@ -121,7 +121,7 @@ class FormationControllerTest extends TestCase
         $this->assertDatabaseMissing('formations', ['id' => $formation->id]);
     }
 
-    public function test_supprimer_formation_dun_autre_interdit(): void
+    public function test_delete_other_formation_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formationAutre = Formation::factory()->create(['user_id' => 99]);
@@ -130,7 +130,7 @@ class FormationControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_mes_formations_retourne_uniquement_les_siennes(): void
+    public function test_my_formations_returns_only_own(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         Formation::factory()->count(2)->create(['user_id' => 1]);
@@ -140,14 +140,14 @@ class FormationControllerTest extends TestCase
         $reponse->assertOk()->assertJsonCount(2);
     }
 
-    public function test_mes_formations_interdit_pour_apprenant(): void
+    public function test_my_formations_forbidden_for_learner(): void
     {
         $this->simulerConnexion($this->profilApprenant);
         $reponse = $this->withToken('jeton-test')->getJson('/api/my-formations');
         $reponse->assertForbidden();
     }
 
-    public function test_requete_sans_jeton_retourne_401(): void
+    public function test_no_token_returns_401(): void
     {
         $reponse = $this->postJson('/api/formations', []);
         $reponse->assertUnauthorized();

@@ -34,7 +34,7 @@ class ModuleControllerTest extends TestCase
         ]);
     }
 
-    public function test_lister_modules_dune_formation(): void
+    public function test_list_modules(): void
     {
         $formation = Formation::factory()->create();
         Module::factory()->count(3)->create(['formation_id' => $formation->id]);
@@ -43,7 +43,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertOk()->assertJsonCount(3);
     }
 
-    public function test_ajouter_module_en_tant_que_proprietaire(): void
+    public function test_add_module_as_owner(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formation = Formation::factory()->create(['user_id' => 1]);
@@ -55,7 +55,7 @@ class ModuleControllerTest extends TestCase
         $this->assertDatabaseHas('modules', ['titre' => 'Introduction', 'formation_id' => $formation->id]);
     }
 
-    public function test_ajouter_module_formation_dun_autre_interdit(): void
+    public function test_add_module_other_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formationAutre = Formation::factory()->create(['user_id' => 99]);
@@ -68,7 +68,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_ajouter_module_interdit_pour_apprenant(): void
+    public function test_add_module_forbidden_for_learner(): void
     {
         $this->simulerConnexion($this->profilApprenant);
         $formation = Formation::factory()->create(['user_id' => 1]);
@@ -81,7 +81,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_modifier_module_de_sa_formation(): void
+    public function test_update_own_module(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formation = Formation::factory()->create(['user_id' => 1]);
@@ -93,7 +93,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertOk()->assertJsonPath('titre', 'Titre modifié');
     }
 
-    public function test_modifier_module_dun_autre_formateur_interdit(): void
+    public function test_update_other_module_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formationAutre = Formation::factory()->create(['user_id' => 99]);
@@ -108,7 +108,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
-    public function test_supprimer_module_de_sa_formation(): void
+    public function test_delete_own_module(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formation = Formation::factory()->create(['user_id' => 1]);
@@ -119,7 +119,7 @@ class ModuleControllerTest extends TestCase
         $this->assertDatabaseMissing('modules', ['id' => $module->id]);
     }
 
-    public function test_supprimer_module_dun_autre_interdit(): void
+    public function test_delete_other_module_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         $formationAutre = Formation::factory()->create(['user_id' => 99]);

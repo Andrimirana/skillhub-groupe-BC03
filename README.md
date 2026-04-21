@@ -19,7 +19,6 @@
 
 ## 1. Présentation générale
 
-<<<<<<< HEAD
 SkillHub est une plateforme web collaborative de mise en relation entre formateurs et apprenants, développée dans le cadre du Bachelor Concepteur Développeur Web Full Stack (Bloc 03 : Cloud, DevOps et Architecture, Promotion 2025/2026).
 
 Ce dépôt regroupe :
@@ -30,17 +29,6 @@ Ce dépôt regroupe :
 - Un pipeline CI/CD complet
 
 Objectifs Bloc 03 : industrialisation, conteneurisation, automatisation, qualité logicielle
-=======
-```
-skillhub-final/
-├── backend/          → API REST Laravel 12 (PHP 8.2+)
-├── frontend/         → Application React 19 + pages publiques EC03
-│   └── public/ec03/  → Interface publique statique (accueil, formations, dashboard)
-├── skillhub.sql      → Dump de la base de données MySQL
-├── openapi.yaml      → Documentation OpenAPI / Swagger
-└── README.md
-```
->>>>>>> fdcaf21ec09f1439ac343ad8093bd2072192b7e4
 
 ---
 
