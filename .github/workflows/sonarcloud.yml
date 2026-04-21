@@ -93,7 +93,7 @@ jobs:
         with:
           name: couverture-auth
           path: services/auth/coverage.xml
-
+ 
   # ==========================================
   # Job 4: Tests Service Catalog
   # ==========================================

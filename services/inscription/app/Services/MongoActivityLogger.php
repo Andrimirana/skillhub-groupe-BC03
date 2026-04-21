@@ -31,7 +31,8 @@ class MongoActivityLogger
                     ...$payload,
                     'timestamp' => CarbonImmutable::now()->toIso8601String(),
                 ]);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            error_log('[MongoActivityLogger] ' . $e->getMessage());
         }
     }
 }
