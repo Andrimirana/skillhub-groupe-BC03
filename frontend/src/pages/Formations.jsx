@@ -351,7 +351,7 @@ function Formations() {
       </main>
 
       {modalOuverte && (
-        <div id="modalOverlay" className="overlay" role="presentation" onClick={fermerModal} onKeyDown={fermerModal}></div>
+        <div id="modalOverlay" className="overlay" aria-hidden="true" onClick={fermerModal} onKeyDown={fermerModal}></div>
       )}
       {modalOuverte && (
         <div id="modal" className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-formations" ref={modalRef}>

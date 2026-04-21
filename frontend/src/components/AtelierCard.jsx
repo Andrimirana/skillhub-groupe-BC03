@@ -15,7 +15,7 @@ function AtelierCard({ image = null, titre, description, date, statut, inscrits,
   };
 
   return (
-    <div className="atelier-card" tabIndex="0">
+    <div className="atelier-card">
       {image && (
         <div className="atelier-card-image-wrap">
           <img src={image} alt="" className="atelier-card-image" aria-hidden="true" />

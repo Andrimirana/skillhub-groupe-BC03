@@ -548,7 +548,7 @@ function Accueil() {
         </form>
       </section>
 
-      <div id="modalOverlay" className="overlay" role="presentation" hidden={!modalOuverte} onClick={fermerModal} onKeyDown={fermerModal}></div>
+      <div id="modalOverlay" className="overlay" aria-hidden="true" hidden={!modalOuverte} onClick={fermerModal} onKeyDown={fermerModal}></div>
       <div
         id="modal"
         className="modal"

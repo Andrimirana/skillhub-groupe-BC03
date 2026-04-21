@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
-    private const ROLE_FORMATEUR = 'formateur';
+    private const ROLE_FORMATEUR    = 'formateur';
+    private const MSG_FORMATEUR_REQ = 'Seuls les formateurs peuvent gérer les modules.';
 
     public function __construct(private MongoActivityLogger $mongoLogger)
     {
@@ -28,7 +29,7 @@ class ModuleController extends Controller
         $authUser = $requete->get('auth_user');
 
         if (($authUser['role'] ?? '') !== self::ROLE_FORMATEUR) {
-            return response()->json(['message' => 'Seuls les formateurs peuvent gérer les modules.'], 403);
+            return response()->json(['message' => self::MSG_FORMATEUR_REQ], 403);
         }
 
         if ($formation->user_id !== $authUser['id']) {
@@ -65,7 +66,7 @@ class ModuleController extends Controller
         $formation = $module->formation;
 
         if (($authUser['role'] ?? '') !== self::ROLE_FORMATEUR) {
-            return response()->json(['message' => 'Seuls les formateurs peuvent gérer les modules.'], 403);
+            return response()->json(['message' => self::MSG_FORMATEUR_REQ], 403);
         }
 
         if (! $formation || $formation->user_id !== $authUser['id']) {
@@ -95,7 +96,7 @@ class ModuleController extends Controller
         $formation = $module->formation;
 
         if (($authUser['role'] ?? '') !== self::ROLE_FORMATEUR) {
-            return response()->json(['message' => 'Seuls les formateurs peuvent gérer les modules.'], 403);
+            return response()->json(['message' => self::MSG_FORMATEUR_REQ], 403);
         }
 
         if (! $formation || $formation->user_id !== $authUser['id']) {

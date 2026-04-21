@@ -21,14 +21,14 @@ function Topbar() {
     const themeInitial = themeSauvegarde === "dark" ? "dark" : "light";
 
     setTheme(themeInitial);
-    document.documentElement.setAttribute("data-theme", themeInitial);
+    document.documentElement.dataset.theme = themeInitial;
   }, []);
 
   const basculerTheme = () => {
     const prochainTheme = theme === "dark" ? "light" : "dark";
     setTheme(prochainTheme);
     localStorage.setItem("theme-dashboard", prochainTheme);
-    document.documentElement.setAttribute("data-theme", prochainTheme);
+    document.documentElement.dataset.theme = prochainTheme;
   };
 
   const gererRetour = () => {
