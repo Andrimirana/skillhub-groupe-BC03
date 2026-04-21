@@ -14,8 +14,8 @@ import Inscription from "./pages/Inscription";
 import RouteProtegee from "./components/RouteProtegee";
 import { verifierSession } from "./services/session";
 
-// Redirige l'utilisateur vers son tableau de bord selon son rôle.
-function RedirectionAccueil() {
+// Hook partagé pour vérifier la session utilisateur
+function useVerifierSession() {
   const [resultatSession, setResultatSession] = useState({
     chargement: true,
     estAuthentifie: false,
@@ -45,6 +45,13 @@ function RedirectionAccueil() {
       actif = false;
     };
   }, []);
+
+  return resultatSession;
+}
+
+// Redirige l'utilisateur vers son tableau de bord selon son rôle.
+function RedirectionAccueil() {
+  const resultatSession = useVerifierSession();
 
   if (resultatSession.chargement) {
     return null;
@@ -59,35 +66,7 @@ function RedirectionAccueil() {
 }
 
 function RouteInvite() {
-  const [resultatSession, setResultatSession] = useState({
-    chargement: true,
-    estAuthentifie: false,
-    utilisateur: null,
-  });
-
-  useEffect(() => {
-    let actif = true;
-
-    const verifier = async () => {
-      const resultat = await verifierSession();
-
-      if (!actif) {
-        return;
-      }
-
-      setResultatSession({
-        chargement: false,
-        estAuthentifie: resultat.estAuthentifie,
-        utilisateur: resultat.utilisateur,
-      });
-    };
-
-    verifier();
-
-    return () => {
-      actif = false;
-    };
-  }, []);
+  const resultatSession = useVerifierSession();
 
   if (resultatSession.chargement) {
     return null;
