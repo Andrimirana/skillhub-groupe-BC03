@@ -6,36 +6,18 @@ use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
-
-    // ==========================================
-    // CONFIGURATION DE LA SÉCURITÉ POUR LES TESTS
-    // ==========================================
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        putenv('APP_MASTER_KEY=CleDeTestSecrete123!');
-    }
-
-    private function chiffrerPourTest(string $motDePasseClair): string
-    {
-        $cle = hash('sha256', env('APP_MASTER_KEY'), true);
-        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-gcm'));
-        $tag = "";
-        $ciphertext = openssl_encrypt($motDePasseClair, 'aes-256-gcm', $cle, OPENSSL_RAW_DATA, $iv, $tag);
-        return base64_encode($iv) . ':' . base64_encode($ciphertext) . ':' . base64_encode($tag);
-    }
 
     private function genererEntetesSecurite(array $donnees = [], int $decalageTemps = 0, bool $mauvaiseSignature = false): array
     {
         $payload = json_encode($donnees);
         $nonce = uniqid('test_', true);
         $timestamp = time() + $decalageTemps;
-        $masterKey = env('APP_MASTER_KEY');
+        $masterKey = env('APP_MASTER_KEY', 'test_fallback_key');
 
         $signature = hash_hmac('sha256', $payload . $nonce . $timestamp, $masterKey);
 
@@ -153,7 +135,7 @@ class AuthControllerTest extends TestCase
 
     public function test_connexion_reussie_avec_identifiants_valides(): void
     {
-        User::factory()->create(['email' => 'jean@example.com', 'password' => $this->chiffrerPourTest('Password1!')]);
+        User::factory()->create(['email' => 'jean@example.com', 'password' => Hash::make('Password1!')]);
         $donnees = ['email' => 'jean@example.com', 'mot_de_passe' => 'Password1!'];
         $response = $this->postJson('/api/login', $donnees, $this->genererEntetesSecurite($donnees));
         $response->assertStatus(200)->assertJsonStructure(['token']);
@@ -161,7 +143,7 @@ class AuthControllerTest extends TestCase
 
     public function test_connexion_echoue_mauvais_mot_de_passe(): void
     {
-        User::factory()->create(['email' => 'jean@example.com', 'password' => $this->chiffrerPourTest('Password1!')]);
+        User::factory()->create(['email' => 'jean@example.com', 'password' => Hash::make('Password1!')]);
         $donnees = ['email' => 'jean@example.com', 'mot_de_passe' => 'MauvaisPass1!'];
         $response = $this->postJson('/api/login', $donnees, $this->genererEntetesSecurite($donnees));
         $response->assertStatus(401);
@@ -180,7 +162,7 @@ class AuthControllerTest extends TestCase
 
     public function test_acces_profil_reussi_avec_token_valide(): void
     {
-        $user = User::factory()->create(['password' => $this->chiffrerPourTest('Password1!')]);
+        $user = User::factory()->create(['password' => Hash::make('Password1!')]);
         $jeton = $this->genererJetonPourTest($user);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $jeton)->getJson('/api/profil');
@@ -211,7 +193,7 @@ class AuthControllerTest extends TestCase
 
     public function test_changement_mot_de_passe_reussi(): void
     {
-        $user = User::factory()->create(['password' => $this->chiffrerPourTest('AncienPass1!')]);
+        $user = User::factory()->create(['password' => Hash::make('AncienPass1!')]);
         $jeton = $this->genererJetonPourTest($user);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $jeton)->putJson('/api/change-password', [
@@ -220,17 +202,15 @@ class AuthControllerTest extends TestCase
         ]);
         $response->assertStatus(200);
 
-        // Vérification que le password a bien changé et est au format AES-GCM (iv:ciphertext:tag)
+        // Vérification que le password a bien changé et est au format bcrypt
         $user->refresh();
         $this->assertNotEmpty($user->password);
-        $this->assertStringContainsString(':', $user->password);
-        $parties = explode(':', $user->password);
-        $this->assertCount(3, $parties);
+        $this->assertTrue(Hash::check('NouveauPass2@', $user->password));
     }
 
     public function test_changement_mot_de_passe_echoue_si_ancien_incorrect(): void
     {
-        $user = User::factory()->create(['password' => $this->chiffrerPourTest('AncienPass1!')]);
+        $user = User::factory()->create(['password' => Hash::make('AncienPass1!')]);
         $jeton = $this->genererJetonPourTest($user);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $jeton)->putJson('/api/change-password', [
@@ -242,7 +222,7 @@ class AuthControllerTest extends TestCase
 
     public function test_changement_mot_de_passe_echoue_si_nouveau_identique_ancien(): void
     {
-        $user = User::factory()->create(['password' => $this->chiffrerPourTest('AncienPass1!')]);
+        $user = User::factory()->create(['password' => Hash::make('AncienPass1!')]);
         $jeton = $this->genererJetonPourTest($user);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $jeton)->putJson('/api/change-password', [
@@ -254,7 +234,7 @@ class AuthControllerTest extends TestCase
 
     public function test_changement_mot_de_passe_echoue_si_nouveau_trop_faible(): void
     {
-        $user = User::factory()->create(['password' => $this->chiffrerPourTest('AncienPass1!')]);
+        $user = User::factory()->create(['password' => Hash::make('AncienPass1!')]);
         $jeton = $this->genererJetonPourTest($user);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $jeton)->putJson('/api/change-password', [
