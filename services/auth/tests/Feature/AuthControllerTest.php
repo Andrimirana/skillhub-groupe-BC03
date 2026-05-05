@@ -17,7 +17,7 @@ class AuthControllerTest extends TestCase
         $payload = json_encode($donnees);
         $nonce = uniqid('test_', true);
         $timestamp = time() + $decalageTemps;
-        $masterKey = env('APP_MASTER_KEY', 'test_fallback_key');
+        $masterKey = env('APP_MASTER_KEY', 'CleDeTestSecrete123!');
 
         $signature = hash_hmac('sha256', $payload . $nonce . $timestamp, $masterKey);
 
