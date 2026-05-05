@@ -36,6 +36,7 @@ jobs:
           php artisan key:generate
           touch database/database.sqlite
           DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite XDEBUG_MODE=coverage php artisan test --coverage-clover=coverage.xml
+          ls -la coverage.xml || echo "Coverage Auth not generated"
 
       - name: Tests du Service Catalog avec Coverage
         working-directory: ./services/catalog
@@ -45,6 +46,7 @@ jobs:
           php artisan key:generate
           touch database/database.sqlite
           DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite XDEBUG_MODE=coverage php artisan test --coverage-clover=coverage.xml || true
+          ls -la coverage.xml || echo "Coverage Catalog not generated"
 
       - name: Tests du Service Inscription avec Coverage
         working-directory: ./services/inscription
@@ -54,6 +56,17 @@ jobs:
           php artisan key:generate
           touch database/database.sqlite
           DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite XDEBUG_MODE=coverage php artisan test --coverage-clover=coverage.xml || true
+          ls -la coverage.xml || echo "Coverage Inscription not generated"
+
+      - name: Upload Coverage Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            services/auth/coverage.xml
+            services/catalog/coverage.xml
+            services/inscription/coverage.xml
+          retention-days: 1
 
   # ==========================================
   # Job 2: Analyse de code gérée par le Tech Lead (Mirana)
@@ -67,6 +80,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Download Coverage Reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: .
+
+      - name: Vérification des fichiers coverage
+        run: |
+          echo "Contenu du workspace:"
+          ls -la
+          echo "Fichiers coverage:"
+          find . -name "coverage.xml" -type f
 
       - name: Scan SonarCloud
         uses: SonarSource/sonarqube-scan-action@v5.0.0
