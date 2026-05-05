@@ -91,8 +91,15 @@ jobs:
         run: |
           echo "Contenu du workspace:"
           ls -la
-          echo "Fichiers coverage:"
+          echo "Fichiers coverage téléchargés:"
           find . -name "coverage.xml" -type f
+          echo "Déplacement des fichiers vers services/:"
+          mkdir -p services/auth services/catalog services/inscription
+          mv auth/coverage.xml services/auth/coverage.xml
+          mv catalog/coverage.xml services/catalog/coverage.xml
+          mv inscription/coverage.xml services/inscription/coverage.xml
+          echo "Vérification finale:"
+          ls -la services/*/coverage.xml
 
       - name: Scan SonarCloud
         uses: SonarSource/sonarqube-scan-action@v5.0.0
