@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    procps
 
 # Nettoyer le cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -25,6 +26,9 @@ WORKDIR /var/www
 
 # Copier le code existant dans le conteneur
 COPY . /var/www
+
+# Copier et donner les permissions au script de démarrage
+RUN chmod +x /var/www/start.sh
 
 # Donner les droits d'écriture sur les dossiers de Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
