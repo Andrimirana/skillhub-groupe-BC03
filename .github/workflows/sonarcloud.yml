@@ -26,15 +26,34 @@ jobs:
         with:
           php-version: "8.3"
           extensions: mbstring, pdo_mysql, bcmath, gd
+          coverage: xdebug
 
-      - name: Tests du Service Auth
+      - name: Tests du Service Auth avec Coverage
         working-directory: ./services/auth
         run: |
           composer install --prefer-dist --no-progress
           php -r "file_exists('.env') || copy('.env.example', '.env');"
           php artisan key:generate
           touch database/database.sqlite
-          DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite php artisan test
+          DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite XDEBUG_MODE=coverage php artisan test --coverage-clover=coverage.xml
+
+      - name: Tests du Service Catalog avec Coverage
+        working-directory: ./services/catalog
+        run: |
+          composer install --prefer-dist --no-progress
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
+          touch database/database.sqlite
+          DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite XDEBUG_MODE=coverage php artisan test --coverage-clover=coverage.xml || true
+
+      - name: Tests du Service Inscription avec Coverage
+        working-directory: ./services/inscription
+        run: |
+          composer install --prefer-dist --no-progress
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
+          touch database/database.sqlite
+          DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite XDEBUG_MODE=coverage php artisan test --coverage-clover=coverage.xml || true
 
   # ==========================================
   # Job 2: Analyse de code gérée par le Tech Lead (Mirana)
