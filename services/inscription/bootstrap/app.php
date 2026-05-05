@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.service' => ValidateServiceToken::class,
         ]);
+        // Activer CORS globalement
+        $middleware->api(append: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
