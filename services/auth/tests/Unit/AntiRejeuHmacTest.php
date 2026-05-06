@@ -42,7 +42,8 @@ class AntiRejeuHmacTest extends TestCase
         });
 
         $this->assertEquals(403, $response->getStatusCode());
-        $this->assertStringContainsString('manquants', $response->getContent());
+        $data = json_decode($response->getContent(), true);
+        $this->assertStringContainsString('manquant', $data['message'] ?? '');
     }
 
     public function test_request_blocked_when_nonce_missing(): void
@@ -89,7 +90,8 @@ class AntiRejeuHmacTest extends TestCase
         });
 
         $this->assertEquals(403, $response->getStatusCode());
-        $this->assertStringContainsString('expirée', $response->getContent());
+        $data = json_decode($response->getContent(), true);
+        $this->assertStringContainsString('expir', $data['message'] ?? '');
     }
 
     public function test_request_blocked_when_nonce_already_used(): void
@@ -113,7 +115,8 @@ class AntiRejeuHmacTest extends TestCase
         });
 
         $this->assertEquals(403, $response->getStatusCode());
-        $this->assertStringContainsString('rejeu', $response->getContent());
+        $data = json_decode($response->getContent(), true);
+        $this->assertStringContainsString('rejeu', $data['message'] ?? '');
     }
 
     public function test_request_blocked_when_signature_invalid(): void
@@ -134,7 +137,8 @@ class AntiRejeuHmacTest extends TestCase
         });
 
         $this->assertEquals(403, $response->getStatusCode());
-        $this->assertStringContainsString('invalide', $response->getContent());
+        $data = json_decode($response->getContent(), true);
+        $this->assertStringContainsString('invalide', $data['message'] ?? '');
     }
 
     public function test_request_passes_with_valid_signature(): void

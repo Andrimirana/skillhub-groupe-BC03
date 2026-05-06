@@ -32,7 +32,8 @@ class ValidateServiceTokenTest extends TestCase
         });
 
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertStringContainsString('manquant', $response->getContent());
+        $data = json_decode($response->getContent(), true);
+        $this->assertStringContainsString('manquant', $data['message'] ?? '');
     }
 
     public function test_request_rejected_when_auth_service_returns_invalid(): void
