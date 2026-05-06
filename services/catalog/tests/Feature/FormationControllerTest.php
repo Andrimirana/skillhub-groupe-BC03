@@ -152,4 +152,142 @@ class FormationControllerTest extends TestCase
         $reponse = $this->postJson('/api/formations', []);
         $reponse->assertUnauthorized();
     }
+
+    public function test_list_formations_with_search_filter(): void
+    {
+        Formation::factory()->create(['titre' => 'Laravel Advanced', 'description' => 'Deep dive']);
+        Formation::factory()->create(['titre' => 'PHP Basics', 'description' => 'Introduction to PHP']);
+
+        $reponse = $this->getJson('/api/formations?recherche=Laravel');
+        $reponse->assertOk()->assertJsonCount(1);
+    }
+
+    public function test_list_formations_with_category_filter(): void
+    {
+        Formation::factory()->create(['category' => 'dev']);
+        Formation::factory()->create(['category' => 'design']);
+        Formation::factory()->create(['category' => 'dev']);
+
+        $reponse = $this->getJson('/api/formations?category=dev');
+        $reponse->assertOk()->assertJsonCount(2);
+    }
+
+    public function test_list_formations_with_level_filter(): void
+    {
+        Formation::factory()->create(['level' => 'beginner']);
+        Formation::factory()->create(['level' => 'advanced']);
+
+        $reponse = $this->getJson('/api/formations?level=beginner');
+        $reponse->assertOk()->assertJsonCount(1);
+    }
+
+    public function test_formateur_sees_only_own_formations_in_public_list(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        Formation::factory()->create(['user_id' => 1, 'titre' => 'Mine']);
+        Formation::factory()->create(['user_id' => 99, 'titre' => 'Others']);
+
+        $reponse = $this->withToken('jeton-test')->getJson('/api/formations');
+        $reponse->assertOk()->assertJsonCount(1);
+    }
+
+    public function test_create_formation_with_modules(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+
+        $data = [
+            'titre' => 'Formation with Modules',
+            'description' => 'Test',
+            'category' => 'dev',
+            'date' => '2026-09-01',
+            'price' => 100,
+            'duration' => 10,
+            'level' => 'beginner',
+            'modules' => [
+                ['titre' => 'Module 1', 'contenu' => 'Content 1'],
+                ['titre' => 'Module 2', 'contenu' => 'Content 2'],
+                ['titre' => 'Module 3', 'contenu' => 'Content 3'],
+            ]
+        ];
+
+        $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $data);
+        $reponse->assertCreated();
+        $this->assertDatabaseHas('modules', ['titre' => 'Module 1']);
+    }
+
+    public function test_update_formation_with_partial_data(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create([
+            'user_id' => 1,
+            'titre' => 'Original',
+            'price' => 100
+        ]);
+
+        $reponse = $this->withToken('jeton-test')->putJson("/api/formations/{$formation->id}", [
+            'titre' => 'Updated Title',
+            'description' => 'Updated Description',
+            'category' => 'dev',
+            'date' => '2026-08-01',
+        ]);
+
+        $reponse->assertOk();
+        $this->assertEquals('Updated Title', $formation->fresh()->titre);
+    }
+
+    public function test_show_formation_includes_modules(): void
+    {
+        $formation = Formation::factory()->create();
+        Module::factory()->count(2)->create(['formation_id' => $formation->id]);
+
+        $reponse = $this->getJson("/api/formations/{$formation->id}");
+        $reponse->assertOk()->assertJsonStructure(['modules']);
+    }
+
+    public function test_delete_formation_also_deletes_modules(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+        $module = Module::factory()->create(['formation_id' => $formation->id]);
+
+        $this->withToken('jeton-test')->deleteJson("/api/formations/{$formation->id}");
+
+        $this->assertDatabaseMissing('modules', ['id' => $module->id]);
+    }
+
+    public function test_create_formation_validation_fails_with_invalid_level(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+
+        $data = [
+            'titre' => 'Test',
+            'description' => 'Test',
+            'category' => 'dev',
+            'date' => '2026-09-01',
+            'price' => 100,
+            'duration' => 10,
+            'level' => 'invalid_level',
+        ];
+
+        $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $data);
+        $reponse->assertStatus(422)->assertJsonValidationErrors(['level']);
+    }
+
+    public function test_create_formation_requires_minimum_price(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+
+        $data = [
+            'titre' => 'Test',
+            'description' => 'Test',
+            'category' => 'dev',
+            'date' => '2026-09-01',
+            'price' => -10,
+            'duration' => 10,
+            'level' => 'beginner',
+        ];
+
+        $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $data);
+        $reponse->assertStatus(422)->assertJsonValidationErrors(['price']);
+    }
 }

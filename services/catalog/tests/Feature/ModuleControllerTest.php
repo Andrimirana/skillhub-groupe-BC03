@@ -128,4 +128,93 @@ class ModuleControllerTest extends TestCase
         $reponse = $this->withToken('jeton-test')->deleteJson("/api/modules/{$module->id}");
         $reponse->assertForbidden();
     }
+
+    public function test_add_module_with_custom_ordre(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+
+        $data = ['titre' => 'Custom Order Module', 'contenu' => 'Content', 'ordre' => 5];
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$formation->id}/modules", $data);
+        $reponse->assertCreated()->assertJsonPath('ordre', 5);
+    }
+
+    public function test_add_module_without_ordre_sets_auto_increment(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+        Module::factory()->create(['formation_id' => $formation->id, 'ordre' => 3]);
+
+        $data = ['titre' => 'Auto Order', 'contenu' => 'Content'];
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$formation->id}/modules", $data);
+        $reponse->assertCreated()->assertJsonPath('ordre', 4);
+    }
+
+    public function test_module_validation_requires_titre(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+
+        $data = ['contenu' => 'Content without title'];
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$formation->id}/modules", $data);
+        $reponse->assertStatus(422)->assertJsonValidationErrors(['titre']);
+    }
+
+    public function test_module_validation_requires_contenu(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+
+        $data = ['titre' => 'Title without content'];
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$formation->id}/modules", $data);
+        $reponse->assertStatus(422)->assertJsonValidationErrors(['contenu']);
+    }
+
+    public function test_update_module_changes_ordre(): void
+    {
+        $this->simulerConnexion($this->profilFormateur);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+        $module = Module::factory()->create(['formation_id' => $formation->id, 'ordre' => 1]);
+
+        $data = ['titre' => 'Updated', 'contenu' => 'Updated content', 'ordre' => 10];
+
+        $reponse = $this->withToken('jeton-test')->putJson("/api/modules/{$module->id}", $data);
+        $reponse->assertOk()->assertJsonPath('ordre', 10);
+    }
+
+    public function test_list_modules_returns_empty_array_for_formation_without_modules(): void
+    {
+        $formation = Formation::factory()->create();
+
+        $reponse = $this->getJson("/api/formations/{$formation->id}/modules");
+        $reponse->assertOk()->assertJsonCount(0);
+    }
+
+    public function test_update_module_as_learner_forbidden(): void
+    {
+        $this->simulerConnexion($this->profilApprenant);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+        $module = Module::factory()->create(['formation_id' => $formation->id]);
+
+        $reponse = $this->withToken('jeton-test')->putJson("/api/modules/{$module->id}", [
+            'titre' => 'Attempt',
+            'contenu' => 'x',
+            'ordre' => 1
+        ]);
+        $reponse->assertForbidden();
+    }
+
+    public function test_delete_module_as_learner_forbidden(): void
+    {
+        $this->simulerConnexion($this->profilApprenant);
+        $formation = Formation::factory()->create(['user_id' => 1]);
+        $module = Module::factory()->create(['formation_id' => $formation->id]);
+
+        $reponse = $this->withToken('jeton-test')->deleteJson("/api/modules/{$module->id}");
+        $reponse->assertForbidden();
+    }
 }

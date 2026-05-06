@@ -42,6 +42,13 @@ class ActivityLogControllerTest extends TestCase
             ->assertJsonCount(50); // Vérifie la limite à 50
     }
 
+    public function test_returns_empty_array_when_no_logs(): void
+    {
+        $response = $this->getJson('/api/formations/999/activity-logs');
+
+        $response->assertOk()->assertJsonCount(0);
+    }
+
     public function test_activity_logs_ordered_by_most_recent(): void
     {
         // Créer des logs avec des timestamps différents

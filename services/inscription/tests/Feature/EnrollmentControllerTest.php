@@ -137,4 +137,87 @@ class EnrollmentControllerTest extends TestCase
         $reponse = $this->postJson("/api/formations/{$this->idFormation}/inscription");
         $reponse->assertUnauthorized();
     }
+
+    public function test_enrollment_stores_progression_default_zero(): void
+    {
+        $this->simulerFormationDisponible();
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$this->idFormation}/inscription");
+        $reponse->assertCreated()->assertJsonPath('progression', 0);
+    }
+
+    public function test_enrollment_stores_date_inscription(): void
+    {
+        $this->simulerFormationDisponible();
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$this->idFormation}/inscription");
+        $reponse->assertCreated()->assertJsonStructure(['date_inscription']);
+    }
+
+    public function test_unenroll_non_existing_enrollment_succeeds(): void
+    {
+        $this->simulerConnexion($this->profilApprenant);
+
+        $reponse = $this->withToken('jeton-test')->deleteJson("/api/formations/999/inscription");
+        $reponse->assertOk();
+    }
+
+    public function test_my_courses_with_multiple_formations(): void
+    {
+        Http::fake([
+            '*/api/validate-token' => Http::response(['valid' => true, 'user' => $this->profilApprenant], 200),
+            '*/api/formations/10'  => Http::response(['id' => 10, 'titre' => 'Formation A', 'description' => '', 'category' => 'dev', 'date' => null, 'statut' => '', 'price' => 0, 'duration' => 0, 'level' => '', 'vues' => 0, 'apprenants' => 0, 'formateur' => null, 'modules' => []], 200),
+            '*/api/formations/20'  => Http::response(['id' => 20, 'titre' => 'Formation B', 'description' => '', 'category' => 'design', 'date' => null, 'statut' => '', 'price' => 0, 'duration' => 0, 'level' => '', 'vues' => 0, 'apprenants' => 0, 'formateur' => null, 'modules' => []], 200),
+        ]);
+
+        Enrollment::factory()->create(['utilisateur_id' => 1, 'formation_id' => 10]);
+        Enrollment::factory()->create(['utilisateur_id' => 1, 'formation_id' => 20]);
+
+        $reponse = $this->withToken('jeton-test')->getJson('/api/apprenant/formations');
+        $reponse->assertOk()->assertJsonCount(2);
+    }
+
+    public function test_my_courses_includes_progression(): void
+    {
+        Http::fake([
+            '*/api/validate-token' => Http::response(['valid' => true, 'user' => $this->profilApprenant], 200),
+            '*/api/formations/10'  => Http::response(['id' => 10, 'titre' => 'Formation Test', 'description' => '', 'category' => 'dev', 'date' => null, 'statut' => '', 'price' => 0, 'duration' => 0, 'level' => '', 'vues' => 0, 'apprenants' => 0, 'formateur' => null, 'modules' => []], 200),
+        ]);
+
+        Enrollment::factory()->create(['utilisateur_id' => 1, 'formation_id' => 10, 'progression' => 75]);
+
+        $reponse = $this->withToken('jeton-test')->getJson('/api/apprenant/formations');
+        $reponse->assertOk()
+            ->assertJsonPath('0.progression', 75);
+    }
+
+    public function test_my_courses_handles_deleted_formation(): void
+    {
+        Http::fake([
+            '*/api/validate-token' => Http::response(['valid' => true, 'user' => $this->profilApprenant], 200),
+            '*/api/formations/999' => Http::response([], 404),
+        ]);
+
+        Enrollment::factory()->create(['utilisateur_id' => 1, 'formation_id' => 999]);
+
+        $reponse = $this->withToken('jeton-test')->getJson('/api/apprenant/formations');
+        $reponse->assertOk()->assertJsonPath('0.titre', 'Formation introuvable');
+    }
+
+    public function test_enroll_returns_201_status(): void
+    {
+        $this->simulerFormationDisponible();
+
+        $reponse = $this->withToken('jeton-test')->postJson("/api/formations/{$this->idFormation}/inscription");
+        $reponse->assertStatus(201);
+    }
+
+    public function test_unenroll_returns_success_message(): void
+    {
+        $this->simulerConnexion($this->profilApprenant);
+        Enrollment::factory()->create(['utilisateur_id' => 1, 'formation_id' => $this->idFormation]);
+
+        $reponse = $this->withToken('jeton-test')->deleteJson("/api/formations/{$this->idFormation}/inscription");
+        $reponse->assertOk()->assertJsonStructure(['message']);
+    }
 }
