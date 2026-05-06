@@ -57,16 +57,16 @@ class AuthControllerAdditionalTest extends TestCase
             ]);
     }
 
-    public function test_deconnexion_succeeds_even_without_token(): void
+    public function test_deconnexion_requires_authentication(): void
     {
         $response = $this->postJson('/api/logout');
-        $response->assertStatus(200)->assertJson(['message' => 'Déconnexion effectuée.']);
+        $response->assertStatus(401);
     }
 
-    public function test_deconnexion_handles_invalid_token_gracefully(): void
+    public function test_deconnexion_with_invalid_token_returns_403(): void
     {
         $response = $this->withHeader('Authorization', 'Bearer invalid_token')->postJson('/api/logout');
-        $response->assertStatus(200)->assertJson(['message' => 'Déconnexion effectuée.']);
+        $response->assertStatus(403);
     }
 
     public function test_validation_interne_echoue_si_utilisateur_supprime(): void
@@ -138,7 +138,7 @@ class AuthControllerAdditionalTest extends TestCase
     public function test_profil_requires_valid_token(): void
     {
         $response = $this->withHeader('Authorization', 'Bearer invalid_token')->getJson('/api/profil');
-        $response->assertStatus(401);
+        $response->assertStatus(403);
     }
 
     public function test_validation_token_with_invalid_format(): void
@@ -149,8 +149,8 @@ class AuthControllerAdditionalTest extends TestCase
 
     public function test_multiple_roles_can_register(): void
     {
-        $formateur = ['nom' => 'Formateur', 'email' => 'form@test.com', 'mot_de_passe' => 'Pass1!', 'role' => 'formateur'];
-        $apprenant = ['nom' => 'Apprenant', 'email' => 'app@test.com', 'mot_de_passe' => 'Pass1!', 'role' => 'apprenant'];
+        $formateur = ['nom' => 'Formateur', 'email' => 'form@test.com', 'mot_de_passe' => 'Password1!', 'role' => 'formateur'];
+        $apprenant = ['nom' => 'Apprenant', 'email' => 'app@test.com', 'mot_de_passe' => 'Password1!', 'role' => 'apprenant'];
 
         $r1 = $this->postJson('/api/register', $formateur, $this->genererEntetesSecurite($formateur));
         $r2 = $this->postJson('/api/register', $apprenant, $this->genererEntetesSecurite($apprenant));
