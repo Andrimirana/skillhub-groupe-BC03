@@ -127,14 +127,23 @@ class AuthController extends Controller
 
     public function validateToken(Request $requete): JsonResponse
     {
-        $jeton = $requete->bearerToken();
+        $resultat = $this->verifierValiditeToken($requete->bearerToken());
+        
+        return response()->json($resultat['data'], $resultat['status']);
+    }
 
+    /**
+     * Vérifie la validité d'un jeton JWT et retourne le résultat de la validation.
+     * Extrait la logique de validation pour réduire la complexité cyclomatique.
+     */
+    private function verifierValiditeToken(?string $jeton): array
+    {
         if (! $jeton) {
-            return response()->json(['valid' => false, 'message' => 'Jeton manquant.'], 401);
+            return ['data' => ['valid' => false, 'message' => 'Jeton manquant.'], 'status' => 401];
         }
 
         if (Cache::has($this->cleBlacklist($jeton))) {
-            return response()->json(['valid' => false, 'message' => 'Jeton blacklisté.'], 401);
+            return ['data' => ['valid' => false, 'message' => 'Jeton blacklisté.'], 'status' => 401];
         }
 
         try {
@@ -143,12 +152,12 @@ class AuthController extends Controller
             $utilisateur   = User::query()->find($idUtilisateur);
 
             if (! $utilisateur) {
-                return response()->json(['valid' => false, 'message' => 'Utilisateur introuvable.'], 401);
+                return ['data' => ['valid' => false, 'message' => 'Utilisateur introuvable.'], 'status' => 401];
             }
 
-            return response()->json(['valid' => true, 'user' => $this->presenterUtilisateur($utilisateur)]);
+            return ['data' => ['valid' => true, 'user' => $this->presenterUtilisateur($utilisateur)], 'status' => 200];
         } catch (Throwable) {
-            return response()->json(['valid' => false, 'message' => 'Jeton invalide ou expiré.'], 401);
+            return ['data' => ['valid' => false, 'message' => 'Jeton invalide ou expiré.'], 'status' => 401];
         }
     }
 
