@@ -4,8 +4,6 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Support\Facades\Hash;
-use Tests\TestCase;
 
 /**
  * Tests unitaires pour le modèle User
