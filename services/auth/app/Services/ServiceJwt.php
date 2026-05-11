@@ -15,6 +15,8 @@ class ServiceJwt
 {
     private string $cleSecrete;
 
+
+
     public function __construct()
     {
         $this->cleSecrete = (string) config('app.key');
@@ -78,6 +80,7 @@ class ServiceJwt
         return $donneesDecode;
     }
 
+    // Encodage et décodage base64url pour les segments du JWT
     private function encoderSegment(array $donnees): string
     {
         $json = json_encode($donnees, JSON_THROW_ON_ERROR);
@@ -107,6 +110,8 @@ class ServiceJwt
 
         return $valeur;
     }
+
+    // Décodage du segment de données du JWT en texte JSON avant de le décoder en tableau associatif
 
     private function decoderBase64UrlVersTexte(string $segment): string
     {

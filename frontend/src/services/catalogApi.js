@@ -6,6 +6,8 @@
 import axios from "axios";
 import { recupererJeton, supprimerSession } from "./auth";
 
+
+// Client API Axios pour le service Catalog
 const catalogApi = axios.create({
   baseURL: import.meta.env.VITE_CATALOG_URL || "http://127.0.0.1:8002/api",
   headers: {
@@ -21,6 +23,7 @@ catalogApi.interceptors.request.use((configuration) => {
   return configuration;
 });
 
+// Interceptor pour gérer les erreurs de réponse, notamment les erreurs 401 pour la déconnexion automatique.
 catalogApi.interceptors.response.use(
   (reponse) => reponse,
   (erreur) => {

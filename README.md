@@ -274,6 +274,3 @@ Projet réalisé par le groupe BC03 dans le cadre du Bachelor CDWFS, sous la sup
 
 ---
 
-## Licence
-
-Usage pédagogique interne uniquement.

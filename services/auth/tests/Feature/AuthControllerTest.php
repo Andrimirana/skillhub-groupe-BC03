@@ -92,7 +92,7 @@ class AuthControllerTest extends TestCase
     }
 
     // ==========================================
-    // 2. TESTS SÉCURITÉ ANTI-REJEU & HMAC (TP3)
+    // 2. TESTS SÉCURITÉ ANTI-REJEU & HMA
     // ==========================================
 
     public function test_requete_bloquee_si_entetes_securite_manquants(): void
@@ -188,7 +188,7 @@ class AuthControllerTest extends TestCase
     }
 
     // ==========================================
-    // 5. TESTS CHANGEMENT DE MOT DE PASSE (TP5)
+    // 5. TESTS CHANGEMENT DE MOT DE PASSE 
     // ==========================================
 
     public function test_changement_mot_de_passe_reussi(): void
@@ -220,6 +220,7 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    // Test pour s'assurer que le nouveau mot de passe ne peut pas être identique à l'ancien
     public function test_changement_mot_de_passe_echoue_si_nouveau_identique_ancien(): void
     {
         $user = User::factory()->create(['password' => Hash::make('AncienPass1!')]);
@@ -232,6 +233,7 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(422)->assertJsonValidationErrors(['nouveau_mot_de_passe']);
     }
 
+    // Test pour s'assurer que le nouveau mot de passe respecte les critères de complexité
     public function test_changement_mot_de_passe_echoue_si_nouveau_trop_faible(): void
     {
         $user = User::factory()->create(['password' => Hash::make('AncienPass1!')]);
@@ -257,6 +259,7 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(200)->assertJson(['valid' => true])->assertJsonStructure(['user' => ['id', 'nom', 'email', 'role']]);
     }
 
+    // Test pour s'assurer que la validation échoue si le token est blacklisté
     public function test_validation_interne_echoue_si_token_blacklist(): void
     {
         $user = User::factory()->create();
@@ -268,6 +271,7 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(401)->assertJson(['valid' => false, 'message' => 'Jeton blacklisté.']);
     }
 
+    // Test pour s'assurer que la validation échoue si le token est expiré
     public function test_validation_interne_echoue_sans_token(): void
     {
         $response = $this->postJson('/api/validate-token');

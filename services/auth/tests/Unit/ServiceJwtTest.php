@@ -25,6 +25,7 @@ class ServiceJwtTest extends TestCase
         $this->serviceJwt = new ServiceJwt();
     }
 
+    // Test pour s'assurer que le constructeur lance une exception si la clé d'application est absente
     public function test_constructor_throws_exception_when_app_key_is_empty(): void
     {
         config(['app.key' => '']);
@@ -35,6 +36,7 @@ class ServiceJwtTest extends TestCase
         new ServiceJwt();
     }
 
+    // Test pour vérifier que le JWT généré a le format correct (3 segments séparés par des points)
     public function test_generer_creates_valid_jwt_with_three_segments(): void
     {
         $payload = [
@@ -53,6 +55,7 @@ class ServiceJwtTest extends TestCase
         $this->assertNotEmpty($segments[2]); // Signature
     }
 
+    // Test pour vérifier que le JWT contient les bonnes informations encodées
     public function test_decoder_successfully_decodes_valid_token(): void
     {
         $payload = [
@@ -70,6 +73,7 @@ class ServiceJwtTest extends TestCase
         $this->assertEquals('formateur', $decoded['role']);
     }
 
+    // Test pour vérifier que le JWT est considéré comme invalide si le format est incorrect
     public function test_decoder_throws_exception_for_invalid_jwt_format(): void
     {
         $this->expectException(RuntimeException::class);
@@ -78,6 +82,8 @@ class ServiceJwtTest extends TestCase
         $this->serviceJwt->decoder('invalid.token');
     }
 
+
+    // Test pour vérifier que le JWT est considéré comme invalide si la signature ne correspond pas
     public function test_decoder_throws_exception_for_tampered_signature(): void
     {
         $payload = [
@@ -99,6 +105,7 @@ class ServiceJwtTest extends TestCase
         $this->serviceJwt->decoder($tamperedToken);
     }
 
+    // Test pour vérifier que le JWT est considéré comme expiré après la date d'expiration
     public function test_decoder_throws_exception_for_expired_token(): void
     {
         $payload = [
@@ -115,9 +122,11 @@ class ServiceJwtTest extends TestCase
         $this->serviceJwt->decoder($token);
     }
 
+
+    // Test pour vérifier que le JWT est considéré comme invalide si le payload n'est pas un JSON valide
     public function test_decoder_throws_exception_for_invalid_payload(): void
     {
-        // Créer manuellement un JWT avec payload invalide
+        
         $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
         $invalidPayload = base64_encode('not-json');
         $signature = hash_hmac('sha256', $header . '.' . $invalidPayload, 'test-secret-key-for-jwt-signing', true);
@@ -131,6 +140,7 @@ class ServiceJwtTest extends TestCase
         $this->serviceJwt->decoder($invalidToken);
     }
 
+    // Test pour vérifier que le JWT est valide tant que la date d'expiration n'est pas atteinte
     public function test_token_remains_valid_before_expiration(): void
     {
         $payload = [
@@ -146,6 +156,8 @@ class ServiceJwtTest extends TestCase
         $this->assertEquals(1, $decoded['sub']);
     }
 
+
+    // Test pour vérifier que le JWT est valide même sans champ d'expiration (doit être traité comme non expiré)
     public function test_token_without_expiration_is_valid(): void
     {
         $payload = [
@@ -172,6 +184,7 @@ class ServiceJwtTest extends TestCase
         $this->assertNotEquals($token1, $token2);
     }
 
+    // Test pour vérifier que le même payload génère le même token (si la date d'expiration est la même)
     public function test_same_payload_generates_same_token(): void
     {
         $payload = ['sub' => 1, 'email' => 'test@example.com', 'iat' => 1234567890];

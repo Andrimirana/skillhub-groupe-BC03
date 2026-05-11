@@ -1,0 +1,702 @@
+/* Styles pour la page de suivi de formation /apprendre/ */
+
+.suivi-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* En-tête du suivi */
+.suivi-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 40px;
+    background: linear-gradient(135deg, var(--primary-light), var(--surface));
+    border-radius: 20px;
+    border: 1.5px solid var(--primary-light);
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+
+.suivi-hero-content {
+    flex: 1;
+}
+
+.suivi-retour {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.suivi-retour:hover {
+    color: var(--primary-dark);
+    transform: translateX(-3px);
+}
+
+.suivi-titre {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+    line-height: 1.2;
+}
+
+.suivi-description {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.suivi-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.meta-item svg {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+/* Cercle de progression */
+.suivi-progress-circle {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+}
+
+.suivi-progress-circle svg {
+    width: 100%;
+    height: 100%;
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 8;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.progress-circle-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.progress-percent {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Barre de progression */
+.suivi-progress-bar {
+    padding: 0;
+}
+
+.progress-track {
+    width: 100%;
+    height: 12px;
+    background: var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 12px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 12px rgba(91, 61, 246, 0.3);
+}
+
+.progress-info {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Statistiques */
+.suivi-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1.5px solid var(--primary-light);
+    border-radius: 14px;
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Section modules */
+.suivi-modules-section,
+.suivi-ressources-section,
+.suivi-evaluation-section,
+.suivi-certificat-section {
+    padding: 32px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.section-titre {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-titre svg {
+    color: var(--primary);
+    font-size: 1.3rem;
+}
+
+.section-desc {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 1rem;
+}
+
+/* Liste des modules */
+.modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.module-item {
+    padding: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    transition: all 0.2s;
+}
+
+.module-item:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: translateX(4px);
+}
+
+.module-item.completed {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(91, 61, 246, 0.05), rgba(91, 61, 246, 0.02));
+}
+
+.module-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.module-checkbox-wrapper {
+    padding-top: 3px;
+    cursor: pointer;
+    position: relative;
+}
+
+.module-checkbox-wrapper input {
+    display: none;
+}
+
+.module-checkbox-custom {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    background: white;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.module-checkbox-wrapper input:checked~.module-checkbox-custom {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.module-checkbox-wrapper input:checked~.module-checkbox-custom::after {
+    content: "✓";
+    position: absolute;
+    top: -2px;
+    left: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.module-info {
+    flex: 1;
+}
+
+.module-number {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.module-titre {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 6px;
+}
+
+.module-contenu {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.module-check-icon {
+    font-size: 1.4rem;
+    color: var(--success);
+    flex-shrink: 0;
+}
+
+.modules-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Ressources */
+.ressources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.ressource-card {
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary-light), var(--surface));
+    border: 1.5px solid var(--primary-light);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.ressource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--primary);
+}
+
+.ressource-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.ressource-icon {
+    font-size: 1.6rem;
+    color: var(--primary);
+}
+
+.ressource-type {
+    font-size: 0.8rem;
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.ressource-titre {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.ressource-taille {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.ressource-btn {
+    padding: 8px 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.ressource-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.02);
+}
+
+/* Évaluation */
+.evaluation-card {
+    padding: 24px;
+    background: linear-gradient(135deg, var(--primary-light), rgba(255, 179, 71, 0.1));
+    border-radius: 12px;
+    text-align: center;
+}
+
+.evaluation-desc {
+    color: var(--text-main);
+    margin-bottom: 16px;
+    font-size: 1rem;
+}
+
+.stars-rating {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.star {
+    font-size: 2rem;
+    color: var(--border);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.star:hover {
+    color: var(--accent);
+    transform: scale(1.2) translateY(-4px);
+}
+
+.star.active {
+    color: var(--accent);
+}
+
+.evaluation-feedback {
+    color: var(--primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Certificat */
+.certificat-card {
+    padding: 24px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.certificat-text {
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.btn-share {
+    margin-left: 10px;
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-share:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Modal certificat */
+.certificat-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.certificat-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.certificat-content {
+    position: relative;
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+}
+
+.certificat-content h2 {
+    color: var(--primary);
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+}
+
+.certificat-body {
+    background: linear-gradient(135deg, var(--primary-light), white);
+    padding: 30px;
+    border-radius: 12px;
+    border: 2px solid var(--primary);
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.certificat-body p {
+    margin: 8px 0;
+    color: var(--text-main);
+    font-size: 1rem;
+}
+
+.certificat-nom {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 14px 0 !important;
+}
+
+.certificat-titre {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 14px 0 !important;
+    font-style: italic;
+}
+
+.certificat-date {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-top: 16px !important;
+}
+
+/* Chargement */
+.suivi-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.2rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.suivi-error {
+    padding: 40px;
+    text-align: center;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1.5px solid var(--border);
+}
+
+.suivi-error p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .suivi-main {
+        padding: 16px;
+        gap: 20px;
+    }
+
+    .suivi-hero {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .suivi-progress-circle {
+        width: 140px;
+        height: 140px;
+        align-self: center;
+    }
+
+    .suivi-titre {
+        font-size: 1.8rem;
+    }
+
+    .suivi-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .suivi-meta {
+        gap: 12px;
+    }
+
+    .meta-item {
+        font-size: 0.9rem;
+    }
+
+    .ressources-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    .stars-rating {
+        gap: 8px;
+    }
+
+    .star {
+        font-size: 1.6rem;
+    }
+
+    .module-header {
+        gap: 10px;
+    }
+
+    .suivi-modules-section,
+    .suivi-ressources-section,
+    .suivi-evaluation-section,
+    .suivi-certificat-section {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .suivi-main {
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .suivi-hero {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .suivi-titre {
+        font-size: 1.5rem;
+    }
+
+    .suivi-meta {
+        gap: 8px;
+        flex-wrap: nowrap;
+        font-size: 0.85rem;
+    }
+
+    .meta-item {
+        font-size: 0.8rem;
+    }
+
+    .suivi-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .ressources-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .certificat-content {
+        padding: 20px;
+    }
+
+    .certificat-body {
+        padding: 16px;
+    }
+}

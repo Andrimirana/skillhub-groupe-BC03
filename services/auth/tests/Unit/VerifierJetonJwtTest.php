@@ -28,6 +28,7 @@ class VerifierJetonJwtTest extends TestCase
         $this->middleware = new VerifierJetonJwt($this->serviceJwt);
     }
 
+    // Méthode utilitaire pour générer un token JWT valide pour un utilisateur donné
     public function test_request_rejected_when_token_missing(): void
     {
         $request = Request::create('/test', 'GET');
@@ -41,6 +42,7 @@ class VerifierJetonJwtTest extends TestCase
         $this->assertStringContainsString('manquant', $data['message'] ?? '');
     }
 
+    // Test pour s'assurer que la requête est bloquée si le token JWT est invalide
     public function test_request_rejected_when_token_blacklisted(): void
     {
         $user = User::factory()->create();
@@ -67,6 +69,7 @@ class VerifierJetonJwtTest extends TestCase
         $this->assertStringContainsString('invalide', $data['message'] ?? '');
     }
 
+    // Test pour s'assurer que la requête est bloquée si le token JWT est invalide
     public function test_request_rejected_when_token_invalid(): void
     {
         $request = Request::create('/test', 'GET');

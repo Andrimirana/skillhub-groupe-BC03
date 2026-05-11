@@ -255,6 +255,197 @@
     background: #fff;
 }
 
+.progression-hero {
+    background: linear-gradient(135deg, #f4f0ff 0%, #ffffff 100%);
+}
+
+.progression-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.progression-titre {
+    margin: 0 0 6px 0;
+    font-size: 1.6rem;
+}
+
+.progression-description {
+    margin: 0;
+    color: var(--text-muted);
+    max-width: 640px;
+}
+
+.progression-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+}
+
+.progression-circle svg {
+    transform: rotate(0deg);
+}
+
+.progression-circle-bg {
+    fill: none;
+    stroke: var(--violet-soft);
+    stroke-width: 10;
+}
+
+.progression-circle-fill {
+    fill: none;
+    stroke: var(--violet);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.4s ease;
+}
+
+.progression-circle-label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--violet);
+}
+
+.progression-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.progression-stat {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.progression-stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.progression-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.progression-bar-wrap {
+    margin-top: 18px;
+}
+
+.progression-bar-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--violet-soft);
+    overflow: hidden;
+}
+
+.progression-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ba1f2, var(--violet));
+    transition: width 0.4s ease;
+    border-radius: 999px;
+}
+
+.progression-help {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0 0 10px 0;
+}
+
+.modules-progression {
+    list-style: none;
+    padding-left: 0;
+}
+
+.modules-progression li {
+    background: var(--surface);
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.modules-progression li.module-fait {
+    background: #f1f9f3;
+    border-color: #cce8d3;
+}
+
+.module-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.module-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.module-tick {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border: 2px solid var(--violet);
+    border-radius: 6px;
+    background: #fff;
+    margin-top: 2px;
+    position: relative;
+    transition: background 0.15s ease;
+}
+
+.module-checkbox input[type="checkbox"]:checked + .module-tick {
+    background: var(--violet);
+}
+
+.module-checkbox input[type="checkbox"]:checked + .module-tick::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.module-checkbox:focus-within .module-tick {
+    outline: 3px solid rgba(98, 60, 222, 0.3);
+    outline-offset: 2px;
+}
+
+.module-corps {
+    flex: 1;
+}
+
+.module-corps strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.module-corps p {
+    margin: 0;
+}
+
+.module-fait .module-corps strong {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
 @media (max-width: 768px) {
     .public-nav {
         flex-wrap: wrap;
@@ -267,5 +458,10 @@
 
     .formations-layout {
         grid-template-columns: 1fr;
+    }
+
+    .progression-header {
+        justify-content: center;
+        text-align: center;
     }
 }

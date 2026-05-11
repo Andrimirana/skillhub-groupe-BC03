@@ -12,6 +12,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
+//  vérifie que les requêtes entrantes contiennent des en-têtes de sécurité valides (nonce, horodatage, signature HMAC).
 class AntiRejeuHmac
 {
     private const LIMITE_SECONDES = 300;
@@ -37,6 +38,7 @@ class AntiRejeuHmac
             return response()->json(['message' => 'Tentative de rejeu détectée.'], 403);
         }
 
+        // La signature HMAC est recalculée et comparée à celle fournie pour vérifier l'intégrité de la requête
         $contenuAVerifier  = $requete->getContent() . $nonce . $horodatage;
         $signatureAttendue = hash_hmac('sha256', $contenuAVerifier, env('APP_MASTER_KEY', 'CleDeTestSecrete123!'));
 

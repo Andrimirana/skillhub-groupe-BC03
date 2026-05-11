@@ -21,7 +21,7 @@ class AuthControllerAdditionalTest extends TestCase
             'exp'   => time() + 3600
         ]);
     }
-
+    // Methode pour générer les entêtes de sécurité
     private function genererEntetesSecurite(array $donnees = []): array
     {
         $payload = json_encode($donnees);
@@ -39,6 +39,7 @@ class AuthControllerAdditionalTest extends TestCase
         ];
     }
 
+    // Vérifie que la route de profil retourne les données correctes de l'utilisateur authentifié.
     public function test_profil_returns_correct_user_data(): void
     {
         $user = User::factory()->create([
@@ -69,6 +70,8 @@ class AuthControllerAdditionalTest extends TestCase
         $response->assertStatus(403);
     }
 
+    // Vérifie que la validation d'un token avec un utilisateur supprimé échoue correctement.
+
     public function test_validation_interne_echoue_si_utilisateur_supprime(): void
     {
         $user = User::factory()->create();
@@ -79,6 +82,7 @@ class AuthControllerAdditionalTest extends TestCase
         $response->assertStatus(401)->assertJson(['valid' => false, 'message' => 'Utilisateur introuvable.']);
     }
 
+    // Vérifie que l'inscription avec des données valides crée un utilisateur et retourne un token.
     public function test_inscription_returns_token_and_user_info(): void
     {
         $donnees = ['nom' => 'Jean Dupont', 'email' => 'jean@example.com', 'mot_de_passe' => 'Password1!', 'role' => 'apprenant'];
@@ -111,6 +115,8 @@ class AuthControllerAdditionalTest extends TestCase
         $response->assertStatus(401);
     }
 
+    // Vérifie que l'inscription échoue si le nom est manquant.
+
     public function test_inscription_echoue_si_nom_manquant(): void
     {
         $donnees = ['email' => 'test@example.com', 'mot_de_passe' => 'Password1!', 'role' => 'apprenant'];
@@ -118,6 +124,7 @@ class AuthControllerAdditionalTest extends TestCase
         $response->assertStatus(422)->assertJsonValidationErrors(['nom']);
     }
 
+    // Vérifie que l'inscription échoue si le mot de passe est trop court.
     public function test_connexion_validation_requires_email_and_password(): void
     {
         $donnees = ['email' => 'test@example.com'];
@@ -141,12 +148,14 @@ class AuthControllerAdditionalTest extends TestCase
         $response->assertStatus(403);
     }
 
+    // Vérifie que la validation d'un token avec un utilisateur supprimé échoue correctement.
     public function test_validation_token_with_invalid_format(): void
     {
         $response = $this->withHeader('Authorization', 'Bearer abc.def.ghi')->postJson('/api/validate-token');
         $response->assertStatus(401)->assertJson(['valid' => false]);
     }
 
+    // Vérifie que la validation d'un token avec un utilisateur supprimé échoue correctement.
     public function test_multiple_roles_can_register(): void
     {
         $formateur = ['nom' => 'Formateur', 'email' => 'form@test.com', 'mot_de_passe' => 'Password1!', 'role' => 'formateur'];

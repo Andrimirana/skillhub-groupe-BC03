@@ -25,12 +25,14 @@ class AntiRejeuHmacTest extends TestCase
         config(['app.key' => 'CleDeTestSecrete123!']);
     }
 
+    // Méthode utilitaire pour générer une signature HMAC valide
     private function genererSignatureValide(string $contenu, string $nonce, int $timestamp): string
     {
         $donnees = $contenu . $nonce . $timestamp;
         return hash_hmac('sha256', $donnees, 'CleDeTestSecrete123!');
     }
 
+    // Test pour s'assurer que la requête est bloquée si la signature HMAC est manquante
     public function test_request_blocked_when_hmac_signature_missing(): void
     {
         $request = Request::create('/test', 'POST');
@@ -46,6 +48,7 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertStringContainsString('manquant', $data['message'] ?? '');
     }
 
+    // Test pour s'assurer que la requête est bloquée si le nonce est manquant
     public function test_request_blocked_when_nonce_missing(): void
     {
         $request = Request::create('/test', 'POST');
@@ -59,6 +62,7 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertEquals(403, $response->getStatusCode());
     }
 
+    // Test pour s'assurer que la requête est bloquée si le timestamp est manquant
     public function test_request_blocked_when_timestamp_missing(): void
     {
         $request = Request::create('/test', 'POST');
@@ -72,9 +76,10 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertEquals(403, $response->getStatusCode());
     }
 
+    // Test pour s'assurer que la requête est bloquée si le timestamp est trop dans le passe
     public function test_request_blocked_when_timestamp_expired(): void
     {
-        $expiredTimestamp = time() - 400; // 400 secondes dans le passé (> 300s limite)
+        $expiredTimestamp = time() - 400; 
         $nonce = 'test-nonce-' . uniqid();
         $content = '';
         
@@ -94,6 +99,7 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertStringContainsString('expir', $data['message'] ?? '');
     }
 
+    // Test pour s'assurer que la requête est bloquée si le timestamp est trop dans le futur
     public function test_request_blocked_when_nonce_already_used(): void
     {
         $timestamp = time();
@@ -119,6 +125,8 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertStringContainsString('rejeu', $data['message'] ?? '');
     }
 
+
+    // Test pour s'assurer que la requête est bloquée si la signature HMAC est invalide
     public function test_request_blocked_when_signature_invalid(): void
     {
         $timestamp = time();
@@ -141,7 +149,8 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertStringContainsString('invalide', $data['message'] ?? '');
     }
 
-    public function test_request_passes_with_valid_signature(): void
+    // Test pour s'assurer que la requête passe avec une signature HMAC valide et un nonce unique
+    public function test_request_passes_with_valid_signature(): void 
     {
         $timestamp = time();
         $nonce = 'test-nonce-' . uniqid();
@@ -186,6 +195,8 @@ class AntiRejeuHmacTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+
+    // Test pour s'assurer que la requête passe avec un timestamp dans le futur mais toujours dans la limite de 5 minutes
     public function test_future_timestamp_within_5_minutes_is_valid(): void
     {
         $timestamp = time() + 250; // 250 secondes dans le futur (< 300s limite)

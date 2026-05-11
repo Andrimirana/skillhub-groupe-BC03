@@ -15,7 +15,7 @@ class ActivityLogControllerTest extends TestCase
     use RefreshDatabase;
 
     public function test_get_activity_logs_for_formation(): void
-    {
+    { 
         // Créer 5 logs pour la formation ID 1
         ActivityLog::factory()->count(5)->create(['course_id' => 1]);
         

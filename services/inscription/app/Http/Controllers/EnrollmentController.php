@@ -20,6 +20,8 @@ class EnrollmentController extends Controller
     {
     }
 
+    // Inscription à une formation. Seuls les apprenants peuvent s'inscrire. Vérifie l'existence de la formation auprès du service Catalog avant de créer l'inscription. Enregistre l'activité d'inscription dans MongoDB.
+
     public function store(Request $requete, int $idFormation): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -44,6 +46,8 @@ class EnrollmentController extends Controller
             'date_inscription' => now(),
         ]);
 
+
+        // Enregistrement de l'activité d'inscription dans MongoDB
         $this->mongoLogger->log('course_enrollment', [
             'user_id'   => $utilisateurAuth['id'],
             'course_id' => $idFormation,
@@ -58,6 +62,7 @@ class EnrollmentController extends Controller
         ], 201);
     }
 
+    // Désinscription d'une formation. Seuls les apprenants peuvent se désinscrire. Supprime l'inscription de la base de données.
     public function destroy(Request $requete, int $idFormation): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -103,6 +108,8 @@ class EnrollmentController extends Controller
             }
         }
 
+
+        // Combinaison des données d'inscription et de formation pour la réponse finale
         $resultat = $inscriptions->map(function (Enrollment $inscription) use ($formations): array {
             $formation = $formations->get($inscription->formation_id, []);
 

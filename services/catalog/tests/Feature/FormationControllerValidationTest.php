@@ -30,6 +30,7 @@ class FormationControllerValidationTest extends TestCase
         ]);
     }
 
+    // Vérifie que la création d'une formation sans titre échoue avec une erreur de validation.
     public function test_create_formation_with_missing_title_fails(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -44,6 +45,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertJsonValidationErrors(['titre']);
     }
 
+    // Vérifie qu'un niveau de formation non reconnu est rejeté à la création.
     public function test_create_formation_with_invalid_niveau_fails(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -59,6 +61,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertJsonValidationErrors(['niveau']);
     }
 
+    // Vérifie qu'une durée négative est refusée par la validation à la création.
     public function test_create_formation_with_negative_duree_fails(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -74,6 +77,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertJsonValidationErrors(['duree']);
     }
 
+    // Vérifie qu'un titre dépassant la longueur maximale est refusé à la mise à jour.
     public function test_update_formation_with_too_long_title_fails(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -90,6 +94,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertJsonValidationErrors(['titre']);
     }
 
+    // Vérifie qu'une description vide est refusée à la mise à jour d'une formation.
     public function test_update_formation_with_empty_description_fails(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -106,6 +111,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertJsonValidationErrors(['description']);
     }
 
+    // Vérifie que la suppression d'une formation inexistante renvoie un 404.
     public function test_delete_nonexistent_formation_returns_404(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -115,6 +121,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertNotFound();
     }
 
+    // Vérifie que la mise à jour d'une formation inexistante renvoie un 404.
     public function test_update_nonexistent_formation_returns_404(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -129,12 +136,14 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertNotFound();
     }
 
+    // Vérifie que l'affichage d'une formation inexistante renvoie un 404.
     public function test_show_nonexistent_formation_returns_404(): void
     {
         $reponse = $this->getJson('/api/formations/999999');
         $reponse->assertNotFound();
     }
 
+    // Vérifie qu'une création avec des données valides aboutit à un 201 et insère bien la formation.
     public function test_create_formation_with_valid_data_creates_successfully(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -155,6 +164,7 @@ class FormationControllerValidationTest extends TestCase
         ]);
     }
 
+    // Vérifie que la recherche par mot-clé renvoie uniquement les formations correspondantes.
     public function test_search_formations_with_query_parameter(): void
     {
         Formation::factory()->create(['titre' => 'Laravel Advanced', 'description' => 'Laravel avancé']);
@@ -168,6 +178,7 @@ class FormationControllerValidationTest extends TestCase
         $reponse->assertJsonFragment(['titre' => 'Laravel Advanced']);
     }
 
+    // Vérifie que le filtrage par niveau renvoie le bon nombre de formations.
     public function test_filter_formations_by_niveau(): void
     {
         Formation::factory()->create(['titre' => 'Formation 1', 'niveau' => 'débutant']);

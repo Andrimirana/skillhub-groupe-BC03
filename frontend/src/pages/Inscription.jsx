@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { inscrire } from "../services/authApi";
 import { sauvegarderSession } from "../services/auth";
+import PublicNavbar from "../components/PublicNavbar";
 import "../styles/connexion.css";
 
 function Inscription() {
@@ -163,10 +164,19 @@ function Inscription() {
   };
 
   return (
-    <main className="connexion-page">
-      <section className="connexion-carte" aria-labelledby="titre-inscription">
-        <h1 id="titre-inscription">Inscription</h1>
-        <p>Créez votre compte pour accéder au dashboard.</p>
+    <>
+      <PublicNavbar
+        menuItems={[
+          { label: "Accueil", to: "/" },
+          { label: "Formations", to: "/formations" },
+          { label: "À propos", href: "#" },
+          { label: "Contact", href: "#footer" },
+        ]}
+      />
+      <main className="connexion-page">
+        <section className="connexion-carte" aria-labelledby="titre-inscription">
+          <h1 id="titre-inscription">Inscription</h1>
+          <p>Créez votre compte pour accéder au dashboard.</p>
 
         <form onSubmit={gererInscription} className="connexion-formulaire" noValidate>
           <label>
@@ -264,8 +274,10 @@ function Inscription() {
           </p>
         </form>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
 
 export default Inscription;
+

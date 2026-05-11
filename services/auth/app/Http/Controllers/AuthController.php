@@ -2,7 +2,7 @@
 
 /**
  * Fichier : AuthController.php
- * Rôle    : Gère l'inscription, la connexion, la déconnexion et la validation des jetons JWT.
+ * Rôle    : Gère l'inscription, la connexion, la déconnexion et la validation des jetons JWT
  * Modifié : 2026-04-21
  */
 
@@ -22,6 +22,8 @@ class AuthController extends Controller
     public function __construct(private ServiceJwt $serviceJwt)
     {
     }
+
+    // Inscription
 
     public function inscription(Request $requete): JsonResponse
     {
@@ -53,6 +55,7 @@ class AuthController extends Controller
         return response()->json($this->construireReponseJwt($utilisateur, $jeton, $expiration), 201);
     }
 
+    // Connexion
     public function connexion(Request $requete): JsonResponse
     {
         $donneesValidees = $requete->validate([
@@ -80,11 +83,13 @@ class AuthController extends Controller
         return response()->json($this->construireReponseJwt($utilisateur, $jeton, $expiration));
     }
 
+    // Retourne les informations du profil de l'utilisateur authentifié.
     public function profil(Request $requete): JsonResponse
     {
         return response()->json($this->presenterUtilisateur($requete->user()));
     }
 
+    // Déconnecte l'utilisateur en blacklistant le jeton JWT dans le cache jusqu'à son expiration naturelle.
     public function deconnexion(Request $requete): JsonResponse
     {
         $jeton = $requete->bearerToken();
@@ -105,6 +110,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Déconnexion effectuée.']);
     }
 
+    // Modifie le mot de passe de l'utilisateur authentifié après validation de l'ancien mot de passe.
     public function modifierMotDePasse(Request $requete): JsonResponse
     {
         $utilisateur = $requete->user();
@@ -125,6 +131,8 @@ class AuthController extends Controller
         return response()->json(['message' => 'Mot de passe modifié avec succès.']);
     }
 
+
+    // Valide un jeton JWT et retourne les informations de l'utilisateur associé si le jeton est valide.
     public function validateToken(Request $requete): JsonResponse
     {
         $resultat = $this->verifierValiditeToken($requete->bearerToken());
@@ -161,6 +169,7 @@ class AuthController extends Controller
         }
     }
 
+    // Présente les données de l'utilisateur de manière structurée pour les réponses API.
     private function presenterUtilisateur(User $utilisateur): array
     {
         return [
@@ -171,6 +180,7 @@ class AuthController extends Controller
         ];
     }
 
+    // Construit la réponse JSON pour les endpoints d'authentification, incluant le jeton JWT et les informations utilisateur.
     private function construireReponseJwt(User $utilisateur, string $jeton, int $expiration): array
     {
         return [
@@ -181,6 +191,7 @@ class AuthController extends Controller
         ];
     }
 
+    // Génère des en-têtes de sécurité pour les tests d'inscription, incluant une signature HMAC pour les données sensibles.
     private function cleBlacklist(string $jeton): string
     {
         return 'jwt_blacklist:' . hash('sha256', $jeton);

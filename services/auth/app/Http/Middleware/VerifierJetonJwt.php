@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
+// Ce middleware est appliqué aux routes qui nécessitent une authentification via JWT. Il vérifie la validité du jeton, s'assure que l'utilisateur existe et injecte l'utilisateur dans la requête pour une utilisation ultérieure dans les contrôleurs.
 class VerifierJetonJwt
 {
     public function __construct(private ServiceJwt $serviceJwt)
@@ -53,7 +54,7 @@ class VerifierJetonJwt
         }
     }
 
-    private function cleBlacklist(string $jeton): string
+    private function cleBlacklist(string $jeton): string // Génère une clé de cache unique pour blacklisté un jeton JWT en utilisant un hash sécurisé du jeton lui-même.
     {
         return 'jwt_blacklist:' . hash('sha256', $jeton);
     }

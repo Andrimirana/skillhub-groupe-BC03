@@ -90,8 +90,13 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth_api:8000}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017}
+      MONGO_DATABASE: ${MONGO_DATABASE:-skillhub_logs}
+      MONGO_COLLECTION: ${MONGO_COLLECTION:-activity_logs}
     depends_on:
       db:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     networks:
       - skillhub_network
@@ -133,8 +138,13 @@ services:
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth_api:8000}
       CATALOG_SERVICE_URL: ${CATALOG_SERVICE_URL:-http://catalog_api:8000}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017}
+      MONGO_DATABASE: ${MONGO_DATABASE:-skillhub_logs}
+      MONGO_COLLECTION: ${MONGO_COLLECTION:-activity_logs}
     depends_on:
       db:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     networks:
       - skillhub_network

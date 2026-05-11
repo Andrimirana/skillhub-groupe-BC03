@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import { deconnecter } from "../services/authApi";
 import { listerFormations } from "../services/formationsApi";
-import logoSkillHub from "../assets/logo.svg";
+import PublicNavbar from "../components/PublicNavbar";
 import "../styles/formations-page.css";
 
 const CATEGORIES = ["", "dev", "design", "business", "marketing"];
@@ -157,33 +157,6 @@ function Formations() {
     };
   }, [recherche, categorie, niveau, minHeures, maxHeures, minPrix, maxPrix, formations]);
 
-  const appliquerRechercheEtFiltres = () => {
-    const query = recherche.trim().toLowerCase();
-    const minH = Number.isNaN(parseFloat(minHeures)) ? 0 : parseFloat(minHeures);
-    const maxH = Number.isNaN(parseFloat(maxHeures)) ? Number.POSITIVE_INFINITY : parseFloat(maxHeures);
-    const minP = Number.isNaN(parseFloat(minPrix)) ? 0 : parseFloat(minPrix);
-    const maxP = Number.isNaN(parseFloat(maxPrix)) ? Number.POSITIVE_INFINITY : parseFloat(maxPrix);
-
-    const resultat = formations.filter((formation) => {
-      const matchQuery =
-        formation.nom.toLowerCase().includes(query)
-        || formation.description.toLowerCase().includes(query)
-        || formation.categorie.toLowerCase().includes(query);
-
-      const matchFiltres =
-        (categorie === "" || formation.categorie === categorie)
-        && (niveau === "" || formation.level === niveau)
-        && formation.duree >= minH
-        && formation.duree <= maxH
-        && formation.prix >= minP
-        && formation.prix <= maxP;
-
-      return matchQuery && matchFiltres;
-    });
-
-    setFormationsFiltrees(resultat);
-  };
-
   const gererDeconnexion = async () => {
     try { await deconnecter(); } catch { /* ignore */ }
     finally { supprimerSession(); navigate("/connexion", { replace: true }); }
@@ -197,51 +170,16 @@ function Formations() {
   const fermerModal = () => setModalOuverte(false);
   const soumettreModal = (e) => { e.preventDefault(); navigate("/inscription"); };
 
-  const rechercher = (event) => {
-    event.preventDefault();
-  };
-
   return (
     <>
-      <header className="header">
-        <nav className="navbar" aria-label="Navigation principale">
-          <div className="logo">
-            <img src={logoSkillHub} alt="Logo SkillHub" />
-          </div>
-          <button
-            className="menuburger"
-            id="burger"
-            aria-label="Ouvrir le menu"
-            aria-expanded={menuOuvert}
-            aria-controls="navigation-menu"
-            type="button"
-            onClick={() => setMenuOuvert((valeur) => !valeur)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-          <ul className={`liens-navigation ${menuOuvert ? "active" : ""}`} id="navigation-menu">
-            <li><Link to="/">Accueil</Link></li>
-            <li><a href="#">À propos</a></li>
-            <li><a href="#footer">Contact</a></li>
-            {!utilisateur && (
-              <li><Link to="/connexion">Se connecter</Link></li>
-            )}
-          </ul>
-          <div className="bouton-inscription">
-            {utilisateur ? (
-              <button className="btn-login btn-logout" type="button" onClick={gererDeconnexion}>
-                Se déconnecter
-              </button>
-            ) : (
-              <button id="openModal" className="btn-login" aria-haspopup="dialog" type="button" onClick={ouvrirModal}>
-                S'inscrire
-              </button>
-            )}
-          </div>
-        </nav>
-      </header>
+      <PublicNavbar
+        menuItems={[
+          { label: "Accueil", to: "/" },
+          { label: "Formations", to: "/formations" },
+          { label: "À propos", href: "#" },
+          { label: "Contact", href: "#footer" },
+        ]}
+      />
 
       <main id="contenu">
         <section className="hero" aria-labelledby="hero-title">
@@ -254,7 +192,7 @@ function Formations() {
             <h1 id="hero-title">Découvre nos formations</h1>
             <p>Explore des parcours modernes, orientés pratique et progression continue.</p>
           </div>
-          <form className="search barre-recherche" aria-label="Recherche sur le site" role="search" onSubmit={rechercher}>
+          <form className="search barre-recherche" aria-label="Recherche sur le site" role="search">
             <div className="search-input">
               <input
                 type="text"
@@ -264,7 +202,6 @@ function Formations() {
                 value={recherche}
                 onChange={(event) => setRecherche(event.target.value)}
               />
-              <button type="submit">Chercher</button>
             </div>
           </form>
         </section>
@@ -325,7 +262,6 @@ function Formations() {
               value={maxPrix}
               onChange={(event) => setMaxPrix(event.target.value)}
             />
-            <button id="filterBtn" type="button" onClick={appliquerRechercheEtFiltres}>Filtrer</button>
           </aside>
           <div className="cards-container" id="cardsContainer" aria-live="polite">
             {erreur && <p>Impossible de charger les formations.</p>}

@@ -34,6 +34,7 @@ class ModuleControllerTest extends TestCase
         ]);
     }
 
+    // Vérifie que la liste des modules d'une formation renvoie tous ses modules.
     public function test_list_modules(): void
     {
         $formation = Formation::factory()->create();
@@ -43,6 +44,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertOk()->assertJsonCount(3);
     }
 
+    // Vérifie que le formateur propriétaire de la formation peut y ajouter un module.
     public function test_add_module_as_owner(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -55,6 +57,7 @@ class ModuleControllerTest extends TestCase
         $this->assertDatabaseHas('modules', ['titre' => 'Introduction', 'formation_id' => $formation->id]);
     }
 
+    // Vérifie qu'un formateur ne peut pas ajouter un module à la formation d'un autre formateur.
     public function test_add_module_other_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -68,6 +71,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
+    // Vérifie qu'un apprenant ne peut pas ajouter un module à une formation.
     public function test_add_module_forbidden_for_learner(): void
     {
         $this->simulerConnexion($this->profilApprenant);
@@ -81,6 +85,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
+    // Vérifie que le formateur peut modifier un module de sa propre formation.
     public function test_update_own_module(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -93,6 +98,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertOk()->assertJsonPath('titre', 'Titre modifié');
     }
 
+    // Vérifie qu'un formateur ne peut pas modifier un module appartenant à une autre formation.
     public function test_update_other_module_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -108,6 +114,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
+    // Vérifie que le formateur peut supprimer un module de sa propre formation.
     public function test_delete_own_module(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -119,6 +126,7 @@ class ModuleControllerTest extends TestCase
         $this->assertDatabaseMissing('modules', ['id' => $module->id]);
     }
 
+    // Vérifie qu'un formateur ne peut pas supprimer un module d'une formation qu'il ne possède pas.
     public function test_delete_other_module_forbidden(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -129,6 +137,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
+    // Vérifie qu'un module créé avec un ordre personnalisé conserve cette valeur.
     public function test_add_module_with_custom_ordre(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -140,6 +149,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertCreated()->assertJsonPath('ordre', 5);
     }
 
+    // Vérifie que l'ordre est calculé automatiquement si non fourni à la création du module.
     public function test_add_module_without_ordre_sets_auto_increment(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -152,6 +162,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertCreated()->assertJsonPath('ordre', 4);
     }
 
+    // Vérifie que la création d'un module sans titre échoue avec une erreur de validation.
     public function test_module_validation_requires_titre(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -163,6 +174,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertStatus(422)->assertJsonValidationErrors(['titre']);
     }
 
+    // Vérifie que la création d'un module sans contenu échoue avec une erreur de validation.
     public function test_module_validation_requires_contenu(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -174,6 +186,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertStatus(422)->assertJsonValidationErrors(['contenu']);
     }
 
+    // Vérifie que la mise à jour d'un module enregistre bien le nouvel ordre.
     public function test_update_module_changes_ordre(): void
     {
         $this->simulerConnexion($this->profilFormateur);
@@ -186,6 +199,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertOk()->assertJsonPath('ordre', 10);
     }
 
+    // Vérifie qu'une formation sans modules renvoie une liste vide sans erreur.
     public function test_list_modules_returns_empty_array_for_formation_without_modules(): void
     {
         $formation = Formation::factory()->create();
@@ -194,6 +208,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertOk()->assertJsonCount(0);
     }
 
+    // Vérifie qu'un apprenant ne peut pas modifier un module et reçoit un 403.
     public function test_update_module_as_learner_forbidden(): void
     {
         $this->simulerConnexion($this->profilApprenant);
@@ -208,6 +223,7 @@ class ModuleControllerTest extends TestCase
         $reponse->assertForbidden();
     }
 
+    // Vérifie qu'un apprenant ne peut pas supprimer un module et reçoit un 403.
     public function test_delete_module_as_learner_forbidden(): void
     {
         $this->simulerConnexion($this->profilApprenant);

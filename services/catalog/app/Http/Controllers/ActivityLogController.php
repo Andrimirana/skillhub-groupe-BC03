@@ -3,7 +3,7 @@
 /**
  * Fichier : ActivityLogController.php
  * Rôle    : Expose les logs d'activité MongoDB d'une formation via l'API REST.
- * Modifié : 2026-04-21
+ * Modifié : 2026-05-08
  */
 
 namespace App\Http\Controllers;
@@ -19,10 +19,7 @@ class ActivityLogController extends Controller
      */
     public function getByFormation(int $formationId): JsonResponse
     {
-        $logs = ActivityLog::where('course_id', $formationId)
-            ->orderByDesc('timestamp')
-            ->limit(50)
-            ->get();
+        $logs = ActivityLog::forCourse($formationId, 50);
 
         return response()->json($logs);
     }

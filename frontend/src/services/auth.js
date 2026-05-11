@@ -1,3 +1,8 @@
+// services/auth.js
+/*
+| Projet: SkillHub
+| Rôle du fichier: Gestion de la session d'authentification côté client (stockage du token JWT et des infos utilisateur dans localStorage).
+*/
 const CLE_JETON = "jeton_auth";
 const CLE_UTILISATEUR = "utilisateur_auth";
 

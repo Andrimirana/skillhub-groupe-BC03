@@ -11,6 +11,7 @@ class FormationModelTest extends TestCase
 {
     use RefreshDatabase;
 
+    // Vérifie que tous les champs fillable du modèle Formation sont bien persistés en base.
     public function test_formation_has_all_fillable_attributes(): void
     {
         $data = [
@@ -35,6 +36,7 @@ class FormationModelTest extends TestCase
         $this->assertEquals(99.99, $formation->price);
     }
 
+    // Vérifie que le champ date est bien casté en instance Carbon par Eloquent.
     public function test_formation_casts_date_correctly(): void
     {
         $formation = Formation::factory()->create(['date' => '2026-07-15']);
@@ -43,6 +45,7 @@ class FormationModelTest extends TestCase
         $this->assertEquals('2026-07-15', $formation->date->toDateString());
     }
 
+    // Vérifie que le prix est casté en décimal sous forme de chaîne avec deux décimales.
     public function test_formation_casts_price_as_decimal(): void
     {
         $formation = Formation::factory()->create(['price' => 149.50]);
@@ -51,6 +54,7 @@ class FormationModelTest extends TestCase
         $this->assertEquals('149.50', $formation->price);
     }
 
+    // Vérifie que la durée est castée en entier même quand fournie sous forme de chaîne.
     public function test_formation_casts_duration_as_integer(): void
     {
         $formation = Formation::factory()->create(['duration' => '15']);
@@ -59,6 +63,7 @@ class FormationModelTest extends TestCase
         $this->assertEquals(15, $formation->duration);
     }
 
+    // Vérifie que la relation HasMany vers les modules est bien définie sur la Formation.
     public function test_formation_has_modules_relationship(): void
     {
         $formation = Formation::factory()->create();
@@ -68,6 +73,7 @@ class FormationModelTest extends TestCase
         $this->assertCount(3, $formation->modules);
     }
 
+    // Vérifie que les modules d'une formation sont triés par leur champ ordre croissant.
     public function test_modules_are_ordered_by_ordre(): void
     {
         $formation = Formation::factory()->create();
@@ -82,6 +88,7 @@ class FormationModelTest extends TestCase
         $this->assertEquals('Third', $modules[2]->titre);
     }
 
+    // Vérifie qu'une formation existante peut être mise à jour.
     public function test_formation_can_be_updated(): void
     {
         $formation = Formation::factory()->create(['titre' => 'Original Title']);
@@ -91,6 +98,7 @@ class FormationModelTest extends TestCase
         $this->assertEquals('Updated Title', $formation->fresh()->titre);
     }
 
+    // Vérifie qu'une formation peut être supprimée et n'est plus présente en base.
     public function test_formation_can_be_deleted(): void
     {
         $formation = Formation::factory()->create();
@@ -101,6 +109,7 @@ class FormationModelTest extends TestCase
         $this->assertDatabaseMissing('formations', ['id' => $id]);
     }
 
+    // Vérifie que les valeurs par défaut (vues et nb d'apprenants) sont bien à zéro.
     public function test_formation_default_values(): void
     {
         $formation = Formation::factory()->create([

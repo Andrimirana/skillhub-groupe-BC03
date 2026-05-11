@@ -6,6 +6,7 @@
 import axios from "axios";
 import { recupererJeton, supprimerSession } from "./auth";
 
+// Client API Axios pour le service Inscription
 const inscriptionApi = axios.create({
   baseURL: import.meta.env.VITE_INSCRIPTION_URL || "http://127.0.0.1:8003/api",
   headers: {
@@ -13,6 +14,7 @@ const inscriptionApi = axios.create({
   },
 });
 
+// Interceptor pour ajouter le token d'authentification à chaque requête
 inscriptionApi.interceptors.request.use((configuration) => {
   const jeton = recupererJeton();
   if (jeton) {
@@ -21,6 +23,7 @@ inscriptionApi.interceptors.request.use((configuration) => {
   return configuration;
 });
 
+// Interceptor pour gérer les erreurs de réponse, notamment les erreurs 401 pour la déconnexion automatique.
 inscriptionApi.interceptors.response.use(
   (reponse) => reponse,
   (erreur) => {

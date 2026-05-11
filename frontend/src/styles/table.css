@@ -1,17 +1,19 @@
 /* TABLEAU PRINCIPAL */
+
 .liste {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
-  border-radius: 14px;
+  background: var(--surface);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid #e7e9f4;
-  box-shadow: 0 10px 24px rgba(47, 55, 95, 0.08);
-  font-size: 14px;
+  border: 1.5px solid var(--primary-light);
+  box-shadow: var(--shadow);
+  font-size: 15px;
 }
 
+
 .liste thead {
-  background: rgba(98, 60, 222, 0.08);
+  background: var(--primary-light);
 }
 
 .liste th,
@@ -21,10 +23,11 @@
   vertical-align: middle;
 }
 
+
 .liste th {
-  color: #464d69;
-  font-weight: 600;
-  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.93rem;
   letter-spacing: 0.01em;
 }
 

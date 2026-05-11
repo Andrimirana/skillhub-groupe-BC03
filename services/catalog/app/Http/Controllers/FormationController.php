@@ -20,6 +20,8 @@ class FormationController extends Controller
     {
     }
 
+
+    // Liste toutes les formations avec possibilité de filtrer par recherche, catégorie et niveau. Les formateurs ne voient que leurs propres formations.
     public function index(Request $requete): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -58,6 +60,7 @@ class FormationController extends Controller
         return response()->json($formations);
     }
 
+    // Liste les formations du formateur connecté
     public function myFormations(Request $requete): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -76,6 +79,8 @@ class FormationController extends Controller
         return response()->json($formations);
     }
 
+
+    // Affiche les détails d'une formation spécifique, y compris les modules associés. Incrémente le compteur de vues et enregistre l'activité dans MongoDB.
     public function show(Formation $formation): JsonResponse
     {
         $formation->increment('vues');
@@ -95,6 +100,7 @@ class FormationController extends Controller
         ]);
     }
 
+    // Crée une nouvelle formation. Seuls les formateurs peuvent créer des formations. Enregistre l'activité de création dans MongoDB.
     public function store(Request $requete): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -130,6 +136,7 @@ class FormationController extends Controller
         return response()->json($this->presenterFormation($formation, true), 201);
     }
 
+    // Modifie une formation existante. Seuls les formateurs peuvent modifier leurs propres formations. Enregistre l'activité de modification dans MongoDB.
     public function update(Request $requete, Formation $formation): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -167,6 +174,7 @@ class FormationController extends Controller
         return response()->json($this->presenterFormation($formation, true));
     }
 
+    // Supprime une formation. Seuls les formateurs peuvent supprimer leurs propres formations. Enregistre l'activité de suppression dans MongoDB.
     public function destroy(Request $requete, Formation $formation): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -213,6 +221,8 @@ class FormationController extends Controller
         ];
     }
 
+    
+
     private function presenterFormation(Formation $formation, bool $inclureUserId): array
     {
         $donnees = [
@@ -255,6 +265,7 @@ class FormationController extends Controller
         }
     }
 
+    // Modules par défaut utilisés si aucun module n'est fourni lors de la création d'une formation.
     private function modulesParDefaut(): array
     {
         return [

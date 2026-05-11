@@ -1,0 +1,424 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SkillHub API",
+    "version": "1.0.0",
+    "description": "API complète de la plateforme SkillHub pour la gestion des formations et inscriptions",
+    "contact": {
+      "name": "Équipe SkillHub",
+      "email": "support@skillhub.com"
+    }
+  },
+  "servers": [
+    { "url": "http://localhost:8000", "description": "Service Auth" },
+    { "url": "http://localhost:8001", "description": "Service Catalog" },
+    { "url": "http://localhost:8002", "description": "Service Inscription" }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "Authentification et sessions" },
+    { "name": "Formations", "description": "Gestion des formations" },
+    { "name": "Inscriptions", "description": "Gestion des inscriptions" },
+    { "name": "Utilisateurs", "description": "Gestion des profils utilisateur" }
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Connexion utilisateur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 6 }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": { "description": "Identifiants invalides" },
+          "400": { "description": "Données manquantes" }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Inscription utilisateur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 6 },
+                  "nom": { "type": "string" },
+                  "prenom": { "type": "string" },
+                  "role": { "type": "string", "enum": ["apprenant", "formateur"] }
+                },
+                "required": ["email", "password", "nom", "prenom", "role"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Inscription réussie" },
+          "400": { "description": "Données invalides ou email déjà utilisé" }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Déconnexion utilisateur",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Déconnexion réussie" },
+          "401": { "description": "Non authentifié" }
+        }
+      }
+    },
+    "/api/auth/verify": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Vérifier la session",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Session valide",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": { "description": "Session invalide" }
+        }
+      }
+    },
+    "/api/formations": {
+      "get": {
+        "tags": ["Formations"],
+        "summary": "Lister toutes les formations",
+        "parameters": [
+          {
+            "name": "niveau",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["beginner", "intermediaire", "advanced"] }
+          },
+          {
+            "name": "categorie",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des formations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Formation" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Formations"],
+        "summary": "Créer une nouvelle formation",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Formation créée" },
+          "400": { "description": "Données invalides" },
+          "401": { "description": "Non authentifié" }
+        }
+      }
+    },
+    "/api/formations/{id}": {
+      "get": {
+        "tags": ["Formations"],
+        "summary": "Détail d'une formation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détail de la formation",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Formation" }
+              }
+            }
+          },
+          "404": { "description": "Formation non trouvée" }
+        }
+      },
+      "put": {
+        "tags": ["Formations"],
+        "summary": "Modifier une formation",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FormationInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Formation modifiée" },
+          "404": { "description": "Formation non trouvée" },
+          "401": { "description": "Non autorisé" }
+        }
+      },
+      "delete": {
+        "tags": ["Formations"],
+        "summary": "Supprimer une formation",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Formation supprimée" },
+          "404": { "description": "Formation non trouvée" },
+          "401": { "description": "Non autorisé" }
+        }
+      }
+    },
+    "/api/inscriptions": {
+      "post": {
+        "tags": ["Inscriptions"],
+        "summary": "Inscrire à une formation",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "formation_id": { "type": "integer" }
+                },
+                "required": ["formation_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Inscription réussie" },
+          "400": { "description": "Données invalides" },
+          "401": { "description": "Non authentifié" }
+        }
+      }
+    },
+    "/api/inscriptions/user/{userId}": {
+      "get": {
+        "tags": ["Inscriptions"],
+        "summary": "Lister les inscriptions d'un utilisateur",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Inscription" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inscriptions/{id}": {
+      "delete": {
+        "tags": ["Inscriptions"],
+        "summary": "Se désinscrire d'une formation",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Désinscription réussie" },
+          "404": { "description": "Inscription non trouvée" }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": ["Utilisateurs"],
+        "summary": "Obtenir le profil d'un utilisateur",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil utilisateur",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "description": "Utilisateur non trouvé" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string", "format": "email" },
+          "nom": { "type": "string" },
+          "prenom": { "type": "string" },
+          "role": { "type": "string", "enum": ["apprenant", "formateur"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Formation": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "titre": { "type": "string" },
+          "description": { "type": "string" },
+          "formateur": { "type": "string" },
+          "level": { "type": "string", "enum": ["beginner", "intermediaire", "advanced"] },
+          "duree": { "type": "integer", "description": "Durée en heures" },
+          "prix": { "type": "number", "format": "float" },
+          "modules": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Module" }
+          },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "FormationInput": {
+        "type": "object",
+        "properties": {
+          "titre": { "type": "string" },
+          "description": { "type": "string" },
+          "level": { "type": "string", "enum": ["beginner", "intermediaire", "advanced"] },
+          "duree": { "type": "integer" },
+          "prix": { "type": "number" },
+          "categorie": { "type": "string" }
+        },
+        "required": ["titre", "description", "level"]
+      },
+      "Module": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "titre": { "type": "string" },
+          "contenu": { "type": "string" },
+          "ordre": { "type": "integer" }
+        }
+      },
+      "Inscription": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "user_id": { "type": "integer" },
+          "formation_id": { "type": "integer" },
+          "progression": { "type": "number", "format": "float" },
+          "status": { "type": "string", "enum": ["en cours", "complétée", "abandonnée"] },
+          "date_inscription": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "token": { "type": "string" },
+          "user": { "$ref": "#/components/schemas/User" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT pour l'authentification"
+      }
+    }
+  }
+}
+

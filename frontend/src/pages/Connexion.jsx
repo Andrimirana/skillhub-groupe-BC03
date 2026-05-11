@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { connecter } from "../services/authApi";
 import { sauvegarderSession } from "../services/auth";
+import PublicNavbar from "../components/PublicNavbar";
 import "../styles/connexion.css";
 
 // Page de connexion : authentifie l'utilisateur et redirige selon son rôle.
@@ -45,9 +46,20 @@ function Connexion() {
     }
   };
 
+
+  // Rendu de la page
   return (
-    <main className="connexion-page">
-      <section className="connexion-carte" aria-labelledby="titre-connexion">
+    <>
+      <PublicNavbar
+        menuItems={[
+          { label: "Accueil", to: "/" },
+          { label: "Formations", to: "/formations" },
+          { label: "À propos", href: "#" },
+          { label: "Contact", href: "#footer" },
+        ]}
+      />
+      <main className="connexion-page">
+        <section className="connexion-carte" aria-labelledby="titre-connexion">
         <h1 id="titre-connexion">Connexion</h1>
         <p>Connectez-vous pour accéder au dashboard.</p>
 
@@ -84,6 +96,8 @@ function Connexion() {
             </select>
           </label>
 
+
+          
           {erreur && <p className="connexion-erreur">{erreur}</p>}
 
           <button type="submit" className="connexion-bouton" disabled={chargement}>
@@ -95,7 +109,8 @@ function Connexion() {
           </p>
         </form>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
 

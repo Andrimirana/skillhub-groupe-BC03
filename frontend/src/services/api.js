@@ -14,6 +14,8 @@ const api = axios.create({
   },
 });
 
+// Interceptor pour ajouter le token d'authentification à chaque requête
+
 api.interceptors.request.use((configuration) => {
   const jeton = recupererJeton();
 
@@ -21,17 +23,17 @@ api.interceptors.request.use((configuration) => {
     configuration.headers.Authorization = `Bearer ${jeton}`;
   }
 
-  return configuration;
+  return configuration; // Retourne la configuration modifiée pour la requête
 });
 
 api.interceptors.response.use(
-  (reponse) => reponse,
+  (reponse) => reponse, // Retourne la réponse sans modification
   (erreur) => {
     if (erreur.response?.status === 401) {
       supprimerSession();
     }
 
-    return Promise.reject(erreur);
+    return Promise.reject(erreur); // Rejette la promesse avec l'erreur pour la gestion dans les composants
   },
 );
 

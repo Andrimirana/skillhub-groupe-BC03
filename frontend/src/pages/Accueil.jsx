@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import { deconnecter } from "../services/authApi";
 import { listerFormations } from "../services/formationsApi";
-import logoSkillHub from "../assets/logo.svg";
+import PublicNavbar from "../components/PublicNavbar";
 import "../styles/accueil.css";
 
 const TEMOIGNAGES = [
@@ -48,6 +48,7 @@ function niveauAffichage(level) {
   return "Débutant";
 }
 
+// Page d'accueil principale du site
 function Accueil() {
   const navigate = useNavigate();
   const modalRef = useRef(null);
@@ -73,100 +74,41 @@ function Accueil() {
   });
   const [messageEnvoi, setMessageEnvoi] = useState("");
 
+  // Récupère l'utilisateur connecté et prépare les liens principaux
   const utilisateur = recupererUtilisateur();
   const lienHeroFormateur = utilisateur?.role === "formateur" ? "/dashboard/formateur" : "/connexion";
   const lienHeroApprenant = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/formations";
 
+  // Met à jour le titre de la page
   useEffect(() => {
     document.title = "SkillHub";
   }, []);
 
+  // Charge les formations à mettre en avant
   useEffect(() => {
     let actif = true;
-
     const chargerFormations = async () => {
       try {
         const donnees = await listerFormations();
-
-        if (!actif) {
-          return;
-        }
-
+        if (!actif) return;
         setFormationsMisesEnAvant(donnees.slice(0, 3));
         setErreurFormations(false);
       } catch {
-        if (!actif) {
-          return;
-        }
-
+        if (!actif) return;
         setFormationsMisesEnAvant([]);
         setErreurFormations(true);
       }
     };
-
     chargerFormations();
-
-    return () => {
-      actif = false;
-    };
+    return () => { actif = false; };
   }, []);
 
+  // Gère l'ouverture/fermeture de la modale d'inscription (désactivée car formulaire supprimé)
+  // useEffect(() => { ... }, [modalOuverte]);
+
+  // Animation d'apparition des éléments au scroll
   useEffect(() => {
-    if (!modalOuverte) {
-      document.body.classList.remove("no-scroll");
-      return;
-    }
-
-    document.body.classList.add("no-scroll");
-
-    const premierInput = modalRef.current?.querySelector("input");
-    premierInput?.focus();
-
-    const gererClavier = (event) => {
-      if (event.key === "Escape") {
-        setModalOuverte(false);
-      }
-
-      if (event.key !== "Tab" || !modalRef.current) {
-        return;
-      }
-
-      const focusables = modalRef.current.querySelectorAll(
-        "button, input, [tabindex]:not([tabindex='-1'])",
-      );
-
-      if (!focusables.length) {
-        return;
-      }
-
-      const premier = focusables[0];
-      const dernier = focusables[focusables.length - 1];
-
-      if (event.shiftKey && document.activeElement === premier) {
-        event.preventDefault();
-        dernier.focus();
-      }
-
-      if (!event.shiftKey && document.activeElement === dernier) {
-        event.preventDefault();
-        premier.focus();
-      }
-    };
-
-    document.addEventListener("keydown", gererClavier);
-
-    return () => {
-      document.body.classList.remove("no-scroll");
-      document.removeEventListener("keydown", gererClavier);
-      lastFocusedRef.current?.focus();
-    };
-  }, [modalOuverte]);
-
-  useEffect(() => {
-    if (!("IntersectionObserver" in window)) {
-      return;
-    }
-
+    if (!("IntersectionObserver" in window)) return;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -176,39 +118,28 @@ function Accueil() {
           }
         });
       },
-      {
-        threshold: 0.15,
-      },
+      { threshold: 0.15 },
     );
-
     const elements = document.querySelectorAll(
       ".hero-highlight-card, .hero-stat-card, .guide-carte, .valeur-carte, .temoignage-container",
     );
-
     elements.forEach((element) => {
       element.classList.add("reveal-on-scroll");
       observer.observe(element);
     });
-
-    return () => {
-      observer.disconnect();
-    };
+    return () => { observer.disconnect(); };
   }, [formationsMisesEnAvant]);
 
+  // Fait défiler automatiquement les témoignages
   useEffect(() => {
-    if (!TEMOIGNAGES.length) {
-      return;
-    }
-
+    if (!TEMOIGNAGES.length) return;
     const timer = window.setTimeout(() => {
       setPointActif((precedent) => (precedent + 1) % TEMOIGNAGES.length);
     }, 3000);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
+    return () => { window.clearTimeout(timer); };
   }, [pointActif]);
 
+  // Déconnexion utilisateur
   const gererDeconnexion = async () => {
     try {
       await deconnecter();
@@ -218,119 +149,33 @@ function Accueil() {
     }
   };
 
-  const ouvrirModal = () => {
-    lastFocusedRef.current = document.activeElement;
-    setModalOuverte(true);
-  };
-
+  // Ferme la modale d'inscription
   const fermerModal = () => {
     setModalOuverte(false);
   };
 
+  // Soumet le formulaire de la modale d'inscription
   const soumettreModal = (event) => {
     event.preventDefault();
     navigate("/inscription");
   };
 
-  const changerChamp = (event) => {
-    const { name, value } = event.target;
-    setFormulaire((precedent) => ({
-      ...precedent,
-      [name]: value,
-    }));
-    setErreurs((precedent) => ({
-      ...precedent,
-      [name]: "",
-    }));
-  };
+  // Fonctions formulaire inscription (désactivées car formulaire supprimé)
+  // const changerChamp = (event) => { ... };
+  // const emailValide = (email) => ...;
+  // const soumettreInscription = (event) => { ... };
 
-  const emailValide = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-
-  const soumettreInscription = (event) => {
-    event.preventDefault();
-
-    const nouvellesErreurs = {
-      nom: "",
-      email: "",
-      mdp: "",
-      confirmer: "",
-    };
-
-    let valide = true;
-
-    if (!formulaire.nom.trim()) {
-      nouvellesErreurs.nom = "Le nom est obligatoire";
-      valide = false;
-    }
-
-    if (!emailValide(formulaire.email)) {
-      nouvellesErreurs.email = "Email invalide";
-      valide = false;
-    }
-
-    if (formulaire.mdp.length < 6) {
-      nouvellesErreurs.mdp = "Mot de passe trop court";
-      valide = false;
-    }
-
-    if (formulaire.confirmer !== formulaire.mdp) {
-      nouvellesErreurs.confirmer = "Les mots de passe ne correspondent pas";
-      valide = false;
-    }
-
-    setErreurs(nouvellesErreurs);
-
-    if (valide) {
-      setMessageEnvoi("Redirection vers l'inscription...");
-      navigate("/inscription");
-      return;
-    }
-
-    setMessageEnvoi("");
-  };
-
+  // Rendu de la page d'accueil
   return (
     <>
-      <header className="header">
-        <nav className="navbar" aria-label="Navigation principale">
-          <div className="logo">
-            <img src={logoSkillHub} alt="Logo SkillHub" />
-          </div>
-          <button
-            className="menuburger"
-            id="burger"
-            aria-label="Ouvrir le menu"
-            aria-expanded={menuOuvert}
-            aria-controls="menu-principal"
-            type="button"
-            onClick={() => setMenuOuvert((valeur) => !valeur)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-          <ul className={`liens-navigation ${menuOuvert ? "active" : ""}`} id="menu-principal">
-            <li><Link to="/" aria-current="page">Accueil</Link></li>
-            <li><Link to="/formations">Formations</Link></li>
-            <li><a href="#">À propos</a></li>
-            <li><a href="#footer">Contact</a></li>
-            {!utilisateur && (
-              <li><Link to="/connexion">Se connecter</Link></li>
-            )}
-          </ul>
-          <div className="bouton-inscription">
-            {utilisateur ? (
-              <button className="btn-login btn-logout" type="button" onClick={gererDeconnexion}>
-                Se déconnecter
-              </button>
-            ) : (
-              <button id="openModal" className="btn-login" aria-haspopup="dialog" type="button" onClick={ouvrirModal}>
-                S'inscrire
-              </button>
-            )}
-          </div>
-        </nav>
-      </header>
+      <PublicNavbar
+        menuItems={[
+          { label: "Accueil", to: "/" },
+          { label: "Formations", to: "/formations" },
+          { label: "À propos", href: "#" },
+          { label: "Contact", href: "#footer" },
+        ]}
+      />
 
       <main id="contenu">
         <section className="hero" aria-labelledby="hero-title">
@@ -488,65 +333,8 @@ function Accueil() {
         </div>
       </section>
 
-      <section className="inscription" aria-labelledby="inscription-title">
-        <form id="inscription" noValidate onSubmit={soumettreInscription}>
-          <h2 id="inscription-title">Inscription</h2>
-          <div className="champ">
-            <label htmlFor="nom-form">Nom</label>
-            <input
-              type="text"
-              id="nom-form"
-              name="nom"
-              required
-              value={formulaire.nom}
-              onChange={changerChamp}
-              className={erreurs.nom ? "erreur-bordure" : ""}
-            />
-            <small className="error" aria-live="assertive">{erreurs.nom}</small>
-          </div>
-          <div className="champ">
-            <label htmlFor="email-form">Email</label>
-            <input
-              type="email"
-              id="email-form"
-              name="email"
-              required
-              value={formulaire.email}
-              onChange={changerChamp}
-              className={erreurs.email ? "erreur-bordure" : ""}
-            />
-            <small className="error" aria-live="assertive">{erreurs.email}</small>
-          </div>
-          <div className="champ">
-            <label htmlFor="mdp-form">Mot de passe</label>
-            <input
-              type="password"
-              id="mdp-form"
-              name="mdp"
-              required
-              value={formulaire.mdp}
-              onChange={changerChamp}
-              className={erreurs.mdp ? "erreur-bordure" : ""}
-            />
-            <small className="error" aria-live="assertive">{erreurs.mdp}</small>
-          </div>
-          <div className="champ">
-            <label htmlFor="confirmer-form">Confirmer mot de passe</label>
-            <input
-              type="password"
-              id="confirmer-form"
-              name="confirmer"
-              required
-              value={formulaire.confirmer}
-              onChange={changerChamp}
-              className={erreurs.confirmer ? "erreur-bordure" : ""}
-            />
-            <small className="error" aria-live="assertive">{erreurs.confirmer}</small>
-          </div>
-          <button type="submit">S'inscrire</button>
-          <p id="envoiReussi" aria-live="polite">{messageEnvoi}</p>
-        </form>
-      </section>
+
+      {/* Le formulaire d'inscription a été retiré de la page d'accueil */}
 
       <div id="modalOverlay" className="overlay" aria-hidden="true" hidden={!modalOuverte} onClick={fermerModal} onKeyDown={fermerModal}></div>
       <div

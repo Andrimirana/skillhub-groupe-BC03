@@ -25,7 +25,8 @@
 }
 
 .dashboard-layout,
-.app-container {
+.app-container,
+.app-layout {
   display: flex;
   width: 100vw;
   min-height: 100vh;
@@ -34,7 +35,8 @@
 }
 
 [data-theme="dark"] .dashboard-layout,
-[data-theme="dark"] .app-container {
+[data-theme="dark"] .app-container,
+[data-theme="dark"] .app-layout {
   background: linear-gradient(180deg, #161b2a 0%, #1e2436 100%);
 }
 

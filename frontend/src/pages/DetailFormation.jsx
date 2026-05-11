@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { detailFormation, inscrireFormation } from "../services/formationsApi";
-import { estConnecte } from "../services/auth";
+import { detailFormation, inscrireFormation, listerFormationsApprenant } from "../services/formationsApi";
+import { estConnecte, recupererUtilisateur } from "../services/auth";
 import "../styles/public.css";
 
 function DetailFormation() {
@@ -11,20 +11,44 @@ function DetailFormation() {
   const [chargement, setChargement] = useState(true);
   const [inscriptionEnCours, setInscriptionEnCours] = useState(false);
   const [message, setMessage] = useState("");
+  const [estInscrit, setEstInscrit] = useState(false);
+
+  const utilisateur = recupererUtilisateur();
+  const peutSInscrire = !utilisateur || utilisateur.role === "apprenant";
 
   useEffect(() => {
+    let actif = true;
+
     const charger = async () => {
       try {
         setChargement(true);
         const donnees = await detailFormation(id);
+        if (!actif) return;
         setFormation(donnees);
+
+        if (estConnecte() && peutSInscrire) {
+          try {
+            const mesFormations = await listerFormationsApprenant();
+            if (!actif) return;
+            const dejaInscrit = (mesFormations || []).some(
+              (item) => String(item.id) === String(id),
+            );
+            setEstInscrit(dejaInscrit);
+          } catch {
+            // En cas d'échec on laisse l'utilisateur essayer de s'inscrire normalement.
+          }
+        }
       } finally {
-        setChargement(false);
+        if (actif) setChargement(false);
       }
     };
 
     charger();
-  }, [id]);
+
+    return () => {
+      actif = false;
+    };
+  }, [id, peutSInscrire]);
 
   const niveau = useMemo(
     () => ({ beginner: "Débutant", intermediaire: "Intermédiaire", advanced: "Avancé" }),
@@ -41,6 +65,7 @@ function DetailFormation() {
       setInscriptionEnCours(true);
       await inscrireFormation(id);
       setMessage("Inscription réussie. Redirection vers le suivi...");
+      setEstInscrit(true);
       setTimeout(() => navigate(`/apprendre/${id}`), 500);
     } catch (e) {
       const texte = e.response?.data?.message || "Impossible de suivre cette formation.";
@@ -93,9 +118,15 @@ function DetailFormation() {
 
           {message && <p className="status-banner">{message}</p>}
 
-          <button type="button" className="public-btn" onClick={gererSuivre} disabled={inscriptionEnCours}>
-            {inscriptionEnCours ? "Inscription..." : "Suivre la formation"}
-          </button>
+          {estInscrit ? (
+            <Link to={`/apprendre/${id}`} className="public-btn">
+              Voir la progression
+            </Link>
+          ) : peutSInscrire ? (
+            <button type="button" className="public-btn" onClick={gererSuivre} disabled={inscriptionEnCours}>
+              {inscriptionEnCours ? "Inscription..." : "Suivre la formation"}
+            </button>
+          ) : null}
         </section>
       </main>
     </div>

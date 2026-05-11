@@ -158,10 +158,10 @@ function Apprenant() {
                         <>
                           <button
                             type="button"
-                            className="btn-secondary"
+                            className="btn-create"
                             onClick={() => navigate(`/apprendre/${formation.id}`)}
                           >
-                            Suivre
+                            Continuer à se former
                           </button>
                           <button
                             type="button"

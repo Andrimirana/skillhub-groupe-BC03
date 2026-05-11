@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faMoon, faSun, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { deconnecter } from "../services/authApi";
@@ -13,8 +13,19 @@ function Topbar() {
   const utilisateur = recupererUtilisateur();
   const routeDashboard = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
   const nomUtilisateur = utilisateur?.nom || "Utilisateur";
+  const roleUtilisateur = utilisateur?.role || "utilisateur";
   const [theme, setTheme] = useState("light");
   const afficherBoutonRetour = !["/dashboard/formateur", "/dashboard/apprenant"].includes(location.pathname);
+
+  // Genère initiales pour l'avatar
+  const obtenirInitiales = () => {
+    return nomUtilisateur
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   useEffect(() => {
     const themeSauvegarde = localStorage.getItem("theme-dashboard");
@@ -62,25 +73,27 @@ function Topbar() {
       </nav>
 
       <div className="topbar-actions">
-        <span className="topbar-username">{nomUtilisateur}</span>
+        {/* Bouton Retour */}
         {afficherBoutonRetour && (
-          <button type="button" className="back_btn" onClick={gererRetour}>
+          <button type="button" className="action-btn back_btn" onClick={gererRetour}>
             <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" />
-            <span>Retour</span>
           </button>
         )}
+
+        {/* Bouton Thème */}
         <button
           type="button"
-          className="theme_btn"
+          className="action-btn theme_btn"
           onClick={basculerTheme}
           aria-label={theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"}
           title={theme === "dark" ? "Mode clair" : "Mode sombre"}
         >
           <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} aria-hidden="true" />
-          <span>{theme === "dark" ? "Clair" : "Sombre"}</span>
         </button>
-        <button type="button" className="logout_btn" onClick={gererDeconnexion}>
-          Déconnexion
+
+        {/* Bouton Déconnexion */}
+        <button type="button" className="action-btn logout_btn" onClick={gererDeconnexion} title="Se déconnecter">
+          <FontAwesomeIcon icon={faSignOutAlt} />
         </button>
       </div>
     </header>
