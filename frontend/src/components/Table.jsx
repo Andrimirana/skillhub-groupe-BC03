@@ -1,13 +1,7 @@
 import PropTypes from "prop-types";
 import "../styles/table.css";
 
-// Table des formations du tableau de bord
 function Table({ formations, onDelete, onEdit, onView, mode }) {
-  const formatterPrix = new Intl.NumberFormat("fr-FR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
   const niveauxAffichage = {
     beginner: "Débutant",
     intermediaire: "Intermédiaire",
@@ -19,9 +13,7 @@ function Table({ formations, onDelete, onEdit, onView, mode }) {
       <thead>
         <tr>
           <th scope="col">Cours</th>
-          <th scope="col">Statut</th>
           <th scope="col">Date</th>
-          <th scope="col">Prix</th>
           <th scope="col">Durée</th>
           <th scope="col">Niveau</th>
           <th scope="col">Inscrits</th>
@@ -33,9 +25,7 @@ function Table({ formations, onDelete, onEdit, onView, mode }) {
         {formations.map((formation) => (
           <tr key={formation.id}>
             <th scope="row">{formation.titre}</th>
-            <td>{formation.statut}</td>
             <td>{new Date(formation.date).toLocaleDateString("fr-FR")}</td>
-            <td>{formatterPrix.format(Number(formation.price ?? 0))} Rs</td>
             <td>{formation.duration ?? 0} h</td>
             <td>{niveauxAffichage[formation.level] ?? "Débutant"}</td>
             <td>{formation.apprenants ?? 0}</td>
@@ -61,7 +51,7 @@ function Table({ formations, onDelete, onEdit, onView, mode }) {
 
         {formations.length === 0 && (
           <tr>
-            <td colSpan="8">Aucune formation trouvée</td>
+            <td colSpan="6">Aucune formation trouvée</td>
           </tr>
         )}
       </tbody>
@@ -73,9 +63,7 @@ Table.propTypes = {
   formations: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
     titre: PropTypes.string,
-    statut: PropTypes.string,
     date: PropTypes.string,
-    price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     duration: PropTypes.number,
     level: PropTypes.string,
     apprenants: PropTypes.number,
@@ -84,6 +72,13 @@ Table.propTypes = {
   onEdit: PropTypes.func,
   onView: PropTypes.func,
   mode: PropTypes.string,
+};
+
+Table.defaultProps = {
+  onDelete: null,
+  onEdit: null,
+  onView: null,
+  mode: "",
 };
 
 export default Table;

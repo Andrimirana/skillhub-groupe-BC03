@@ -1,6 +1,4 @@
 import PropTypes from "prop-types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../styles/searchbar.css";
 
 // Barre de recherche
@@ -11,7 +9,6 @@ function Searchbar({ search, setSearch }) {
         Rechercher une formation
       </label>
       <div className="search-field">
-        <FontAwesomeIcon icon={faSearch} aria-hidden="true" />
         <input
           id="search-input"
           type="text"

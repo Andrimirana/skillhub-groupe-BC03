@@ -1,11 +1,38 @@
 #!/bin/sh
+set -e
 
 # Script de démarrage du service Catalog
 echo "=== Démarrage du service Catalog ==="
 
-# Installation des dépendances
+# Installer les dépendances
 export COMPOSER_PROCESS_TIMEOUT=600
-composer install --no-interaction
+mkdir -p /var/www/storage /var/www/bootstrap/cache /var/www/vendor
+rm -rf /var/www/vendor/* /var/www/vendor/.??* 2>/dev/null || true
+composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Générer la clé d'application si nécessaire
+if [ ! -f /var/www/.env ]; then
+    cp /var/www/.env.example /var/www/.env
+fi
+
+php artisan key:generate --force
+
+# Forcer la connexion MySQL depuis les variables d'environnement Docker
+sed -i "s|^DB_CONNECTION=.*|DB_CONNECTION=${DB_CONNECTION:-mysql}|" /var/www/.env
+sed -i "s|^#\? *DB_HOST=.*|DB_HOST=${DB_HOST:-db}|" /var/www/.env
+sed -i "s|^#\? *DB_PORT=.*|DB_PORT=${DB_PORT:-3306}|" /var/www/.env
+sed -i "s|^#\? *DB_DATABASE=.*|DB_DATABASE=${DB_DATABASE:-skillhub_catalog}|" /var/www/.env
+sed -i "s|^#\? *DB_USERNAME=.*|DB_USERNAME=${DB_USERNAME:-skillhub_user}|" /var/www/.env
+sed -i "s|^#\? *DB_PASSWORD=.*|DB_PASSWORD=${DB_PASSWORD:-skillhub_pass}|" /var/www/.env
+sed -i "s|^SESSION_DRIVER=.*|SESSION_DRIVER=${SESSION_DRIVER:-file}|" /var/www/.env
+
+# Configurer les URL inter-services dans .env : PHP-FPM/CLI n'expose pas
+# toujours les variables Docker dans $_ENV selon sa configuration.
+if grep -q '^AUTH_SERVICE_URL=' /var/www/.env; then
+    sed -i "s|^AUTH_SERVICE_URL=.*|AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://auth-api:8080}|" /var/www/.env
+else
+    echo "AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://auth-api:8080}" >> /var/www/.env
+fi
 
 # Migration de la base de données
 php artisan migrate --force

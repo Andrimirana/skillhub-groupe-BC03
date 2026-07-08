@@ -1,53 +1,54 @@
-/*
-| Projet: SkillHub
-| Rôle du fichier: Page liste des ateliers
-| Dernière modification: 2026-03-06
-*/
-
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+import DashboardNavbar from "../components/DashboardNavbar";
 import AtelierCard from "../components/AtelierCard";
 import { listerFormationsApprenant, listerMesFormations } from "../services/formationsApi";
 import { recupererUtilisateur } from "../services/auth";
 import "../styles/layout.css";
+import "../styles/atelierCard.css";
+
+const IMAGES_FORMATIONS = [
+  "/assets/images/learning/learning-hero.jpg",
+  "/assets/images/learning/learning-laptop.jpg",
+  "/assets/images/learning/learning-notes.jpg",
+  "/assets/images/learning/learning-team.jpg",
+];
 
 function Ateliers() {
-  const [ateliersLocaux, setAteliersLocaux] = useState([]);
+  const [formations, setFormations] = useState([]);
   const [chargement, setChargement] = useState(true);
   const [erreurChargement, setErreurChargement] = useState("");
   const utilisateur = recupererUtilisateur();
   const estFormateur = utilisateur?.role === "formateur";
 
   useEffect(() => {
-    // Le formateur voit uniquement ses propres formations
-    const chargerAteliers = async () => {
+    const chargerFormations = async () => {
       try {
         setErreurChargement("");
-        const donnees = utilisateur?.role === "formateur"
+        const donnees = estFormateur
           ? await listerMesFormations()
           : await listerFormationsApprenant();
-        setAteliersLocaux(donnees);
+        setFormations(donnees);
       } catch {
-        setErreurChargement("Impossible de charger les ateliers depuis le backend.");
+        setErreurChargement("Impossible de charger les formations depuis le backend.");
       } finally {
         setChargement(false);
       }
     };
 
-    chargerAteliers();
-  }, [utilisateur?.role]);
+    chargerFormations();
+  }, [estFormateur]);
 
   return (
     <div className="dashboard-layout">
       <Sidebar />
 
       <main className="main-area">
-        <Topbar />
+        <DashboardNavbar />
 
         <section className="page-content">
           <div className="page-head">
-            <h2 className="page-title">{estFormateur ? "Mes ateliers" : "Mes formations suivies"}</h2>
+            <h2 className="page-title">{estFormateur ? "Mes formations" : "Mes formations suivies"}</h2>
             <p className="page-subtitle">
               {estFormateur
                 ? "Retrouvez toutes les formations que vous avez publiées."
@@ -56,22 +57,25 @@ function Ateliers() {
           </div>
 
           {erreurChargement && <p className="error">{erreurChargement}</p>}
-          {!chargement && !erreurChargement && ateliersLocaux.length === 0 && (
+          {!chargement && !erreurChargement && formations.length === 0 && (
             <p>{estFormateur ? "Aucune formation publiée pour le moment." : "Aucune formation suivie pour le moment."}</p>
           )}
 
           <div className="atelier-list">
-            {ateliersLocaux.map((atelier) => (
+            {formations.map((formation, index) => (
               <AtelierCard
-                key={atelier.id}
-                titre={atelier.titre}
-                description={atelier.description}
-                date={atelier.date}
-                statut={atelier.statut}
-                price={atelier.price}
-                duration={atelier.duration}
-                level={atelier.level}
-                inscrits={atelier.vues ?? 0}
+                key={formation.id}
+                id={formation.id}
+                image={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
+                titre={formation.titre}
+                description={formation.description}
+                formateur={formation.formateur || "Formateur SkillHub"}
+                date={formation.date}
+                statut={formation.statut}
+                price={formation.price}
+                duration={formation.duration}
+                level={formation.level}
+                inscrits={formation.apprenants ?? formation.vues ?? 0}
               />
             ))}
           </div>

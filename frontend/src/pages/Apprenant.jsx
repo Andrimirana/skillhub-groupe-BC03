@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+import DashboardNavbar from "../components/DashboardNavbar";
 import Summary from "../components/Summary";
 import Searchbar from "../components/Searchbar";
 import AtelierCard from "../components/AtelierCard";
-import { desinscrireFormation, inscrireFormation, listerFormations, listerFormationsApprenant } from "../services/formationsApi";
+import {
+  desinscrireFormation,
+  inscrireFormation,
+  listerFormations,
+  listerFormationsApprenant,
+} from "../services/formationsApi";
 import "../styles/layout.css";
 import "../styles/Bouton.css";
 import "../styles/atelierCard.css";
@@ -73,10 +78,6 @@ function Apprenant() {
       label: "Formations terminées",
       value: formationsSuivies.filter((formation) => (formation.progression ?? 0) >= 100).length,
     },
-    {
-      label: "À poursuivre",
-      value: formationsSuivies.filter((formation) => (formation.progression ?? 0) < 100).length,
-    },
   ];
 
   const gererSuivre = async (idFormation) => {
@@ -119,7 +120,7 @@ function Apprenant() {
       <Sidebar />
 
       <main className="main-area" role="main">
-        <Topbar />
+        <DashboardNavbar />
 
         <section className="page-content" aria-labelledby="page-title">
           <div className="page-head">
@@ -131,7 +132,7 @@ function Apprenant() {
 
           <div className="toolbar" role="search">
             <Searchbar search={recherche} setSearch={setRecherche} />
-            <Link to="/formations" className="btn-secondary">Découvrir des formations</Link>
+            <Link to="/formations" className="btn-secondary btn-discover">Découvrir des formations</Link>
           </div>
 
           {erreurChargement && <p className="error">{erreurChargement}</p>}
@@ -143,11 +144,14 @@ function Apprenant() {
                 {formationsFiltrees.length === 0 && <p>Aucune formation suivie pour le moment.</p>}
 
                 <div className="atelier-list">
-                  {formationsFiltrees.map((formation) => (
+                  {formationsFiltrees.map((formation, index) => (
                     <AtelierCard
                       key={formation.id}
+                      id={formation.id}
+                      image={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
                       titre={formation.titre}
                       description={formation.description}
+                      formateur={formation.formateur || "Formateur SkillHub"}
                       date={formation.date}
                       statut={formation.statut}
                       price={formation.price}
@@ -161,7 +165,7 @@ function Apprenant() {
                             className="btn-create"
                             onClick={() => navigate(`/apprendre/${formation.id}`)}
                           >
-                            Continuer à se former
+                            Continuer
                           </button>
                           <button
                             type="button"
@@ -184,9 +188,11 @@ function Apprenant() {
                   {suggestions.map((formation, index) => (
                     <AtelierCard
                       key={formation.id}
+                      id={formation.id}
                       image={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
                       titre={formation.titre}
                       description={formation.description}
+                      formateur={formation.formateur || "Formateur SkillHub"}
                       date={formation.date}
                       statut={formation.statut}
                       price={formation.price}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DetailFormation from "./pages/DetailFormation";
 import SuiviFormation from "./pages/SuiviFormation";
 import Formateur from "./pages/Formateur";
@@ -9,8 +9,7 @@ import ModifierFormation from "./pages/ModifierFormation";
 import Ateliers from "./pages/Ateliers";
 import Accueil from "./pages/Accueil";
 import Formations from "./pages/Formations";
-import Connexion from "./pages/Connexion";
-import Inscription from "./pages/Inscription";
+import Profil from "./pages/Profil";
 import RouteProtegee from "./components/RouteProtegee";
 import { verifierSession } from "./services/session";
 
@@ -65,21 +64,6 @@ function RedirectionAccueil() {
   return <Navigate to={routeTableauDeBord} replace />;
 }
 
-function RouteInvite() {
-  const resultatSession = useVerifierSession();
-
-  if (resultatSession.chargement) {
-    return null;
-  }
-
-  if (resultatSession.estAuthentifie) {
-    const routeTableauDeBord = resultatSession.utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
-    return <Navigate to={routeTableauDeBord} replace />;
-  }
-
-  return <Outlet />;
-}
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -88,10 +72,8 @@ export default function App() {
         <Route path="/formations" element={<Formations />} />
         <Route path="/formation/:id" element={<DetailFormation />} />
 
-        <Route element={<RouteInvite />}>
-          <Route path="/connexion" element={<Connexion />} />
-          <Route path="/inscription" element={<Inscription />} />
-        </Route>
+        <Route path="/connexion" element={<Navigate to="/" replace />} />
+        <Route path="/inscription" element={<Navigate to="/" replace />} />
 
         <Route element={<RouteProtegee rolesAutorises={["formateur"]} />}>
           <Route path="/dashboard/formateur" element={<Formateur />} />
@@ -108,6 +90,7 @@ export default function App() {
 
         <Route element={<RouteProtegee />}>
           <Route path="/mes-ateliers" element={<Ateliers />} />
+          <Route path="/profil" element={<Profil />} />
         </Route>
 
         <Route path="/dashboard" element={<RedirectionAccueil />} />

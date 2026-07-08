@@ -1,82 +1,72 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { recupererUtilisateur, supprimerSession } from "../services/auth";
-import { deconnecter } from "../services/authApi";
+﻿import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChalkboard, faBullhorn, faMagnifyingGlass, faGraduationCap, faChevronLeft, faChevronRight, faClock, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
+import { recupererUtilisateur } from "../services/auth";
 import { listerFormations } from "../services/formationsApi";
 import PublicNavbar from "../components/PublicNavbar";
+import AuthModal from "../components/AuthModal";
 import "../styles/accueil.css";
 
 const TEMOIGNAGES = [
   {
     nom: "Nandrianina",
+    role: "Apprenante depuis 1 mois",
     photo: "/assets/images/profile1.jfif",
-    texte: "SkillHub m'a permis d'avancer rapidement.",
+    texte: "SkillHub m'a permis d'avancer rapidement. Les modules sont clairs et bien structurés.",
   },
   {
     nom: "Maholy",
+    role: "Apprenante depuis 3 mois",
     photo: "/assets/images/profile1.jfif",
-    texte: "J'ai adoré la progression module par module.",
+    texte: "J'ai adoré la progression module par module. Je me sens vraiment accompagnée.",
   },
   {
     nom: "Irene",
+    role: "Formatrice certifiée",
     photo: "/assets/images/profile1.jfif",
-    texte: "Les ateliers sont très bien structurés.",
+    texte: "Les ateliers sont très bien structurés. Une expérience enrichissante pour mes élèves.",
   },
   {
     nom: "Mathieu",
+    role: "Apprenant depuis 6 mois",
     photo: "/assets/images/profile1.jfif",
-    texte: "Une plateforme claire et efficace.",
+    texte: "Une plateforme claire et efficace. J'ai progressé plus vite que prévu.",
   },
 ];
 
 const IMAGES_APPRENTISSAGE = [
-  "/assets/images/learning/learning-hero.jpg",
-  "/assets/images/learning/learning-laptop.jpg",
-  "/assets/images/learning/learning-notes.jpg",
-  "/assets/images/learning/learning-team.jpg",
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
 ];
 
-function niveauAffichage(level) {
-  if (level === "advanced") {
-    return "Avancé";
-  }
+function libelleHeures(nombreHeures) {
+  const heures = Number(nombreHeures || 0);
+  return `${heures || 1} heure${heures > 1 ? "s" : ""} de cours`;
+}
 
-  if (level === "intermediaire") {
-    return "Intermédiaire";
-  }
-
-  return "Débutant";
+function obtenirPoints(description) {
+  if (!description) return [];
+  return description
+    .split(/[.;]/).map((s) => s.trim()).filter((s) => s.length > 8).slice(0, 3);
 }
 
 // Page d'accueil principale du site
 function Accueil() {
-  const navigate = useNavigate();
-  const modalRef = useRef(null);
-  const lastFocusedRef = useRef(null);
-
-  const [menuOuvert, setMenuOuvert] = useState(false);
-  const [modalOuverte, setModalOuverte] = useState(false);
+  const [authModal, setAuthModal] = useState(null);
   const [pointActif, setPointActif] = useState(0);
+  const [formationActive, setFormationActive] = useState(0);
+  const [directionTemoignages, setDirectionTemoignages] = useState("");
+  const [directionFormations, setDirectionFormations] = useState("");
   const [formationsMisesEnAvant, setFormationsMisesEnAvant] = useState([]);
   const [erreurFormations, setErreurFormations] = useState(false);
 
-  const [formulaire, setFormulaire] = useState({
-    nom: "",
-    email: "",
-    mdp: "",
-    confirmer: "",
-  });
-  const [erreurs, setErreurs] = useState({
-    nom: "",
-    email: "",
-    mdp: "",
-    confirmer: "",
-  });
-  const [messageEnvoi, setMessageEnvoi] = useState("");
-
   // Récupère l'utilisateur connecté et prépare les liens principaux
   const utilisateur = recupererUtilisateur();
-  const lienHeroFormateur = utilisateur?.role === "formateur" ? "/dashboard/formateur" : "/connexion";
   const lienHeroApprenant = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/formations";
 
   // Met à jour le titre de la page
@@ -91,7 +81,7 @@ function Accueil() {
       try {
         const donnees = await listerFormations();
         if (!actif) return;
-        setFormationsMisesEnAvant(donnees.slice(0, 3));
+        setFormationsMisesEnAvant(donnees.slice(0, 9));
         setErreurFormations(false);
       } catch {
         if (!actif) return;
@@ -102,9 +92,6 @@ function Accueil() {
     chargerFormations();
     return () => { actif = false; };
   }, []);
-
-  // Gère l'ouverture/fermeture de la modale d'inscription (désactivée car formulaire supprimé)
-  // useEffect(() => { ... }, [modalOuverte]);
 
   // Animation d'apparition des éléments au scroll
   useEffect(() => {
@@ -121,7 +108,7 @@ function Accueil() {
       { threshold: 0.15 },
     );
     const elements = document.querySelectorAll(
-      ".hero-highlight-card, .hero-stat-card, .guide-carte, .valeur-carte, .temoignage-container",
+      ".hero-highlight-card, .hero-stat-card, .guide-carte, .valeur-carte, .valeurs-illu, .valeurs-header, .valeurs-liste li, .temoignage-container, .temoignage-card",
     );
     elements.forEach((element) => {
       element.classList.add("reveal-on-scroll");
@@ -134,36 +121,44 @@ function Accueil() {
   useEffect(() => {
     if (!TEMOIGNAGES.length) return;
     const timer = window.setTimeout(() => {
+      setDirectionTemoignages("next");
       setPointActif((precedent) => (precedent + 1) % TEMOIGNAGES.length);
-    }, 3000);
+    }, 5200);
     return () => { window.clearTimeout(timer); };
   }, [pointActif]);
 
-  // Déconnexion utilisateur
-  const gererDeconnexion = async () => {
-    try {
-      await deconnecter();
-    } catch { /* ignore */ } finally {
-      supprimerSession();
-      navigate("/connexion", { replace: true });
-    }
+  // Fait défiler automatiquement les formations populaires
+  useEffect(() => {
+    if (!formationsMisesEnAvant.length) return;
+    const timer = window.setTimeout(() => {
+      setDirectionFormations("next");
+      setFormationActive((f) => (f + 1) % formationsMisesEnAvant.length);
+    }, 6500);
+    return () => { window.clearTimeout(timer); };
+  }, [formationActive, formationsMisesEnAvant]);
+
+  const changerTemoignage = (direction) => {
+    setDirectionTemoignages(direction);
+    setPointActif((p) => {
+      if (direction === "prev") {
+        return (p - 1 + TEMOIGNAGES.length) % TEMOIGNAGES.length;
+      }
+
+      return (p + 1) % TEMOIGNAGES.length;
+    });
   };
 
-  // Ferme la modale d'inscription
-  const fermerModal = () => {
-    setModalOuverte(false);
-  };
+  const changerFormation = (direction) => {
+    if (!formationsMisesEnAvant.length) return;
+    setDirectionFormations(direction);
+    setFormationActive((f) => {
+      if (direction === "prev") {
+        return (f - 1 + formationsMisesEnAvant.length) % formationsMisesEnAvant.length;
+      }
 
-  // Soumet le formulaire de la modale d'inscription
-  const soumettreModal = (event) => {
-    event.preventDefault();
-    navigate("/inscription");
+      return (f + 1) % formationsMisesEnAvant.length;
+    });
   };
-
-  // Fonctions formulaire inscription (désactivées car formulaire supprimé)
-  // const changerChamp = (event) => { ... };
-  // const emailValide = (email) => ...;
-  // const soumettreInscription = (event) => { ... };
 
   // Rendu de la page d'accueil
   return (
@@ -186,42 +181,55 @@ function Accueil() {
             <img src="/assets/images/learning/learning-notes.jpg" alt="" aria-hidden="true" />
           </div>
           <h1 className="hero-titre" id="hero-title">
-            Apprends. <span className="progresse">Progresse</span>. Réussis.
+            Apprenez. <span className="progresse">Progressez</span>.<br />Réussissez ensemble.
           </h1>
           <p className="hero-texte">
-            Ici, chaque effort compte. Tu apprends, tu pratiques,
-            et tu vois tes progrès se transformer en vraies victoires. <br />
-            SkillHub rend ton chemin plus fluide et inspirant.
+            Des parcours clairs, des formateurs passionnés et une progression visible.
+            SkillHub transforme chaque étape d'apprentissage en réussite concrète.
           </p>
           <div className="hero-boutons">
-            <Link to={lienHeroFormateur} className="btn btn-formateur" role="button"><i className="fa-solid fa-chalkboard-user"></i>{' '}Formateurs</Link>
-            <Link to={lienHeroApprenant} className="btn btn-apprenant" role="button"><i className="fa-solid fa-book-open-reader"></i>{' '}Apprenants</Link>
+            <Link to={lienHeroApprenant} className="btn btn-formateur" role="button">Explorer les formations</Link>
+            {utilisateur?.role === "formateur" ? (
+              <Link to="/dashboard/formateur" className="btn btn-apprenant" role="button">Mon espace formateur</Link>
+            ) : (
+              <button type="button" className="btn btn-apprenant" onClick={() => setAuthModal("inscription")}>Devenir formateur</button>
+            )}
           </div>
         </section>
       </main>
 
       <section className="guide" id="guide" aria-labelledby="guide-title">
         <div className="guide-header">
-          <h2 id="guide-title">Comment <br />ça marche ?</h2>
+          <span className="section-kicker">Un parcours simple</span>
+          <h2 id="guide-title">Comment ça marche ?</h2>
         </div>
         <div className="guide-cartes">
           <div className="guide-column guide-formateurs">
-            <p className="guide-role">Formateurs</p>
+            <p className="guide-role">
+              <FontAwesomeIcon icon={faChalkboard} aria-hidden="true" style={{ marginRight: "6px" }} />
+              Formateurs
+            </p>
             <article className="guide-carte">
+              <span className="guide-step">01</span>
               <div className="carte-header">
-                <img src="/assets/images/icon_profile.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <span className="guide-icon-wrapper guide-icon-wrapper--formateur">
+                  <FontAwesomeIcon icon={faChalkboard} className="guide-fa-icon" aria-hidden="true" />
+                </span>
                 <h3 className="guide-titre">Créez votre cours</h3>
               </div>
               <div className="guide-texte">
                 <p>
-                  Déposez facilement vos formations en ligne, ajoutez vidéos, documents et quiz,
-                  et configurez vos modules selon votre style d’enseignement.
+                  Déposez facilement vos formations en ligne, ajoutez vos cours,
+                configurez vos modules selon votre style d’enseignement.
                 </p>
               </div>
             </article>
             <article className="guide-carte">
+              <span className="guide-step">02</span>
               <div className="carte-header">
-                <img src="/assets/images/icon-robot.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <span className="guide-icon-wrapper guide-icon-wrapper--formateur">
+                  <FontAwesomeIcon icon={faBullhorn} className="guide-fa-icon" aria-hidden="true" />
+                </span>
                 <h3 className="guide-titre">Publiez et atteignez vos élèves</h3>
               </div>
               <div className="guide-texte">
@@ -234,10 +242,16 @@ function Accueil() {
             </article>
           </div>
           <div className="guide-column guide-apprenants">
-            <p className="guide-role">Apprenants</p>
+            <p className="guide-role">
+              <FontAwesomeIcon icon={faGraduationCap} aria-hidden="true" style={{ marginRight: "6px" }} />
+              Apprenants
+            </p>
             <article className="guide-carte">
+              <span className="guide-step">01</span>
               <div className="carte-header">
-                <img src="/assets/images/icon-search.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <span className="guide-icon-wrapper guide-icon-wrapper--apprenant">
+                  <FontAwesomeIcon icon={faMagnifyingGlass} className="guide-fa-icon" aria-hidden="true" />
+                </span>
                 <h3 className="guide-titre">Explorez et choisissez</h3>
               </div>
               <div className="guide-texte">
@@ -248,8 +262,11 @@ function Accueil() {
               </div>
             </article>
             <article className="guide-carte">
+              <span className="guide-step">02</span>
               <div className="carte-header">
-                <img src="/assets/images/icons_book.svg" alt="" className="guide-icon" aria-hidden="true" />
+                <span className="guide-icon-wrapper guide-icon-wrapper--apprenant">
+                  <FontAwesomeIcon icon={faGraduationCap} className="guide-fa-icon" aria-hidden="true" />
+                </span>
                 <h3 className="guide-titre">Apprenez à votre rythme</h3>
               </div>
               <div className="guide-texte">
@@ -264,113 +281,143 @@ function Accueil() {
       </section>
 
       <section className="valeurs valeurs-highlights" aria-labelledby="valeurs-title">
-        <div className="valeurs-header">
-          <h2 id="valeurs-title">Nos valeurs</h2>
-        </div>
-        <div className="valeurs_container valeurs-list">
-          <article className="valeur-item">
-            <h3><i className="fa-solid fa-layer-group"></i> Modules guidés</h3>
-            <p className="texte-carte">Des parcours découpés clairement pour avancer étape par étape.</p>
-          </article>
-          <article className="valeur-item">
-            <h3><i className="fa-solid fa-chart-line"></i> Progression visible</h3>
-            <p className="texte-carte">Suivi d'apprentissage et montée en compétences en continu.</p>
-          </article>
-          <article className="valeur-item">
-            <h3><i className="fa-solid fa-shield-heart"></i> Expérience rassurante</h3>
-            <p className="texte-carte">Une interface claire, pédagogique et facile à prendre en main.</p>
-          </article>
+        <div className="valeurs-inner">
+          <div className="valeurs-illu">
+            <img src="/assets/images/valeurs-illustration.png" alt="Apprenante utilisant SkillHub" />
+          </div>
+          <div className="valeurs-contenu">
+            <div className="valeurs-header">
+              <span className="section-kicker">Notre engagement</span>
+              <h2 id="valeurs-title">Nos valeurs</h2>
+            </div>
+            <ul className="valeurs-liste">
+              <li>
+                <strong>Sécurité</strong>
+                <p>Vos données et votre progression sont protégées à chaque étape de votre parcours.</p>
+              </li>
+              <li>
+                <strong>Excellence</strong>
+                <p>Des formations de qualité, conçues et animées par des experts passionnés par leur domaine.</p>
+              </li>
+              <li>
+                <strong>Accessibilité</strong>
+                <p>Apprenez depuis n'importe où, à votre rythme, sans barrières techniques ni financières.</p>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
 
       <section className="temoignages" aria-labelledby="temoignages-title">
-        <h2 id="temoignages-title">Témoignages</h2>
-        <div className="temoignage-container" id="temoignageCarte" aria-live="polite">
-          {TEMOIGNAGES.map((temoignage, index) => (
-            <article className={`temoignage-carte ${index === pointActif ? "active" : ""}`} key={temoignage.nom}>
-              <span className="temoignage-quote" aria-hidden="true">“</span>
-              <img src={temoignage.photo} className="temoignage-profil" alt="" />
-              <h3 className="temoignage-nom">{temoignage.nom}</h3>
-              <p className="temoignage-texte">{temoignage.texte}</p>
-            </article>
-          ))}
-        </div>
-        <div className="temoignage-dots" id="temoignagePoints" role="tablist">
-          {TEMOIGNAGES.map((temoignage, index) => (
-            <span
-              key={`${temoignage.nom}-dot`}
-              className={`temoignage-point ${index === pointActif ? "active" : ""}`}
-              onClick={() => setPointActif(index)}
-              onKeyDown={(e) => e.key === 'Enter' && setPointActif(index)}
-              role="tab"
-              tabIndex={0}
-            ></span>
-          ))}
+        <div className="temoignages-inner">
+          <div className="temoignages-gauche">
+            <span className="section-kicker temoignages-kicker">Témoignages</span>
+            <h2 id="temoignages-title">Ils nous font<br />confiance</h2>
+            <div className="temoignages-nav">
+              <button
+                className="temoignage-btn"
+                onClick={() => changerTemoignage("prev")}
+                aria-label="Précédent"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              <button
+                className="temoignage-btn temoignage-btn--actif"
+                onClick={() => changerTemoignage("next")}
+                aria-label="Suivant"
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </div>
+          </div>
+          <div className={`temoignages-cartes${directionTemoignages ? ` carousel-${directionTemoignages}` : ""}`} aria-live="polite">
+            {[0, 1].map((offset) => {
+              const index = (pointActif + offset) % TEMOIGNAGES.length;
+              const t = TEMOIGNAGES[index];
+              return (
+                <article className="temoignage-card" key={`${t.nom}-${offset}`}>
+                  <span className="temoignage-guillemet" aria-hidden="true">"</span>
+                  <img src={t.photo} className="temoignage-profil" alt="" />
+                  <h3 className="temoignage-nom">{t.nom}</h3>
+                  <p className="temoignage-role">{t.role}</p>
+                  <p className="temoignage-texte">{t.texte}</p>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       <section className="valeurs featured-formations" aria-labelledby="formations-mises-en-avant-title">
         <div className="valeurs-header">
-          <h2 id="formations-mises-en-avant-title">Formations mises en avant</h2>
+          <span className="section-kicker">À découvrir maintenant</span>
+          <h2 id="formations-mises-en-avant-title">Formations populaires</h2>
         </div>
-        <div className="valeurs_container featured-grid" id="featuredFormations" aria-live="polite">
-          {!erreurFormations && formationsMisesEnAvant.map((formation, index) => (
-            <article className="valeur-carte featured-card" key={formation.id}>
-              <div className="featured-thumb">
-                <img src={IMAGES_APPRENTISSAGE[index % IMAGES_APPRENTISSAGE.length]} alt="" className="icon-carte featured-image" aria-hidden="true" />
-              </div>
-              <div className="featured-content">
-                <h3><i className="fa-solid fa-graduation-cap"></i> {formation.titre}</h3>
-                <p className="texte-carte featured-meta"><i className="fa-solid fa-signal"></i> Niveau : {niveauAffichage(formation.level)}</p>
-                <p className="texte-carte featured-meta"><i className="fa-solid fa-chalkboard-user"></i> Formateur : {formation.formateur || "N/A"}</p>
-              </div>
-            </article>
-          ))}
-          {erreurFormations && <p>Impossible de charger les formations mises en avant.</p>}
-        </div>
+        {!erreurFormations && formationsMisesEnAvant.length > 0 && (
+          <div className="formations-carousel">
+            <button
+              className="formations-btn"
+              onClick={() => changerFormation("prev")}
+              aria-label="Formation précédente"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+            <div className={`formations-slide-track${directionFormations ? ` carousel-${directionFormations}` : ""}`} aria-live="polite">
+              {[0, 1, 2].map((offset) => {
+                const index = (formationActive + offset) % formationsMisesEnAvant.length;
+                const formation = formationsMisesEnAvant[index];
+                return (
+                  <article className="featured-card" key={`${formation.id}-${offset}`}>
+                    <div className="f-card-cover">
+                      <img
+                        src={IMAGES_APPRENTISSAGE[index % IMAGES_APPRENTISSAGE.length]}
+                        alt=""
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="f-card-body">
+                      <h3 className="f-card-titre">{formation.titre}</h3>
+                      <div className="f-card-stats">
+                        <span><FontAwesomeIcon icon={faClock} className="f-stat-icon" aria-hidden="true" /> {libelleHeures(formation.duration ?? formation.duree)}</span>
+                        <span><FontAwesomeIcon icon={faUserGraduate} className="f-stat-icon" aria-hidden="true" /> {formation.apprenants || 0} apprenants</span>
+                      </div>
+                      <p className="f-card-auteur">Par {formation.formateur || "Formateur SkillHub"}</p>
+                      <hr className="f-card-sep" />
+                      <p className="f-card-learn-title">Ce que vous apprendrez</p>
+                      <ul className="f-card-bullets">
+                        {obtenirPoints(formation.description).map((point, i) => (
+                          <li key={i}>{point}</li>
+                        ))}
+                      </ul>
+                      {(!formation.description || obtenirPoints(formation.description).length === 0) && (
+                        <p className="f-card-no-desc">Aucune description disponible.</p>
+                      )}
+                    </div>
+                    <div className="f-card-footer">
+                      <Link to={`/formation/${formation.id}`} className="f-btn f-btn--info">Plus d'infos</Link>
+                      <Link to={`/apprendre/${formation.id}`} className="f-btn f-btn--start">Commencer</Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            <button
+              className="formations-btn"
+              onClick={() => changerFormation("next")}
+              aria-label="Formation suivante"
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
+        )}
+        {erreurFormations && <p>Impossible de charger les formations mises en avant.</p>}
         <div style={{ textAlign: "center", marginTop: "20px" }}>
           <Link to="/formations" className="btn btn-apprenant" role="button">Voir toutes les formations</Link>
         </div>
       </section>
 
-
-      {/* Le formulaire d'inscription a été retiré de la page d'accueil */}
-
-      <div id="modalOverlay" className="overlay" aria-hidden="true" hidden={!modalOuverte} onClick={fermerModal} onKeyDown={fermerModal}></div>
-      <div
-        id="modal"
-        className="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="title"
-        hidden={!modalOuverte}
-        ref={modalRef}
-      >
-        <h2 id="title">Rejoindre SkillHub</h2>
-        <p className="modal-subtitle">Créez votre compte gratuitement</p>
-        <form onSubmit={soumettreModal}>
-          <div className="champ">
-            <label htmlFor="modal-nom">Nom</label>
-            <input id="modal-nom" type="text" placeholder="Votre nom" required />
-          </div>
-          <div className="champ">
-            <label htmlFor="modal-email">Email</label>
-            <input id="modal-email" type="email" placeholder="votre@email.com" required />
-          </div>
-          <div className="champ">
-            <label htmlFor="modal-mdp">Mot de passe</label>
-            <input id="modal-mdp" type="password" placeholder="••••••••" required />
-          </div>
-          <div className="modal-actions">
-            <button type="submit">Créer le compte</button>
-            <button type="button" id="closeModal" onClick={fermerModal}>Annuler</button>
-          </div>
-        </form>
-        <p className="modal-login-link">
-          Déjà inscrit ?{" "}
-          <Link to="/connexion" onClick={fermerModal}>Se connecter</Link>
-        </p>
-      </div>
+      {authModal && <AuthModal modeInitial={authModal} onClose={() => setAuthModal(null)} />}
 
       <footer className="footer" id="footer">
         <div className="footer-container">

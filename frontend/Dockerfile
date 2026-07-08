@@ -27,6 +27,7 @@ FROM nginx:alpine as production-stage
 # Récupérer UNIQUEMENT le code compilé de l'étape 1 (le dossier 'dist')
 # et le placer dans le dossier public de Nginx
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exposer le port 80 pour le trafic web
 EXPOSE 80

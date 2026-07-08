@@ -1,46 +1,73 @@
 import PropTypes from "prop-types";
-import "../styles/atelierCard.css";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
+import "../styles/formations-page.css";
 
-// Affichage des ateliers une par une
-function AtelierCard({ image = null, titre, description, date, statut, inscrits, price, duration, level, actions = null }) {
-  const dateAffichee = new Date(date).toLocaleDateString("fr-FR");
-  const prixAffiche = `${new Intl.NumberFormat("fr-FR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number(price ?? 0))} Rs`;
-  const niveauxAffichage = {
-    beginner: "Débutant",
-    intermediaire: "Intermédiaire",
-    advanced: "Avancé",
-  };
+const IMAGES_FORMATIONS = [
+  "/assets/images/learning/learning-hero.jpg",
+  "/assets/images/learning/learning-laptop.jpg",
+  "/assets/images/learning/learning-notes.jpg",
+  "/assets/images/learning/learning-team.jpg",
+];
+
+function obtenirPoints(description) {
+  if (!description) return [];
+  return description
+    .split(/[.!?]/)
+    .map((point) => point.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+}
+
+function AtelierCard({
+  image = null,
+  titre,
+  description,
+  id = null,
+  formateur = "Formateur SkillHub",
+  inscrits,
+  duration,
+  actions = null,
+}) {
+  const imageCarte = image || IMAGES_FORMATIONS[Math.abs(String(titre).length) % IMAGES_FORMATIONS.length];
+  const points = obtenirPoints(description);
+  const lienDetail = id ? `/formation/${id}` : "/formations";
+  const lienApprendre = id ? `/apprendre/${id}` : "/formations";
 
   return (
-    <div className="atelier-card">
-      {image && (
-        <div className="atelier-card-image-wrap">
-          <img src={image} alt="" className="atelier-card-image" aria-hidden="true" />
+    <article className="f-card dashboard-f-card">
+      <div className="f-card-cover">
+        <img src={imageCarte} alt="" loading="lazy" aria-hidden="true" />
+      </div>
+
+      <div className="f-card-body">
+        <h3 className="f-card-titre">{titre}</h3>
+        <div className="f-card-stats">
+          <span><FontAwesomeIcon icon={faClock} className="f-stat-icon" aria-hidden="true" /> {duration ?? 1} heure{Number(duration ?? 1) > 1 ? "s" : ""} de cours</span>
+          <span><FontAwesomeIcon icon={faUserGraduate} className="f-stat-icon" aria-hidden="true" /> {inscrits ?? 0} apprenants</span>
         </div>
-      )}
-
-      <div className="atelier-card-header">
-        <h3>{titre}</h3>
-        <span className={`atelier-badge ${statut === "Terminé" ? "atelier-badge-termine" : "atelier-badge-avenir"}`}>
-          {statut}
-        </span>
+        <p className="f-card-auteur">Par {formateur}</p>
+        <hr className="f-card-sep" />
+        <p className="f-card-learn-title">Ce que vous apprendrez</p>
+        {points.length > 0 ? (
+          <ul className="f-card-bullets">
+            {points.map((point) => <li key={point}>{point}</li>)}
+          </ul>
+        ) : (
+          <p className="f-card-no-desc">Aucune description disponible.</p>
+        )}
       </div>
 
-      <p className="atelier-description">{description || "Aucune description disponible."}</p>
-
-      <div className="atelier-meta">
-        <p><strong>Date :</strong> {dateAffichee}</p>
-        <p><strong>Prix :</strong> {prixAffiche}</p>
-        <p><strong>Durée :</strong> {duration ?? 0} h</p>
-        <p><strong>Niveau :</strong> {niveauxAffichage[level] ?? "Débutant"}</p>
-        <p><strong>Inscrits :</strong> {inscrits}</p>
+      <div className="f-card-footer">
+        {actions || (
+          <>
+            <Link to={lienDetail} className="f-btn f-btn--info">Plus d'infos</Link>
+            <Link to={lienApprendre} className="f-btn f-btn--start">Commencer</Link>
+          </>
+        )}
       </div>
-
-      {actions && <div className="atelier-actions">{actions}</div>}
-    </div>
+    </article>
   );
 }
 
@@ -48,6 +75,8 @@ AtelierCard.propTypes = {
   image: PropTypes.string,
   titre: PropTypes.string.isRequired,
   description: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  formateur: PropTypes.string,
   date: PropTypes.string,
   statut: PropTypes.string,
   inscrits: PropTypes.number,

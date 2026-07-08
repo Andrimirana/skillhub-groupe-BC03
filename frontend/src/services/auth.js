@@ -30,6 +30,22 @@ export function recupererUtilisateur() {
   }
 }
 
+export function mettreAJourUtilisateurSession(donneesUtilisateur) {
+  const utilisateurActuel = recupererUtilisateur();
+
+  if (!utilisateurActuel) {
+    return null;
+  }
+
+  const utilisateurMisAJour = {
+    ...utilisateurActuel,
+    ...donneesUtilisateur,
+  };
+
+  localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateurMisAJour));
+  return utilisateurMisAJour;
+}
+
 export function supprimerSession() {
   localStorage.removeItem(CLE_JETON);
   localStorage.removeItem(CLE_UTILISATEUR);

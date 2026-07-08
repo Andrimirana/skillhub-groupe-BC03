@@ -65,3 +65,118 @@
   background: #353e5d;
   border-color: #60719b;
 }
+
+/* Boutons dashboard cohérents */
+.btn-create {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: 0 10px 22px rgba(5, 150, 105, 0.18);
+  white-space: nowrap;
+}
+
+.btn-create:hover,
+.btn-create:focus {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  box-shadow: 0 12px 26px rgba(5, 150, 105, 0.22);
+}
+
+.btn-secondary {
+  color: var(--primary);
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+  white-space: nowrap;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-discover {
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-discover:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 12px 18px;
+  color: #dc2626;
+  background: #fff1f2;
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-delete:hover {
+  color: #ffffff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+/* Boutons plus sobres */
+.btn-create,
+.btn-secondary,
+.btn-delete {
+  min-height: 40px;
+  border-radius: 8px;
+  padding: 10px 16px;
+  box-shadow: none;
+  transform: none;
+  font-size: 0.92rem;
+  font-weight: 800;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.btn-create {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-create:hover,
+.btn-create:focus {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  color: var(--text-main);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: var(--primary);
+  background: var(--primary-light);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+.btn-delete {
+  color: #dc2626;
+  background: #ffffff;
+  border-color: #fecaca;
+}
+
+.btn-compact {
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 0.86rem;
+}

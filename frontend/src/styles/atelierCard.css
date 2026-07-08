@@ -134,3 +134,252 @@
 [data-theme="dark"] .atelier-meta p {
     color: #d4dbf4;
 }
+
+/* Cartes ateliers compactes. */
+.atelier-list {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 250px));
+    justify-content: start;
+    gap: 14px;
+}
+
+.atelier-card {
+    max-width: 250px;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 15px;
+}
+
+.atelier-card-image-wrap {
+    height: 125px;
+    margin: -14px -14px 2px;
+}
+
+.atelier-card h3 {
+    font-size: 1rem;
+}
+
+.atelier-description {
+    font-size: 0.84rem;
+}
+
+@media (max-width: 600px) {
+    .atelier-list {
+        grid-template-columns: 1fr;
+    }
+
+    .atelier-card {
+        max-width: none;
+    }
+}
+
+/* Dashboard cards alignées avec les cards formations */
+.atelier-list {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 260px));
+    gap: 18px;
+}
+
+.atelier-card {
+    max-width: 260px;
+    padding: 0;
+    gap: 0;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+    cursor: default;
+}
+
+.atelier-card:hover,
+.atelier-card:focus {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 48px rgba(79, 70, 229, 0.14);
+}
+
+.atelier-card-image-wrap {
+    position: relative;
+    height: 112px;
+    margin: 9px 9px 0;
+    border: 0;
+    border-radius: 13px;
+    background: #eef2ff;
+}
+
+.atelier-card-image-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.03), rgba(15, 23, 42, 0.24)),
+        linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(5, 150, 105, 0.1));
+    pointer-events: none;
+}
+
+.atelier-card-image {
+    transition: transform 0.25s ease;
+}
+
+.atelier-card:hover .atelier-card-image {
+    transform: scale(1.04);
+}
+
+.atelier-price-badge {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    z-index: 1;
+    padding: 6px 10px;
+    border-radius: 9px;
+    color: #ffffff;
+    background: var(--accent);
+    font-size: 0.73rem;
+    font-weight: 900;
+    box-shadow: 0 8px 16px rgba(5, 150, 105, 0.22);
+}
+
+.atelier-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 13px 14px 12px;
+}
+
+.atelier-card-header {
+    align-items: center;
+}
+
+.atelier-card h3 {
+    min-height: 40px;
+    margin: 0;
+    color: var(--text-main);
+    font-size: 0.92rem;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+}
+
+.atelier-description {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.atelier-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    padding: 0;
+    border: 0;
+}
+
+.atelier-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 750;
+}
+
+.atelier-meta .svg-inline--fa {
+    color: var(--primary);
+    flex: 0 0 auto;
+}
+
+.atelier-badge,
+.atelier-level {
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 900;
+}
+
+.atelier-level {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.atelier-badge-avenir {
+    color: #047857;
+    background: var(--accent-light);
+}
+
+.atelier-badge-termine {
+    color: #4338ca;
+    background: var(--primary-light);
+}
+
+.atelier-actions {
+    gap: 7px;
+    padding: 10px 14px 14px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.atelier-actions .btn-create,
+.atelier-actions .btn-secondary,
+.atelier-actions .btn-delete {
+    flex: 1;
+    min-height: 36px;
+    padding: 8px 9px;
+    border-radius: 9px;
+    font-size: 0.72rem;
+    font-weight: 850;
+    text-align: center;
+}
+
+[data-theme="dark"] .atelier-card {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .atelier-card-image-wrap {
+    background: #20283a;
+}
+
+[data-theme="dark"] .atelier-actions {
+    border-top-color: var(--border);
+}
+
+/* Les dashboards réutilisent désormais le design officiel .f-card */
+.atelier-list .f-card {
+    max-width: 260px;
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.07);
+}
+
+.atelier-list .f-card-footer {
+    gap: 7px;
+    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.atelier-list .f-card-footer .btn-create,
+.atelier-list .f-card-footer .btn-secondary,
+.atelier-list .f-card-footer .btn-delete {
+    flex: 1;
+    min-height: 36px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 850;
+    line-height: 1.15;
+    text-align: center;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.atelier-list .f-card-footer .btn-create {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.atelier-list .f-card-footer .btn-create:hover {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}

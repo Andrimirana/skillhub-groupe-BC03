@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+import DashboardNavbar from "../components/DashboardNavbar";
 import { detailFormation, modifierFormation } from "../services/formationsApi";
 import "../styles/layout.css";
 import "../styles/Bouton.css";
@@ -180,7 +180,7 @@ function ModifierFormation() {
       <Sidebar />
 
       <main className="main-area" role="main">
-        <Topbar />
+        <DashboardNavbar />
 
         <section className="page-content" aria-labelledby="page-title-modif">
           <div className="page-head">

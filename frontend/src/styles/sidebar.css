@@ -1,129 +1,256 @@
 .sidebar {
-  width: 220px;
+  width: 222px;
+  min-width: 222px;
   height: 100vh;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 14px 18px 14px;
-  box-sizing: border-box;
-  border-radius: 18px 0 0 18px;
-  box-shadow: var(--shadow);
-  transition: background 0.2s;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #ffffff;
+  border-right: 1px solid #d8dde5;
+  box-shadow: 4px 0 18px rgba(15, 23, 42, 0.06);
+  transition: width 0.22s ease, min-width 0.22s ease;
+  z-index: 60;
 }
 
-.sidebar_logo {
-  display: flex;
+.profile-sidebar {
+  color: #304254;
+}
+
+.profile-sidebar.is-collapsed {
+  width: 82px;
+  min-width: 82px;
+}
+
+.sidebar-collapse-btn {
+  width: 42px;
+  height: 42px;
+  margin: 14px 0 6px 20px;
+  padding: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 30px;
+  gap: 4px;
+  border: 0;
+  border-radius: 10px;
+  color: #536575;
+  background: transparent;
+  cursor: pointer;
 }
 
-.sidebar a {
+.sidebar-collapse-btn span {
+  width: 18px;
+  height: 2px;
+  display: block;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.sidebar-collapse-btn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.sidebar-user-card {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 14px 64px;
+  color: #102033;
+  text-align: center;
   text-decoration: none;
-  color: inherit;
 }
 
+.sidebar-user-card:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
 
-.logo {
-  width: 126px;
-  height: auto;
+.sidebar-avatar {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  border: 7px solid #d7dee6;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #334452;
+}
+
+.sidebar-avatar > .svg-inline--fa {
+  width: 58px;
+  height: 58px;
+}
+
+.sidebar-avatar-edit {
+  position: absolute;
+  left: -1px;
+  bottom: -4px;
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #8795a3;
+  border-radius: 50%;
+  color: #263544;
+  background: #eef3f6;
+  font-size: 0.78rem;
+}
+
+.sidebar-user-card strong {
+  display: block;
+  max-width: 190px;
+  color: #102033;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
 }
 
 .menu-top,
 .menu-bottom {
   list-style: none;
-  padding: 0;
   margin: 0;
-}
-
-.menu-top {
-  flex: 1;
+  padding: 18px 0;
 }
 
 .menu-bottom {
-  margin-top: 20px;
+  border-top: 1px solid #d8dde5;
 }
 
+.menu-bottom {
+  margin-top: auto;
+}
 
 .sidebar-item {
+  min-height: 50px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
+  gap: 14px;
+  width: 100%;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 0;
+  color: #3a4a5a;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 750;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: none;
   cursor: pointer;
-  color: var(--text-muted);
-  font-size: 15px;
-  font-weight: 600;
-  transition: background 0.18s, color 0.18s;
-  background: none;
+  transition: color 0.18s ease, background 0.18s ease;
 }
 
-.sidebar-item.active,
-.sidebar-item:focus,
-.sidebar-item:hover {
-  background: var(--primary-light);
-  color: var(--primary);
-  outline: none;
-}
-
-.sidebar-item:hover {
-  background: rgba(98, 60, 222, 0.1);
-  color: #623cde;
-}
-
+.sidebar-item:hover,
 .sidebar-item.active {
-  background: rgba(98, 60, 222, 0.14);
-  color: #623cde;
-  font-weight: 600;
+  color: var(--primary);
+  background: #f5f7fb;
+  text-decoration: none;
 }
 
 .sidebar-icon {
-  font-size: 16px;
-  min-width: 18px;
-  color: inherit;
+  width: 17px;
+  min-width: 17px;
+  color: #64717f;
+  font-size: 1rem;
+}
+
+.sidebar-item:hover .sidebar-icon,
+.sidebar-item.active .sidebar-icon {
+  color: var(--primary);
 }
 
 .sidebar-title {
+  min-width: 0;
+  flex: 1;
   white-space: nowrap;
 }
 
-
 .sidebar-btn {
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  text-align: left;
-  font-size: inherit;
-  color: inherit;
-  cursor: pointer;
+  font-family: inherit;
 }
 
-.sidebar-btn:focus {
-  outline: 2px solid #ee4954;
-  outline-offset: 2px;
-  border-radius: 5px;
+.sidebar-logout:hover {
+  color: #dc2626;
+  background: #fff1f2;
+}
+
+.sidebar-logout:hover .sidebar-icon {
+  color: #dc2626;
+}
+
+.profile-sidebar.is-collapsed .sidebar-collapse-btn {
+  margin-inline: auto;
+}
+
+.profile-sidebar.is-collapsed .sidebar-user-card {
+  padding: 8px 10px 28px;
+}
+
+.profile-sidebar.is-collapsed .sidebar-avatar {
+  width: 50px;
+  height: 50px;
+  border-width: 4px;
+}
+
+.profile-sidebar.is-collapsed .sidebar-avatar > .svg-inline--fa {
+  width: 25px;
+  height: 25px;
+}
+
+.profile-sidebar.is-collapsed .sidebar-avatar-edit,
+.profile-sidebar.is-collapsed .sidebar-user-card strong,
+.profile-sidebar.is-collapsed .sidebar-title {
+  display: none;
+}
+
+.profile-sidebar.is-collapsed .sidebar-item {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.profile-sidebar.is-collapsed .sidebar-icon {
+  width: 22px;
+  min-width: 22px;
+  font-size: 1.05rem;
 }
 
 [data-theme="dark"] .sidebar {
-  background: #1a2031;
-  border-right: 1px solid #333a55;
+  background: #111827;
+  border-right-color: #263247;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.3);
 }
 
+[data-theme="dark"] .sidebar-user-card strong,
 [data-theme="dark"] .sidebar-item {
-  color: #c5cbe3;
+  color: #dbe4f0;
 }
 
-[data-theme="dark"] .sidebar-item:hover {
-  background: rgba(98, 60, 222, 0.18);
-  color: #d8cdff;
-}
-
+[data-theme="dark"] .sidebar-item:hover,
 [data-theme="dark"] .sidebar-item.active {
-  background: rgba(98, 60, 222, 0.24);
-  color: #e7deff;
+  color: #ffffff;
+  background: #172033;
+}
+
+[data-theme="dark"] .menu-bottom {
+  border-top-color: #263247;
+}
+
+[data-theme="dark"] .sidebar-collapse-btn:hover {
+  background: #172033;
 }

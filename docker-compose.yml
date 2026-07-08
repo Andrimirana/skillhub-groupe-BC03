@@ -26,40 +26,38 @@ services:
           cpus: "0.5"
 
   # ---------------------------------
-  # MICROSERVICE 1 : AUTH
+  # MICROSERVICE 1 : AUTH (Spring Boot)
   # ---------------------------------
   auth_api:
     build:
-      context: ./services/auth
+      context: ./services/auth-java
       dockerfile: Dockerfile
     container_name: skillhub_auth
-    working_dir: /var/www
-    volumes:
-      - ./services/auth:/var/www
     ports:
-      - "8001:8000"
-    command: php artisan serve --host=0.0.0.0 --port=8000
+      - "8001:8080"
     environment:
-      APP_ENV: ${APP_ENV:-local}
-      APP_DEBUG: ${APP_DEBUG:-false}
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: skillhub_auth
-      DB_USERNAME: ${MYSQL_USER:-skillhub_user}
-      DB_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
+      APP_MASTER_KEY: ${APP_MASTER_KEY:-UneCleSuperSecreteDe32Caracteres!}
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/skillhub_auth?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-skillhub_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - skillhub_network
+      skillhub_network:
+        aliases:
+          - auth-api
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "php", "artisan", "--version"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      # Le premier démarrage Spring/Hibernate peut dépasser une minute sur
+      # Docker Desktop ; laisser le temps à l'API d'ouvrir le port avant de
+      # bloquer le démarrage du frontend.
+      start_period: 120s
     deploy:
       resources:
         limits:
@@ -75,21 +73,21 @@ services:
       dockerfile: Dockerfile
     container_name: skillhub_catalog
     working_dir: /var/www
-    volumes:
-      - ./services/catalog:/var/www
     ports:
       - "8002:8000"
-    command: php artisan serve --host=0.0.0.0 --port=8000
+    command: sh /var/www/start.sh
     environment:
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-false}
+      SESSION_DRIVER: file
+      DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: skillhub_catalog
       DB_USERNAME: ${MYSQL_USER:-skillhub_user}
       DB_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
-      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth_api:8000}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-api:8080}
       MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017}
       MONGO_DATABASE: ${MONGO_DATABASE:-skillhub_logs}
       MONGO_COLLECTION: ${MONGO_COLLECTION:-activity_logs}
@@ -122,21 +120,21 @@ services:
       dockerfile: Dockerfile
     container_name: skillhub_inscription
     working_dir: /var/www
-    volumes:
-      - ./services/inscription:/var/www
     ports:
       - "8003:8000"
-    command: php artisan serve --host=0.0.0.0 --port=8000
+    command: sh /var/www/start.sh
     environment:
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-false}
+      SESSION_DRIVER: file
+      DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: skillhub_enrollment
       DB_USERNAME: ${MYSQL_USER:-skillhub_user}
       DB_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
-      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth_api:8000}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-api:8080}
       CATALOG_SERVICE_URL: ${CATALOG_SERVICE_URL:-http://catalog_api:8000}
       MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017}
       MONGO_DATABASE: ${MONGO_DATABASE:-skillhub_logs}

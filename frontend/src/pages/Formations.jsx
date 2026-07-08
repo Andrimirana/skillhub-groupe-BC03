@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { recupererUtilisateur, supprimerSession } from "../services/auth";
-import { deconnecter } from "../services/authApi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 import { listerFormations } from "../services/formationsApi";
+import { recupererUtilisateur } from "../services/auth";
 import PublicNavbar from "../components/PublicNavbar";
 import "../styles/formations-page.css";
 
@@ -16,10 +17,12 @@ const LABELS_CATEGORIES = {
 };
 
 const IMAGES_FORMATIONS = [
-  "/assets/images/learning/learning-hero.jpg",
-  "/assets/images/learning/learning-laptop.jpg",
-  "/assets/images/learning/learning-notes.jpg",
-  "/assets/images/learning/learning-team.jpg",
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
 ];
 
 function mapperCategorie(category) {
@@ -44,36 +47,29 @@ function mapperCategorie(category) {
   return "dev";
 }
 
-function niveauAffichage(level) {
-  if (level === "advanced") {
-    return "Avancé";
-  }
+function libelleHeures(nombreHeures) {
+  const heures = Number(nombreHeures || 0);
+  return `${heures || 1} heure${heures > 1 ? "s" : ""} de cours`;
+}
 
-  if (level === "intermediaire") {
-    return "Intermédiaire";
-  }
-
-  return "Débutant";
+function obtenirPoints(description) {
+  if (!description) return [];
+  return description
+    .split(/[.;]/).map((s) => s.trim()).filter((s) => s.length > 8).slice(0, 3);
 }
 
 function Formations() {
   const navigate = useNavigate();
   const modalRef = useRef(null);
-  const lastFocusedRef = useRef(null);
-  const [menuOuvert, setMenuOuvert] = useState(false);
   const [modalOuverte, setModalOuverte] = useState(false);
   const [recherche, setRecherche] = useState("");
   const [categorie, setCategorie] = useState("");
   const [niveau, setNiveau] = useState("");
-  const [minHeures, setMinHeures] = useState("");
-  const [maxHeures, setMaxHeures] = useState("");
-  const [minPrix, setMinPrix] = useState("");
-  const [maxPrix, setMaxPrix] = useState("");
   const [formations, setFormations] = useState([]);
   const [formationsFiltrees, setFormationsFiltrees] = useState([]);
   const [erreur, setErreur] = useState(false);
-
   const utilisateur = recupererUtilisateur();
+  const estFormateur = utilisateur?.role === "formateur";
 
   useEffect(() => {
     document.title = "Formations";
@@ -127,11 +123,6 @@ function Formations() {
   useEffect(() => {
     const temporisation = globalThis.setTimeout(() => {
       const query = recherche.trim().toLowerCase();
-      const minH = Number.isNaN(Number.parseFloat(minHeures)) ? 0 : Number.parseFloat(minHeures);
-      const maxH = Number.isNaN(Number.parseFloat(maxHeures)) ? Number.POSITIVE_INFINITY : Number.parseFloat(maxHeures);
-      const minP = Number.isNaN(Number.parseFloat(minPrix)) ? 0 : Number.parseFloat(minPrix);
-      const maxP = Number.isNaN(Number.parseFloat(maxPrix)) ? Number.POSITIVE_INFINITY : Number.parseFloat(maxPrix);
-
       const resultat = formations.filter((formation) => {
         const matchQuery =
           formation.nom.toLowerCase().includes(query)
@@ -140,11 +131,7 @@ function Formations() {
 
         const matchFiltres =
           (categorie === "" || formation.categorie === categorie)
-          && (niveau === "" || formation.level === niveau)
-          && formation.duree >= minH
-          && formation.duree <= maxH
-          && formation.prix >= minP
-          && formation.prix <= maxP;
+          && (niveau === "" || formation.level === niveau);
 
         return matchQuery && matchFiltres;
       });
@@ -155,17 +142,7 @@ function Formations() {
     return () => {
       globalThis.clearTimeout(temporisation);
     };
-  }, [recherche, categorie, niveau, minHeures, maxHeures, minPrix, maxPrix, formations]);
-
-  const gererDeconnexion = async () => {
-    try { await deconnecter(); } catch { /* ignore */ }
-    finally { supprimerSession(); navigate("/connexion", { replace: true }); }
-  };
-
-  const ouvrirModal = () => {
-    lastFocusedRef.current = document.activeElement;
-    setModalOuverte(true);
-  };
+  }, [recherche, categorie, niveau, formations]);
 
   const fermerModal = () => setModalOuverte(false);
   const soumettreModal = (e) => { e.preventDefault(); navigate("/inscription"); };
@@ -183,11 +160,6 @@ function Formations() {
 
       <main id="contenu">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="illustration_2">
-            <div className="ill2">
-              <img src="/assets/images/learning/learning-hero.jpg" alt="" />
-            </div>
-          </div>
           <div className="title">
             <h1 id="hero-title">Découvre nos formations</h1>
             <p>Explore des parcours modernes, orientés pratique et progression continue.</p>
@@ -222,65 +194,49 @@ function Formations() {
               <option value="intermediaire">Intermédiaire</option>
               <option value="advanced">Avancé</option>
             </select>
-            <label htmlFor="minHours">Durée minimum (heures)</label>
-            <input
-              type="number"
-              id="minHours"
-              name="minHours"
-              placeholder="Heure min"
-              min="0"
-              value={minHeures}
-              onChange={(event) => setMinHeures(event.target.value)}
-            />
-            <label htmlFor="maxHours">Durée maximum (heures)</label>
-            <input
-              type="number"
-              id="maxHours"
-              name="maxHours"
-              placeholder="Heure max"
-              min="0"
-              value={maxHeures}
-              onChange={(event) => setMaxHeures(event.target.value)}
-            />
-            <label htmlFor="minPrice">Prix minimum (Rs)</label>
-            <input
-              type="number"
-              id="minPrice"
-              name="minPrice"
-              placeholder="Prix min"
-              min="0"
-              value={minPrix}
-              onChange={(event) => setMinPrix(event.target.value)}
-            />
-            <label htmlFor="maxPrice">Prix maximum (Rs)</label>
-            <input
-              type="number"
-              id="maxPrice"
-              name="maxPrice"
-              placeholder="Prix max"
-              min="0"
-              value={maxPrix}
-              onChange={(event) => setMaxPrix(event.target.value)}
-            />
           </aside>
           <div className="cards-container" id="cardsContainer" aria-live="polite">
             {erreur && <p>Impossible de charger les formations.</p>}
             {!erreur && formationsFiltrees.length === 0 && <p>Aucune formation trouvée.</p>}
             {!erreur && formationsFiltrees.map((formation, index) => (
-              <div className="card" key={formation.id}>
-                <span className={`card-badge ${formation.categorie}`}>{formation.categorie}</span>
-                <img src={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]} alt="Illustration formation" />
-                <h3>{formation.nom}</h3>
-                <p>Formateur : {formation.formateur || "N/A"}</p>
-                <p>{formation.description || "Aucune description disponible."}</p>
-                <p>Niveau : {niveauAffichage(formation.level)}</p>
-                <p>Apprenants : {formation.apprenants} • Vues : {formation.vues}</p>
-                <div className="card-bottom">
-                  <span><i className="fa-regular fa-clock"></i>{formation.duree}h</span>
-                  <span><i className="fa-solid fa-tag"></i>{formation.prix} Rs</span>
+              <article className="f-card" key={formation.id}>
+                <div className="f-card-cover">
+                  <img
+                    src={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
+                    alt=""
+                    loading="lazy"
+                    aria-hidden="true"
+                  />
                 </div>
-                <Link to={`/formation/${formation.id}`} style={{ marginTop: "8px" }}>Voir détail</Link>
-              </div>
+                <div className="f-card-body">
+                  <h3 className="f-card-titre">{formation.nom}</h3>
+                  <div className="f-card-stats">
+                    <span><FontAwesomeIcon icon={faClock} className="f-stat-icon" aria-hidden="true" /> {libelleHeures(formation.duree)}</span>
+                    <span><FontAwesomeIcon icon={faUserGraduate} className="f-stat-icon" aria-hidden="true" /> {formation.apprenants || 0} apprenants</span>
+                  </div>
+                  <p className="f-card-auteur">Par {formation.formateur || "Formateur SkillHub"}</p>
+                  <hr className="f-card-sep" />
+                  <p className="f-card-learn-title">Ce que vous apprendrez</p>
+                  <ul className="f-card-bullets">
+                    {obtenirPoints(formation.description).map((point, i) => (
+                      <li key={i}>{point}</li>
+                    ))}
+                  </ul>
+                  {(!formation.description || obtenirPoints(formation.description).length === 0) && (
+                    <p className="f-card-no-desc">Aucune description disponible.</p>
+                  )}
+                </div>
+                <div className="f-card-footer">
+                  {estFormateur ? (
+                    <span className="f-btn f-btn--disabled">Réservé aux apprenants</span>
+                  ) : (
+                    <>
+                      <Link to={`/formation/${formation.id}`} className="f-btn f-btn--info">Plus d'infos</Link>
+                      <Link to={`/apprendre/${formation.id}`} className="f-btn f-btn--start">Commencer</Link>
+                    </>
+                  )}
+                </div>
+              </article>
             ))}
           </div>
         </section>

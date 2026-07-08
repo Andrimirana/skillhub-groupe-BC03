@@ -6,7 +6,7 @@
 const mongoose = require("mongoose");
 
 // URL de connexion MongoDB
-const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017/skillhub";
+const MONGO_URL = process.env.MONGO_URI || process.env.MONGO_URL || "mongodb://localhost:27017/skillhub";
 
 // Connexion à MongoDB
 async function connectMongoDB() {
@@ -15,9 +15,9 @@ async function connectMongoDB() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("✅ MongoDB connecté avec succès");
+    console.log(" MongoDB connecté avec succès");
   } catch (error) {
-    console.error("❌ Erreur de connexion MongoDB:", error);
+    console.error(" Erreur de connexion MongoDB:", error);
     process.exit(1);
   }
 }

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap");
+
 /* Variables CSS globales */
 :root {
     --primary: #5b3df6;
@@ -14,6 +16,74 @@
     --shadow: 0 8px 24px rgba(52, 60, 98, 0.10);
 }
 
+/* Mode sombre global */
+[data-theme="dark"] {
+    --background: #0f1117;
+    --surface: #1a1d27;
+    --text-main: #e8eaf6;
+    --text-muted: #9199b8;
+    --border: #2d3150;
+    --primary-light: #2a2060;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] body {
+    background-color: var(--background);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .hero {
+    background:
+        linear-gradient(120deg, rgba(5, 10, 30, 0.80), rgba(20, 30, 80, 0.60)),
+        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat !important;
+}
+
+[data-theme="dark"] .hero-titre,
+[data-theme="dark"] .hero-texte {
+    color: #e8eaf6;
+}
+
+[data-theme="dark"] section,
+[data-theme="dark"] .guide,
+[data-theme="dark"] .valeurs,
+[data-theme="dark"] .temoignages,
+[data-theme="dark"] .featured-formations {
+    background: transparent;
+    border-color: #2d3150;
+}
+
+[data-theme="dark"] .guide-carte,
+[data-theme="dark"] .valeur-item,
+[data-theme="dark"] .temoignage-container,
+[data-theme="dark"] .featured-card,
+[data-theme="dark"] .connexion-carte,
+[data-theme="dark"] .inscription form#inscription {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] p,
+[data-theme="dark"] label {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: #12151f;
+    color: var(--text-main);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .formations-hero,
+[data-theme="dark"] .hero {
+    border-color: #2d3150;
+}
+
 /* Styles globaux modernisés */
 html {
     box-sizing: border-box;
@@ -24,6 +94,14 @@ html {
 *::before,
 *::after {
     box-sizing: inherit;
+}
+
+/* Interface volontairement sans pictogrammes décoratifs. */
+.svg-inline--fa,
+.fa,
+.fa-solid,
+.fa-regular {
+    display: none !important;
 }
 
 a {

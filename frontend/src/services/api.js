@@ -9,6 +9,7 @@ import { recupererJeton, supprimerSession } from "./auth";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_AUTH_URL || "http://127.0.0.1:8001/api",
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,7 +1,14 @@
-import logo from "../assets/logo.svg";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRightFromBracket,
+  faBookOpen,
+  faCompass,
+  faGrip,
+  faPen,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { deconnecter } from "../services/authApi";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import "../styles/sidebar.css";
@@ -10,6 +17,7 @@ function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const utilisateur = recupererUtilisateur();
+  const [repliee, setRepliee] = useState(false);
   const routeTableauDeBord = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
 
   const gererDeconnexion = async () => {
@@ -21,47 +29,62 @@ function Sidebar() {
     }
   };
 
+  const navigationPrincipale = [
+    { label: "Dashboard", to: routeTableauDeBord, icon: faGrip },
+    { label: "Mes formations", to: "/mes-ateliers", icon: faBookOpen },
+    { label: "Découvrir", to: "/formations", icon: faCompass },
+    { label: "Mon profil", to: "/profil", icon: faUser },
+  ];
+
+  const afficherLien = (item) => (
+    <li key={item.label}>
+      <Link
+        to={item.to}
+        className={`sidebar-item ${location.pathname === item.to ? "active" : ""}`}
+      >
+        <FontAwesomeIcon icon={item.icon} className="sidebar-icon" />
+        <span className="sidebar-title">{item.label}</span>
+      </Link>
+    </li>
+  );
+
   return (
-    <aside className="sidebar" aria-label="Menu principal">
-      <div className="sidebar_logo">
-        <img
-          src={logo}
-          alt="Logo SkillHub"
-          className="logo"
-          loading="lazy"
-        />
-      </div>
+    <aside className={`sidebar profile-sidebar ${repliee ? "is-collapsed" : ""}`} aria-label="Menu principal">
+      <button
+        type="button"
+        className="sidebar-collapse-btn"
+        onClick={() => setRepliee((etat) => !etat)}
+        aria-label={repliee ? "Déplier le menu" : "Replier le menu"}
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-      <ul className="menu-top">
-        <li>
-          <Link
-            to={routeTableauDeBord}
-            className={`sidebar-item ${location.pathname === routeTableauDeBord ? "active" : ""}`}
-          >
-            <FontAwesomeIcon icon={faBook} aria-hidden="true" />
-            <span>Dashboard</span>
-          </Link>
-        </li>
+      <Link to="/profil" className="sidebar-user-card" aria-label="Voir mon profil">
+        <span className="sidebar-avatar">
+          <FontAwesomeIcon icon={faUser} />
+          <span className="sidebar-avatar-edit">
+            <FontAwesomeIcon icon={faPen} />
+          </span>
+        </span>
+        <strong>{utilisateur?.nom || "Utilisateur SkillHub"}</strong>
+      </Link>
 
-        <li>
-          <Link
-            to="/mes-ateliers"
-            className={`sidebar-item ${location.pathname === "/mes-ateliers" ? "active" : ""}`}
-          >
-            <FontAwesomeIcon icon={faBook} aria-hidden="true" />
-            <span>Mes ateliers</span>
-          </Link>
-        </li>
-      </ul>
+      <nav className="sidebar-nav" aria-label="Navigation dashboard">
+        <ul className="menu-top">
+          {navigationPrincipale.map(afficherLien)}
+        </ul>
 
-      <ul className="menu-bottom">
-        <li className="sidebar-item">
-          <button type="button" className="sidebar-btn" onClick={gererDeconnexion}>
-            <FontAwesomeIcon icon={faSignOutAlt} aria-hidden="true" />
-            <span>Déconnexion</span>
-          </button>
-        </li>
-      </ul>
+        <ul className="menu-bottom">
+          <li>
+            <button type="button" className="sidebar-item sidebar-btn sidebar-logout" onClick={gererDeconnexion}>
+              <FontAwesomeIcon icon={faArrowRightFromBracket} className="sidebar-icon" />
+              <span className="sidebar-title">Déconnexion</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
     </aside>
   );
 }

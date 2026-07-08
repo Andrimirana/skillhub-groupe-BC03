@@ -1,40 +1,19 @@
 // Importe la librairie pour le chiffrement
 import CryptoJS from "crypto-js";
 
-// Fonction pour générer les headers de sécurité
-export const getSecurityHeaders = (data) => {
+/**
+ * Calcule le payload de connexion HMAC-SHA256 pour le protocole Spring Boot.
+ * Le mot de passe sert de clé HMAC (jamais envoyé sur le réseau).
+ * hmac = HMAC_SHA256(key=motDePasse, data="email:nonce:timestamp") en Base64
+ *
+ * @param {string} email     - Email de l'utilisateur
+ * @param {string} motDePasse - Mot de passe (utilisé comme clé, non transmis)
+ * @returns {{ email, nonce, timestamp, hmac }} Corps de la requête POST /api/login
+ */
+export const construirePayloadLogin = (email, motDePasse) => {
   const timestamp = Math.floor(Date.now() / 1000);
-  // Récupère le timestamp actuel
-  const bytes = new Uint8Array(6);
-  // Génère un nonce aléatoire
-  crypto.getRandomValues(bytes);
-  // Construit le nonce sous forme de chaîne
-  const nonce =
-    "front_" +
-    Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-
-  //  On fixe le body en string UNE SEULE FOIS
-  const bodyString = JSON.stringify(data);
-  // Convertit les données en chaîne JSON
-  const payload = bodyString + nonce + timestamp;
-  // Concatène les données pour le hash
-  const secret = import.meta.env.VITE_APP_MASTER_KEY;
-
-  // Récupère la clé secrète depuis les variables d'environnement
-  const signature = CryptoJS.HmacSHA256(payload, secret).toString(
-    CryptoJS.enc.Hex,
-  );
-
-  // Calcule la signature HMAC
-  return {
-    // Retourne les headers de sécurité
-    headers: {
-      "X-Nonce": nonce,
-      "X-Timestamp": timestamp,
-      "X-HMAC-Signature": signature,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: bodyString,
-  };
+  const nonce = crypto.randomUUID();
+  const donnees = `${email}:${nonce}:${timestamp}`;
+  const hmac = CryptoJS.HmacSHA256(donnees, motDePasse).toString(CryptoJS.enc.Base64);
+  return { email, nonce, timestamp, hmac };
 };

@@ -1,13 +1,14 @@
 // Fichier : authApi.js
-// Rôle    : Fournit les fonctions pour l'inscription, la connexion, la déconnexion et la validation du profil connecté en interagissant avec le backend d'authentification.
-// Modifié : 2026-04-21
+// Rôle    : Fournit les fonctions pour l'inscription, la connexion, la déconnexion et la validation du profil connecté en interagissant avec le backend d'authentification Spring Boot.
+// Modifié : 2026-06-01
 
 import axios from "axios";
-import { getSecurityHeaders } from "../utils/security";
+import { construirePayloadLogin } from "../utils/security";
 import { recupererJeton, supprimerSession } from "./auth";
 
 const apiAuth = axios.create({
   baseURL: import.meta.env.VITE_AUTH_URL || "http://127.0.0.1:8001/api",
+  timeout: 10000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -27,18 +28,31 @@ apiAuth.interceptors.response.use(
   },
 );
 
+/**
+ * Inscrit un nouvel utilisateur.
+ * POST /api/register — {nom, email, password, passwordConfirm, role}
+ * Réponse : {token, tokenType, expiresAt, utilisateur}
+ */
 export async function inscrire(nom, email, motDePasse, role) {
-  const data = { nom, email, mot_de_passe: motDePasse, role };
-  const { headers, body } = getSecurityHeaders(data);
-  const reponse = await apiAuth.post("/register", body, { headers });
+  const reponse = await apiAuth.post("/register", {
+    nom,
+    email,
+    password: motDePasse,
+    passwordConfirm: motDePasse,
+    role,
+  });
   return reponse.data;
 }
 
-// Fonction pour se connecter : envoie les identifiants, reçoit le token JWT et les infos utilisateur, et gère les erreurs de connexion.
+/**
+ * Authentifie un utilisateur via HMAC-SHA256.
+ * POST /api/login — {email, nonce, timestamp, hmac}
+ * Le mot de passe sert de clé HMAC et n'est jamais envoyé sur le réseau.
+ * Réponse : {token, tokenType, expiresAt, utilisateur}
+ */
 export async function connecter(email, motDePasse) {
-  const data = { email, mot_de_passe: motDePasse };
-  const { headers, body } = getSecurityHeaders(data);
-  const reponse = await apiAuth.post("/login", body, { headers });
+  const payload = construirePayloadLogin(email, motDePasse);
+  const reponse = await apiAuth.post("/login", payload);
   return reponse.data;
 }
 
@@ -46,8 +60,6 @@ export async function profilConnecte() {
   const reponse = await apiAuth.get("/profil");
   return reponse.data;
 }
-
-// Fonction pour se déconnecter : envoie une requête de déconnexion au backend et supprime la session locale.
 
 export async function deconnecter() {
   await apiAuth.post("/logout");
