@@ -43,6 +43,8 @@ class EnrollmentController extends Controller
             'formation_id'   => $idFormation,
         ], [
             'progression'      => 0,
+            'completed_modules'=> [],
+            'last_lesson_key'  => null,
             'date_inscription' => now(),
         ]);
 
@@ -58,6 +60,8 @@ class EnrollmentController extends Controller
             'utilisateur_id'   => $inscription->utilisateur_id,
             'formation_id'     => $inscription->formation_id,
             'progression'      => $inscription->progression,
+            'completed_modules'=> $inscription->completed_modules ?? [],
+            'last_lesson_key'  => $inscription->last_lesson_key,
             'date_inscription' => optional($inscription->date_inscription)->toIso8601String(),
         ], 201);
     }
@@ -120,18 +124,70 @@ class EnrollmentController extends Controller
                 'category'         => $formation['category'] ?? '',
                 'date'             => $formation['date'] ?? null,
                 'statut'           => $formation['statut'] ?? '',
-                'price'            => $formation['price'] ?? 0,
                 'duration'         => $formation['duration'] ?? 0,
                 'level'            => $formation['level'] ?? '',
+                'image_url'        => $formation['image_url'] ?? null,
                 'vues'             => $formation['vues'] ?? 0,
                 'apprenants'       => $formation['apprenants'] ?? 0,
                 'formateur'        => $formation['formateur'] ?? null,
                 'modules'          => $formation['modules'] ?? [],
                 'progression'      => $inscription->progression,
+                'completed_modules'=> $inscription->completed_modules ?? [],
+                'last_lesson_key'  => $inscription->last_lesson_key,
                 'date_inscription' => optional($inscription->date_inscription)->toIso8601String(),
             ];
         });
 
         return response()->json($resultat->values());
+    }
+
+    public function updateProgress(Request $requete, int $idFormation): JsonResponse
+    {
+        $utilisateurAuth = $requete->input('auth_user');
+
+        if (($utilisateurAuth['role'] ?? '') !== 'apprenant') {
+            return response()->json(['message' => 'Seuls les apprenants peuvent mettre à jour leur progression.'], 403);
+        }
+
+        $donneesValidees = $requete->validate([
+            'progression'          => ['nullable', 'integer', 'min:0', 'max:100'],
+            'completed_modules'    => ['nullable', 'array'],
+            'completed_modules.*'  => ['string', 'max:255'],
+            'last_lesson_key'      => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $inscription = Enrollment::query()
+            ->where('utilisateur_id', $utilisateurAuth['id'])
+            ->where('formation_id', $idFormation)
+            ->first();
+
+        if (! $inscription) {
+            return response()->json(['message' => 'Inscription introuvable.'], 404);
+        }
+
+        $modulesTermines = array_values(array_unique(
+            $donneesValidees['completed_modules'] ?? ($inscription->completed_modules ?? [])
+        ));
+
+        $inscription->update([
+            'progression'       => $donneesValidees['progression'] ?? $inscription->progression,
+            'completed_modules' => $modulesTermines,
+            'last_lesson_key'   => $donneesValidees['last_lesson_key'] ?? $inscription->last_lesson_key,
+        ]);
+
+        $this->mongoLogger->log('course_progress_updated', [
+            'user_id'           => $utilisateurAuth['id'],
+            'course_id'         => $idFormation,
+            'progression'       => $inscription->progression,
+            'completed_modules' => $modulesTermines,
+            'last_lesson_key'   => $inscription->last_lesson_key,
+        ]);
+
+        return response()->json([
+            'formation_id'       => $inscription->formation_id,
+            'progression'        => $inscription->progression,
+            'completed_modules'  => $inscription->completed_modules ?? [],
+            'last_lesson_key'    => $inscription->last_lesson_key,
+        ]);
     }
 }

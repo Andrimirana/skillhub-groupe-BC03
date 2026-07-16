@@ -15,6 +15,8 @@ class Enrollment extends Model
         'utilisateur_id',
         'formation_id',
         'progression',
+        'completed_modules',
+        'last_lesson_key',
         'date_inscription',
     ];
 
@@ -22,6 +24,7 @@ class Enrollment extends Model
     {
         return [
             'progression'      => 'integer',
+            'completed_modules'=> 'array',
             'date_inscription' => 'datetime',
         ];
     }
