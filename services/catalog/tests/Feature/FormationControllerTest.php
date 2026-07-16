@@ -68,7 +68,6 @@ class FormationControllerTest extends TestCase
             'description' => 'Apprenez Laravel de zéro',
             'category'    => 'dev',
             'date'        => '2026-09-01',
-            'price'       => 150,
             'duration'    => 20,
             'level'       => 'beginner',
         ];
@@ -218,7 +217,6 @@ class FormationControllerTest extends TestCase
             'description' => 'Test',
             'category' => 'dev',
             'date' => '2026-09-01',
-            'price' => 100,
             'duration' => 10,
             'level' => 'beginner',
             'modules' => [
@@ -240,7 +238,6 @@ class FormationControllerTest extends TestCase
         $formation = Formation::factory()->create([
             'user_id' => 1,
             'titre' => 'Original',
-            'price' => 100
         ]);
 
         $reponse = $this->withToken('jeton-test')->putJson("/api/formations/{$formation->id}", [
@@ -286,7 +283,6 @@ class FormationControllerTest extends TestCase
             'description' => 'Test',
             'category' => 'dev',
             'date' => '2026-09-01',
-            'price' => 100,
             'duration' => 10,
             'level' => 'invalid_level',
         ];
@@ -295,22 +291,4 @@ class FormationControllerTest extends TestCase
         $reponse->assertStatus(422)->assertJsonValidationErrors(['level']);
     }
 
-    // Vérifie qu'un prix négatif est rejeté par la validation côté serveur.
-    public function test_create_formation_requires_minimum_price(): void
-    {
-        $this->simulerConnexion($this->profilFormateur);
-
-        $data = [
-            'titre' => 'Test',
-            'description' => 'Test',
-            'category' => 'dev',
-            'date' => '2026-09-01',
-            'price' => -10,
-            'duration' => 10,
-            'level' => 'beginner',
-        ];
-
-        $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $data);
-        $reponse->assertStatus(422)->assertJsonValidationErrors(['price']);
-    }
 }
