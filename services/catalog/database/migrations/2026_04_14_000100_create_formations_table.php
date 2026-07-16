@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('category', 100);
             $table->date('date');
             $table->string('statut', 60)->default('À venir');
-            $table->decimal('price', 10, 2)->default(0);
             $table->integer('duration')->default(1);
             $table->string('level', 30)->default('beginner');
             $table->unsignedBigInteger('vues')->default(0);

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Fichier : FormationController.php
- * Rôle    : Gère les opérations CRUD sur les formations (création, lecture, modification, suppression).
- * Modifié : 2026-04-21
- */
-
 namespace App\Http\Controllers;
 
 use App\Models\Formation;
@@ -20,8 +14,6 @@ class FormationController extends Controller
     {
     }
 
-
-    // Liste toutes les formations avec possibilité de filtrer par recherche, catégorie et niveau. Les formateurs ne voient que leurs propres formations.
     public function index(Request $requete): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -35,7 +27,7 @@ class FormationController extends Controller
         if ($recherche !== '') {
             $requeteDB->where(function ($q) use ($recherche): void {
                 $q->where('titre', 'like', "%{$recherche}%")
-                  ->orWhere('description', 'like', "%{$recherche}%");
+                    ->orWhere('description', 'like', "%{$recherche}%");
             });
         }
 
@@ -47,9 +39,10 @@ class FormationController extends Controller
             $requeteDB->where('level', $niveau);
         }
 
-        // Un formateur connecté ne voit que ses propres formations dans la liste publique
         if ($utilisateurAuth && ($utilisateurAuth['role'] ?? '') === 'formateur') {
             $requeteDB->where('user_id', $utilisateurAuth['id']);
+        } else {
+            $requeteDB->whereNotIn('statut', ['Brouillon', 'Archivé']);
         }
 
         $inclureUserId = $utilisateurAuth && ($utilisateurAuth['role'] ?? '') === 'formateur';
@@ -60,7 +53,6 @@ class FormationController extends Controller
         return response()->json($formations);
     }
 
-    // Liste les formations du formateur connecté
     public function myFormations(Request $requete): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -79,8 +71,6 @@ class FormationController extends Controller
         return response()->json($formations);
     }
 
-
-    // Affiche les détails d'une formation spécifique, y compris les modules associés. Incrémente le compteur de vues et enregistre l'activité dans MongoDB.
     public function show(Formation $formation): JsonResponse
     {
         $formation->increment('vues');
@@ -100,7 +90,6 @@ class FormationController extends Controller
         ]);
     }
 
-    // Crée une nouvelle formation. Seuls les formateurs peuvent créer des formations. Enregistre l'activité de création dans MongoDB.
     public function store(Request $requete): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -116,10 +105,10 @@ class FormationController extends Controller
             'description'      => $donneesValidees['description'],
             'category'         => $donneesValidees['category'],
             'date'             => $donneesValidees['date'],
-            'statut'           => $donneesValidees['statut'] ?? 'À venir',
-            'price'            => $donneesValidees['price'],
+            'statut'           => $donneesValidees['statut'] ?? 'Brouillon',
             'duration'         => $donneesValidees['duration'],
             'level'            => $donneesValidees['level'],
+            'image_url'        => $donneesValidees['image_url'] ?? null,
             'vues'             => 0,
             'user_id'          => $utilisateurAuth['id'],
             'formateur_nom'    => $utilisateurAuth['nom'],
@@ -131,12 +120,11 @@ class FormationController extends Controller
             'created_by' => $utilisateurAuth['id'],
         ]);
 
-        $this->remplacerModules($formation, $donneesValidees['modules'] ?? $this->modulesParDefaut());
+        $this->remplacerModules($formation, $donneesValidees['modules']);
 
         return response()->json($this->presenterFormation($formation, true), 201);
     }
 
-    // Modifie une formation existante. Seuls les formateurs peuvent modifier leurs propres formations. Enregistre l'activité de modification dans MongoDB.
     public function update(Request $requete, Formation $formation): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -157,9 +145,9 @@ class FormationController extends Controller
             'category'    => $donneesValidees['category'],
             'date'        => $donneesValidees['date'],
             'statut'      => $donneesValidees['statut'] ?? $formation->statut,
-            'price'       => $donneesValidees['price'] ?? $formation->price,
             'duration'    => $donneesValidees['duration'] ?? $formation->duration,
             'level'       => $donneesValidees['level'] ?? $formation->level,
+            'image_url'   => $donneesValidees['image_url'] ?? $formation->image_url,
         ]);
 
         $this->mongoLogger->log('course_update', [
@@ -174,7 +162,6 @@ class FormationController extends Controller
         return response()->json($this->presenterFormation($formation, true));
     }
 
-    // Supprime une formation. Seuls les formateurs peuvent supprimer leurs propres formations. Enregistre l'activité de suppression dans MongoDB.
     public function destroy(Request $requete, Formation $formation): JsonResponse
     {
         $utilisateurAuth = $requete->input('auth_user');
@@ -198,10 +185,6 @@ class FormationController extends Controller
         return response()->json(['message' => 'Formation supprimée avec succès.']);
     }
 
-    /**
-     * Retourne les règles de validation communes à la création et à la modification.
-     * Le paramètre $creation rend obligatoires price, duration et level uniquement à la création.
-     */
     private function reglesFormation(bool $creation): array
     {
         $requis = $creation ? 'required' : 'nullable';
@@ -212,16 +195,14 @@ class FormationController extends Controller
             'category'          => ['required', 'string', 'max:100'],
             'date'              => ['required', 'date'],
             'statut'            => ['nullable', 'string', 'max:60'],
-            'price'             => [$requis, 'numeric', 'min:0'],
             'duration'          => [$requis, 'integer', 'min:1'],
             'level'             => [$requis, 'in:beginner,intermediaire,advanced'],
-            'modules'           => ['nullable', 'array', 'min:3'],
+            'image_url'         => ['nullable', 'string', 'max:2048'],
+            'modules'           => [$creation ? 'required' : 'nullable', 'array', 'min:1'],
             'modules.*.titre'   => ['required_with:modules', 'string', 'max:255'],
             'modules.*.contenu' => ['required_with:modules', 'string'],
         ];
     }
-
-    
 
     private function presenterFormation(Formation $formation, bool $inclureUserId): array
     {
@@ -232,9 +213,9 @@ class FormationController extends Controller
             'category'    => $formation->category,
             'date'        => optional($formation->date)->format('Y-m-d'),
             'statut'      => $formation->statut,
-            'price'       => (float) $formation->price,
             'duration'    => $formation->duration,
             'level'       => $formation->level,
+            'image_url'   => $formation->image_url,
             'vues'        => $formation->vues,
             'apprenants'  => $formation->apprenants_count ?? 0,
             'formateur'   => $formation->formateur_nom,
@@ -247,10 +228,6 @@ class FormationController extends Controller
         return $donnees;
     }
 
-    /**
-     * Supprime tous les modules existants et les recrée dans l'ordre fourni.
-     * Cette approche simple remplace un diff complexe ligne par ligne.
-     */
     private function remplacerModules(Formation $formation, array $modules): void
     {
         $formation->modules()->delete();
@@ -263,15 +240,5 @@ class FormationController extends Controller
                 'formation_id' => $formation->id,
             ]);
         }
-    }
-
-    // Modules par défaut utilisés si aucun module n'est fourni lors de la création d'une formation.
-    private function modulesParDefaut(): array
-    {
-        return [
-            ['titre' => 'Introduction',          'contenu' => 'Présentation générale de la formation.'],
-            ['titre' => 'Concepts fondamentaux', 'contenu' => 'Notions essentielles à maîtriser.'],
-            ['titre' => 'Projet pratique',       'contenu' => 'Application concrète des acquis.'],
-        ];
     }
 }
