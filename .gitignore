@@ -25,6 +25,7 @@ bootstrap/cache/
 coverage/
 *.xml
 !sonar-project.properties
+!services/auth-java/pom.xml
 
 # Éditeurs
 .idea/
