@@ -1859,3 +1859,110 @@ body {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* Finitions formations : plus de beige, responsive propre */
+.formations {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(83, 99, 242, 0.07), transparent 24%),
+    var(--background) !important;
+}
+
+.cards-container {
+  background: transparent !important;
+}
+
+.filtre {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--surface);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.06);
+}
+
+.filtre h2 {
+  color: var(--text-main);
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  font-weight: 900;
+}
+
+.filtre label {
+  color: var(--text-muted);
+  font-weight: 750;
+}
+
+.filtre select,
+.filtre input {
+  min-height: 42px;
+  border-color: var(--border);
+  background: var(--surface-soft);
+  color: var(--text-main);
+}
+
+.cards-container > .empty-state,
+.cards-container > .skeleton-grid {
+  grid-column: 1 / -1;
+}
+
+.f-card {
+  min-height: 100%;
+  border-radius: 12px !important;
+  background: var(--surface);
+}
+
+.f-card-cover {
+  background: var(--surface-soft);
+}
+
+.f-card-cover img {
+  transition: transform 0.45s ease;
+}
+
+.f-card:hover .f-card-cover img {
+  transform: scale(1.035);
+}
+
+.f-card-titre {
+  color: var(--text-main);
+}
+
+.f-card-footer {
+  gap: 10px;
+}
+
+.f-btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1100px) {
+  .cards-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .formations {
+    flex-direction: column;
+    padding: 28px 16px;
+  }
+
+  .filtre {
+    position: static;
+    width: 100%;
+  }
+
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-theme="dark"] .filtre,
+[data-theme="dark"] .f-card {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: var(--surface);
+}
+
+[data-theme="dark"] .filtre select,
+[data-theme="dark"] .filtre input {
+  background: var(--surface-soft);
+}

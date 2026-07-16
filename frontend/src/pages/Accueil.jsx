@@ -49,12 +49,6 @@ function libelleHeures(nombreHeures) {
   return `${heures || 1} heure${heures > 1 ? "s" : ""} de cours`;
 }
 
-function obtenirPoints(description) {
-  if (!description) return [];
-  return description
-    .split(/[.;]/).map((s) => s.trim()).filter((s) => s.length > 8).slice(0, 3);
-}
-
 // Page d'accueil principale du site
 function Accueil() {
   const [authModal, setAuthModal] = useState(null);
@@ -308,7 +302,7 @@ function Accueil() {
         </div>
       </section>
 
-      <section className="temoignages" aria-labelledby="temoignages-title">
+      <section className="temoignages" id="temoignages" aria-labelledby="temoignages-title">
         <div className="temoignages-inner">
           <div className="temoignages-gauche">
             <span className="section-kicker temoignages-kicker">Témoignages</span>
@@ -370,7 +364,7 @@ function Accueil() {
                   <article className="featured-card" key={`${formation.id}-${offset}`}>
                     <div className="f-card-cover">
                       <img
-                        src={IMAGES_APPRENTISSAGE[index % IMAGES_APPRENTISSAGE.length]}
+                        src={formation.image_url || formation.imageUrl || IMAGES_APPRENTISSAGE[index % IMAGES_APPRENTISSAGE.length]}
                         alt=""
                         loading="lazy"
                         aria-hidden="true"
@@ -382,17 +376,7 @@ function Accueil() {
                         <span><FontAwesomeIcon icon={faClock} className="f-stat-icon" aria-hidden="true" /> {libelleHeures(formation.duration ?? formation.duree)}</span>
                         <span><FontAwesomeIcon icon={faUserGraduate} className="f-stat-icon" aria-hidden="true" /> {formation.apprenants || 0} apprenants</span>
                       </div>
-                      <p className="f-card-auteur">Par {formation.formateur || "Formateur SkillHub"}</p>
                       <hr className="f-card-sep" />
-                      <p className="f-card-learn-title">Ce que vous apprendrez</p>
-                      <ul className="f-card-bullets">
-                        {obtenirPoints(formation.description).map((point, i) => (
-                          <li key={i}>{point}</li>
-                        ))}
-                      </ul>
-                      {(!formation.description || obtenirPoints(formation.description).length === 0) && (
-                        <p className="f-card-no-desc">Aucune description disponible.</p>
-                      )}
                     </div>
                     <div className="f-card-footer">
                       <Link to={`/formation/${formation.id}`} className="f-btn f-btn--info">Plus d'infos</Link>
@@ -428,19 +412,19 @@ function Accueil() {
           <nav className="footer-nav" aria-label="Navigation du footer">
             <h2 className="footer-titre">Navigation</h2>
             <ul className="footer-liste">
-              <li><a href="#">Accueil</a></li>
-              <li><a href="#">Cours</a></li>
-              <li><a href="#">Communauté</a></li>
-              <li><a href="#">À propos</a></li>
+              <li><Link to="/">Accueil</Link></li>
+              <li><Link to="/formations">Cours</Link></li>
+              <li><a href="#temoignages">Communauté</a></li>
+              <li><a href="#guide">À propos</a></li>
             </ul>
           </nav>
           <div className="footer_categ">
             <h2 className="footer-titre">Catégories</h2>
             <ul className="footer-liste">
-              <li><a href="#">Développement web</a></li>
-              <li><a href="#">Design</a></li>
-              <li><a href="#">Marketing</a></li>
-              <li><a href="#">Management</a></li>
+              <li><Link to="/formations?categorie=dev">Développement web</Link></li>
+              <li><Link to="/formations?categorie=design">Design</Link></li>
+              <li><Link to="/formations?categorie=marketing">Marketing</Link></li>
+              <li><Link to="/formations?categorie=business">Management</Link></li>
             </ul>
           </div>
           <div className="footer-social">

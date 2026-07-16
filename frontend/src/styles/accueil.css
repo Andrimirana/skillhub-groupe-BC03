@@ -3392,7 +3392,7 @@ body.no-scroll {
     padding: 0.5rem 0.85rem 0.68rem;
 }
 
-/* Cohérence visuelle accueil */
+
 #contenu,
 .accueil-page {
     background: var(--background);
@@ -3500,10 +3500,10 @@ body.no-scroll {
     }
 }
 
-/* Hero plus grand */
+
 #contenu .hero,
 .hero {
-    min-height: 900px;
-    padding-top: clamp(200px, 22vh, 260px);
-    padding-bottom: clamp(165px, 18vh, 230px);
+    min-height: 1000px;
+    padding-top: clamp(230px, 24vh, 300px);
+    padding-bottom: clamp(190px, 20vh, 260px);
 }

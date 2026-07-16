@@ -66,13 +66,12 @@ function Ateliers() {
               <AtelierCard
                 key={formation.id}
                 id={formation.id}
-                image={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
+                image={formation.image_url || formation.imageUrl || IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
                 titre={formation.titre}
                 description={formation.description}
                 formateur={formation.formateur || "Formateur SkillHub"}
                 date={formation.date}
                 statut={formation.statut}
-                price={formation.price}
                 duration={formation.duration}
                 level={formation.level}
                 inscrits={formation.apprenants ?? formation.vues ?? 0}

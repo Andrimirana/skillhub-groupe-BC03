@@ -1,19 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpen,
   faBriefcase,
   faEnvelope,
-  faGlobe,
   faGraduationCap,
-  faLanguage,
   faPen,
   faPlus,
   faShieldHalved,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { mettreAJourUtilisateurSession, recupererUtilisateur } from "../services/auth";
+import { recupererJeton, recupererUtilisateur, sauvegarderSession } from "../services/auth";
+import { modifierProfil, profilConnecte } from "../services/authApi";
 import "../styles/profilePanel.css";
 
 function ProfilePanel({ formationsCount, titleId }) {
@@ -23,50 +22,104 @@ function ProfilePanel({ formationsCount, titleId }) {
   const [formulaire, setFormulaire] = useState({
     nom: utilisateurInitial.nom || "",
     email: utilisateurInitial.email || "",
-    motDePasse: "",
+    avatarUrl: utilisateurInitial.avatarUrl || utilisateurInitial.avatar_url || "",
   });
   const [message, setMessage] = useState("");
+  const [erreur, setErreur] = useState("");
+  const [sauvegarde, setSauvegarde] = useState(false);
 
-  const role = utilisateur.role === "formateur" ? "Formateur" : "Apprenant";
+  useEffect(() => {
+    let actif = true;
+
+    const chargerProfil = async () => {
+      try {
+        const profil = await profilConnecte();
+        if (!actif) return;
+
+        const utilisateurBackend = {
+          id: profil.id,
+          nom: profil.nom,
+          email: profil.email,
+          role: profil.role,
+          avatarUrl: profil.avatarUrl || profil.avatar_url || "",
+        };
+
+        setUtilisateur(utilisateurBackend);
+        setFormulaire({
+          nom: utilisateurBackend.nom || "",
+          email: utilisateurBackend.email || "",
+          avatarUrl: utilisateurBackend.avatarUrl || "",
+        });
+
+        const jeton = recupererJeton();
+        if (jeton) {
+          sauvegarderSession(jeton, utilisateurBackend);
+        }
+      } catch {
+        // La route protegee gere deja les sessions invalides.
+      }
+    };
+
+    chargerProfil();
+
+    return () => {
+      actif = false;
+    };
+  }, []);
+
   const libelleFormations = utilisateur.role === "formateur" ? "Formations créées" : "Formations suivies";
-  const progressionProfil = Math.min(100, 35 + (utilisateur.nom ? 20 : 0) + (utilisateur.email ? 20 : 0) + (formationsCount > 0 ? 25 : 0));
+  const progressionProfil = Math.min(
+    100,
+    35 + (utilisateur.nom ? 20 : 0) + (utilisateur.email ? 20 : 0) + (formationsCount > 0 ? 25 : 0),
+  );
 
   const ouvrirEdition = () => {
     setFormulaire({
       nom: utilisateur.nom || "",
       email: utilisateur.email || "",
-      motDePasse: "",
+      avatarUrl: utilisateur.avatarUrl || utilisateur.avatar_url || "",
     });
+    setErreur("");
+    setMessage("");
     setEdition(true);
   };
 
   const fermerEdition = () => {
     setEdition(false);
-    setFormulaire((etat) => ({ ...etat, motDePasse: "" }));
+    setErreur("");
   };
 
   const gererChangement = (champ, valeur) => {
     setFormulaire((etat) => ({ ...etat, [champ]: valeur }));
   };
 
-  const gererEnregistrement = (event) => {
+  const gererEnregistrement = async (event) => {
     event.preventDefault();
-    const misAJour = mettreAJourUtilisateurSession({
-      nom: formulaire.nom.trim() || utilisateur.nom,
-      email: formulaire.email.trim() || utilisateur.email,
-    });
+    setErreur("");
+    setMessage("");
 
-    if (misAJour) {
-      setUtilisateur(misAJour);
+    try {
+      setSauvegarde(true);
+      const reponse = await modifierProfil({
+        nom: formulaire.nom.trim(),
+        email: formulaire.email.trim(),
+        avatarUrl: formulaire.avatarUrl.trim(),
+      });
+
+      const profilMisAJour = reponse.utilisateur || {};
+      const utilisateurMisAJour = {
+        ...profilMisAJour,
+        avatarUrl: profilMisAJour.avatarUrl || profilMisAJour.avatar_url || "",
+      };
+      setUtilisateur(utilisateurMisAJour);
+      sauvegarderSession(reponse.token || recupererJeton(), utilisateurMisAJour);
+      setEdition(false);
+      setMessage("Profil mis à jour dans la base de données.");
+    } catch (e) {
+      setErreur(e.response?.data?.message || "Impossible de mettre à jour le profil.");
+    } finally {
+      setSauvegarde(false);
     }
-
-    setFormulaire((etat) => ({ ...etat, motDePasse: "" }));
-    setEdition(false);
-    setMessage(
-      formulaire.motDePasse
-        ? "Profil mis à jour. Le changement de mot de passe sera synchronisé quand l’API profil sera disponible."
-        : "Profil mis à jour.",
-    );
   };
 
   return (
@@ -75,19 +128,18 @@ function ProfilePanel({ formationsCount, titleId }) {
         <div className="profile-cover" />
         <div className="profile-hero-content">
           <div className="profile-avatar" aria-hidden="true">
-            <FontAwesomeIcon icon={faUser} />
+            {utilisateur.avatarUrl || utilisateur.avatar_url ? (
+              <img src={utilisateur.avatarUrl || utilisateur.avatar_url} alt="" />
+            ) : (
+              <FontAwesomeIcon icon={faUser} />
+            )}
           </div>
 
           <div className="profile-main-info">
             <p className="profile-kicker">Profil SkillHub</p>
-            <h1 id={titleId}>
-              {utilisateur.nom || "Utilisateur SkillHub"}
-              <span>{role}</span>
-            </h1>
+            <h1 id={titleId}>{utilisateur.nom || "Utilisateur SkillHub"}</h1>
             <div className="profile-inline-meta">
               <span><FontAwesomeIcon icon={faEnvelope} /> {utilisateur.email || "email non renseigné"}</span>
-              <span><FontAwesomeIcon icon={faGlobe} /> Mauritius</span>
-              <span><FontAwesomeIcon icon={faLanguage} /> Français</span>
             </div>
             <button type="button" className="profile-edit-btn" onClick={ouvrirEdition}>
               <FontAwesomeIcon icon={faPen} />
@@ -113,6 +165,7 @@ function ProfilePanel({ formationsCount, titleId }) {
       </section>
 
       {message && <p className="profile-message">{message}</p>}
+      {erreur && <p className="error">{erreur}</p>}
 
       <div className="profile-sections-grid">
         <article className="profile-info-card">
@@ -145,7 +198,6 @@ function ProfilePanel({ formationsCount, titleId }) {
           <div className="profile-skill-tags">
             <span>Apprentissage</span>
             <span>Collaboration</span>
-            <span>{role}</span>
           </div>
         </article>
 
@@ -189,18 +241,20 @@ function ProfilePanel({ formationsCount, titleId }) {
               </label>
 
               <label>
-                Mot de passe
+                Avatar
                 <input
-                  type="password"
-                  value={formulaire.motDePasse}
-                  onChange={(event) => gererChangement("motDePasse", event.target.value)}
-                  placeholder="Laisser vide pour ne pas changer"
+                  type="url"
+                  value={formulaire.avatarUrl}
+                  onChange={(event) => gererChangement("avatarUrl", event.target.value)}
+                  placeholder="https://exemple.com/avatar.jpg"
                 />
               </label>
 
               <div className="profile-simple-actions">
                 <button type="button" className="profile-cancel-btn" onClick={fermerEdition}>Annuler</button>
-                <button type="submit" className="profile-save-btn">Enregistrer</button>
+                <button type="submit" className="profile-save-btn" disabled={sauvegarde}>
+                  {sauvegarde ? "Enregistrement..." : "Enregistrer"}
+                </button>
               </div>
             </form>
           </section>

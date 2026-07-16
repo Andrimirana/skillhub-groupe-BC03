@@ -106,14 +106,24 @@ function PublicNavbar({ menuItems = [] }) {
                 onClick={() => setMenuProfilOuvert((etat) => !etat)}
                 aria-expanded={menuProfilOuvert}
               >
-                <FontAwesomeIcon icon={faUser} aria-hidden="true" />
+                {utilisateur.avatarUrl || utilisateur.avatar_url ? (
+                  <img src={utilisateur.avatarUrl || utilisateur.avatar_url} alt="" aria-hidden="true" />
+                ) : (
+                  <FontAwesomeIcon icon={faUser} aria-hidden="true" />
+                )}
               </button>
             )}
 
             {utilisateur && menuProfilOuvert && (
               <div className="public-profile-menu" role="dialog" aria-label="Menu profil">
                 <div className="public-profile-head">
-                  <span className="public-profile-avatar"><FontAwesomeIcon icon={faUser} /></span>
+                  <span className="public-profile-avatar">
+                    {utilisateur.avatarUrl || utilisateur.avatar_url ? (
+                      <img src={utilisateur.avatarUrl || utilisateur.avatar_url} alt="" />
+                    ) : (
+                      <FontAwesomeIcon icon={faUser} />
+                    )}
+                  </span>
                   <div>
                     <strong>{utilisateur.nom || "Utilisateur SkillHub"}</strong>
                     <p>{utilisateur.email || "Compte SkillHub"}</p>

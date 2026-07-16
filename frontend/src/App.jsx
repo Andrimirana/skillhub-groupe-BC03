@@ -10,8 +10,11 @@ import Ateliers from "./pages/Ateliers";
 import Accueil from "./pages/Accueil";
 import Formations from "./pages/Formations";
 import Profil from "./pages/Profil";
+import NotFound from "./pages/NotFound";
 import RouteProtegee from "./components/RouteProtegee";
 import { verifierSession } from "./services/session";
+import "./styles/premium-refresh.css";
+import "./styles/Bouton.css";
 
 // Hook partagé pour vérifier la session utilisateur
 function useVerifierSession() {
@@ -94,7 +97,7 @@ export default function App() {
         </Route>
 
         <Route path="/dashboard" element={<RedirectionAccueil />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

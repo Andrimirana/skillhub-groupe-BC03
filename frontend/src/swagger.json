@@ -361,7 +361,6 @@
           "formateur": { "type": "string" },
           "level": { "type": "string", "enum": ["beginner", "intermediaire", "advanced"] },
           "duree": { "type": "integer", "description": "Durée en heures" },
-          "prix": { "type": "number", "format": "float" },
           "modules": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/Module" }
@@ -376,7 +375,6 @@
           "description": { "type": "string" },
           "level": { "type": "string", "enum": ["beginner", "intermediaire", "advanced"] },
           "duree": { "type": "integer" },
-          "prix": { "type": "number" },
           "categorie": { "type": "string" }
         },
         "required": ["titre", "description", "level"]
@@ -421,4 +419,3 @@
     }
   }
 }
-

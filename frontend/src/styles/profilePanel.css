@@ -52,6 +52,14 @@
   height: 72px;
 }
 
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
 .profile-main-info {
   min-width: 0;
   padding-top: 22px;
@@ -1082,6 +1090,351 @@
 [data-theme="dark"] .profile-modal--simple .profile-simple-form label,
 [data-theme="dark"] .profile-modal--simple .profile-modal-close {
   color: #f8fafc !important;
+}
+
+/* Profil inspiration job platform */
+.profile-layout--job {
+  width: min(1120px, 100%);
+  padding: 26px 12px 40px;
+}
+
+.profile-job-card {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.12);
+}
+
+.profile-job-decoration {
+  position: absolute;
+  left: -72px;
+  top: -54px;
+  z-index: -1;
+  width: 190px;
+  height: 430px;
+  border-radius: 28px;
+  background: #1268e8;
+}
+
+.profile-job-cover {
+  position: relative;
+  height: 176px;
+  border-radius: 16px 16px 0 0;
+  background:
+    radial-gradient(circle at 18% 70%, rgba(255, 179, 71, 0.95), transparent 30%),
+    radial-gradient(circle at 48% 20%, rgba(79, 70, 229, 0.75), transparent 28%),
+    radial-gradient(circle at 78% 42%, rgba(45, 212, 191, 0.78), transparent 32%),
+    linear-gradient(120deg, #f97316, #7c3aed 52%, #06b6d4);
+}
+
+.profile-cover-edit {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50% !important;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  cursor: pointer;
+}
+
+.profile-job-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  padding: 0 28px 22px;
+}
+
+.profile-job-main {
+  min-width: 0;
+}
+
+.profile-job-avatar {
+  width: 112px;
+  height: 112px;
+  margin-top: -56px;
+  display: grid;
+  place-items: center;
+  border: 5px solid #ffffff;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #334155;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+}
+
+.profile-job-avatar .svg-inline--fa {
+  width: 48px;
+  height: 48px;
+}
+
+.profile-job-main h1 {
+  margin: 10px 0 2px;
+  color: var(--text-main);
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.profile-job-role,
+.profile-job-location {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.profile-job-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.profile-job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.profile-job-actions .profile-edit-btn {
+  min-height: 38px;
+  padding: 9px 17px;
+  border-radius: 999px !important;
+  color: #ffffff;
+  background: #101827;
+  box-shadow: none;
+}
+
+.profile-settings-btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #101827;
+  border-radius: 999px !important;
+  padding: 9px 16px;
+  color: #101827;
+  background: #ffffff;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.profile-job-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  padding-top: 24px;
+  text-align: right;
+}
+
+.profile-job-side p {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.profile-job-side strong {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: var(--text-main);
+  background: #f8fafc;
+  font-size: 0.84rem;
+}
+
+.profile-skill-tags--job {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+.profile-skill-tags--job span {
+  color: #0f172a;
+  background: #fff3ea;
+}
+
+.profile-job-mini-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0 18px 18px;
+}
+
+.profile-job-mini-cards article {
+  position: relative;
+  min-height: 92px;
+  padding: 15px 46px 15px 16px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.profile-job-mini-cards strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+}
+
+.profile-job-mini-cards p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.profile-job-mini-cards .svg-inline--fa {
+  position: absolute;
+  top: 18px;
+  right: 16px;
+  width: 18px;
+  height: 18px;
+  color: var(--primary);
+}
+
+.profile-sections-grid--job {
+  grid-template-columns: 0.9fr 1.3fr 0.9fr;
+}
+
+.profile-sections-grid--job .profile-info-card {
+  min-height: 150px;
+  border-radius: 12px;
+}
+
+[data-theme="dark"] .profile-job-card,
+[data-theme="dark"] .profile-job-mini-cards article,
+[data-theme="dark"] .profile-job-side strong {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .profile-job-avatar {
+  border-color: var(--surface);
+}
+
+[data-theme="dark"] .profile-settings-btn {
+  color: var(--text-main);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .profile-job-actions .profile-edit-btn {
+  background: var(--primary);
+}
+
+@media (max-width: 900px) {
+  .profile-job-decoration {
+    display: none;
+  }
+
+  .profile-job-body {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-job-side {
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .profile-skill-tags--job {
+    justify-content: flex-start;
+  }
+
+  .profile-job-mini-cards,
+  .profile-sections-grid--job {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Correction layout profil : éviter l'empilement desktop */
+.profile-layout--job {
+  width: min(1040px, 100%);
+  padding: 22px 18px 40px;
+}
+
+.profile-job-decoration {
+  display: none;
+}
+
+.profile-job-card {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.profile-job-cover {
+  height: 138px;
+}
+
+.profile-job-body {
+  grid-template-columns: 1fr 300px;
+  align-items: start;
+  gap: 24px;
+  padding: 0 26px 18px;
+}
+
+.profile-job-main {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  column-gap: 18px;
+  align-items: end;
+}
+
+.profile-job-avatar {
+  grid-row: span 4;
+  margin-top: -46px;
+}
+
+.profile-job-main h1,
+.profile-job-role,
+.profile-job-location,
+.profile-job-actions {
+  grid-column: 2;
+}
+
+.profile-job-main h1 {
+  margin-top: 0;
+}
+
+.profile-job-side {
+  padding-top: 18px;
+  gap: 18px;
+}
+
+.profile-job-mini-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0 26px 22px;
+}
+
+.profile-sections-grid--job {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 860px) {
+  .profile-job-body,
+  .profile-job-main,
+  .profile-job-mini-cards,
+  .profile-sections-grid--job {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-job-main h1,
+  .profile-job-role,
+  .profile-job-location,
+  .profile-job-actions {
+    grid-column: 1;
+  }
+
+  .profile-job-avatar {
+    grid-row: auto;
+  }
 }
 
 /* Modale profil simple */
