@@ -1,211 +1,325 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faBookOpen,
-  faCheckCircle,
-  faChevronLeft,
-  faClock,
-  faLayerGroup,
-  faPlay,
-  faTrophy,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import PublicNavbar from "../components/PublicNavbar";
-import { listerFormationsApprenant } from "../services/formationsApi";
+import {
+  CourseCompletedModal,
+  CourseHeader,
+  CourseSidebar,
+  LessonContent,
+  LessonNavigation,
+  ModuleCompletedModal,
+} from "../components/learning/LearningPageComponents";
+import {
+  detailFormation,
+  inscrireFormation,
+  listerFormationsApprenant,
+  mettreAJourProgressionFormation,
+} from "../services/formationsApi";
 import "../styles/suiviFormation.css";
+
+function lireJson(valeur) {
+  if (!valeur || typeof valeur !== "string") return null;
+  try {
+    return JSON.parse(valeur);
+  } catch {
+    return null;
+  }
+}
+
+function normaliserFormation(formation) {
+  const modules = (formation.modules || []).map((module, moduleIndex) => {
+    const contenu = lireJson(module.contenu) || {};
+    const lessonsSource = Array.isArray(contenu.lessons) && contenu.lessons.length > 0
+      ? contenu.lessons
+      : [{
+        titre: module.titre,
+        type: "Texte",
+        duration: contenu.duration || 10,
+        contenu: module.contenu || contenu.description || "",
+      }];
+
+    const normalizedModule = {
+      key: String(module.id || module.titre || moduleIndex),
+      id: module.id,
+      titre: module.titre || `Module ${moduleIndex + 1}`,
+      duration: Number(contenu.duration || 0),
+      progression: contenu.progression || {},
+      debloquerApresPrecedent: contenu.debloquerApresPrecedent ?? moduleIndex > 0,
+      quizzes: contenu.quizzes || [],
+      lessons: [],
+    };
+
+    normalizedModule.lessons = lessonsSource.map((lesson, lessonIndex) => ({
+      ...lesson,
+      key: `${normalizedModule.key}:lesson:${lessonIndex}`,
+      moduleKey: normalizedModule.key,
+      moduleIndex,
+      lessonIndex,
+      titre: lesson.titre || `Leçon ${lessonIndex + 1}`,
+      type: lesson.type || "Texte",
+      duration: Number(lesson.duration || 5),
+      contenu: lesson.contenu || lesson.description || "",
+      description: lesson.description || "",
+      ressources: lesson.ressources || [],
+    }));
+
+    return normalizedModule;
+  });
+
+  return { ...formation, modules };
+}
+
+function trouverDerniereLeconNonTerminee(lessons, completed, isLocked) {
+  return lessons.find((lesson) => !completed[lesson.key] && !isLocked(lesson)) || lessons[0] || null;
+}
 
 function SuiviFormation() {
   const { id } = useParams();
   const [formation, setFormation] = useState(null);
-  const [chargement, setChargement] = useState(true);
-  const [moduleActif, setModuleActif] = useState(0);
-  const [modulesCompletes, setModulesCompletes] = useState({});
-  const [modalCoursTermine, setModalCoursTermine] = useState(false);
-  const [felicitationAffichee, setFelicitationAffichee] = useState(false);
+  const [activeKey, setActiveKey] = useState("");
+  const [completed, setCompleted] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [moduleDone, setModuleDone] = useState(null);
+  const [courseDone, setCourseDone] = useState(false);
+  const [videoProgress, setVideoProgress] = useState({});
+
+  const flatLessons = useMemo(
+    () => (formation?.modules || []).flatMap((module) => module.lessons.map((lesson) => ({ ...lesson, module }))),
+    [formation],
+  );
+  const activeLesson = flatLessons.find((lesson) => lesson.key === activeKey) || flatLessons[0] || null;
+  const completedCount = flatLessons.filter((lesson) => completed[lesson.key]).length;
+  const progression = flatLessons.length ? Math.round((completedCount / flatLessons.length) * 100) : 0;
+
+  const isLocked = (lesson) => {
+    if (!lesson) return true;
+    if (lesson.moduleIndex === 0 && lesson.lessonIndex === 0) return false;
+    const module = formation?.modules?.[lesson.moduleIndex];
+    const sequential = module?.progression?.mode === "séquentielle" || module?.debloquerApresPrecedent;
+    if (!sequential) return false;
+    const previous = flatLessons[flatLessons.findIndex((item) => item.key === lesson.key) - 1];
+    return previous ? !completed[previous.key] : false;
+  };
+
+  const persist = async (nextCompleted = completed, nextKey = activeKey) => {
+    const nextCompletedKeys = Object.keys(nextCompleted).filter((key) => nextCompleted[key]);
+    const nextProgress = flatLessons.length ? Math.round((nextCompletedKeys.length / flatLessons.length) * 100) : 0;
+    setSaving(true);
+    try {
+      await mettreAJourProgressionFormation(id, {
+        completed_modules: nextCompletedKeys,
+        progression: nextProgress,
+        last_lesson_key: nextKey,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const selectLesson = (key) => {
+    const lesson = flatLessons.find((item) => item.key === key);
+    if (!lesson || isLocked(lesson)) return;
+    setActiveKey(key);
+    setDrawerOpen(false);
+    persist(completed, key).catch(() => {});
+  };
+
+  const completeLesson = () => {
+    if (!activeLesson) return;
+    const nextCompleted = { ...completed, [activeLesson.key]: true };
+    setCompleted(nextCompleted);
+
+    const module = formation.modules[activeLesson.moduleIndex];
+    const moduleCompleted = module.lessons.every((lesson) => nextCompleted[lesson.key]);
+    const allCompleted = flatLessons.every((lesson) => nextCompleted[lesson.key]);
+    const nextLesson = flatLessons[flatLessons.findIndex((lesson) => lesson.key === activeLesson.key) + 1];
+
+    persist(nextCompleted, nextLesson?.key || activeLesson.key).catch(() => {});
+
+    if (allCompleted) {
+      setCourseDone(true);
+    } else if (moduleCompleted) {
+      setModuleDone(module);
+    }
+
+    if (nextLesson) {
+      setActiveKey(nextLesson.key);
+    }
+  };
+
+  const goTo = (direction) => {
+    const index = flatLessons.findIndex((lesson) => lesson.key === activeLesson?.key);
+    const target = flatLessons[index + direction];
+    if (target) selectLesson(target.key);
+  };
+
+  const resume = () => {
+    const lesson = trouverDerniereLeconNonTerminee(flatLessons, completed, isLocked);
+    if (lesson) selectLesson(lesson.key);
+  };
 
   useEffect(() => {
-    const charger = async () => {
+    let alive = true;
+
+    const load = async () => {
       try {
-        setChargement(true);
-        const formations = await listerFormationsApprenant();
-        const trouvee = formations.find((item) => String(item.id) === String(id));
-        setFormation(trouvee || null);
+        setLoading(true);
+        setError("");
+
+        const enrolled = await listerFormationsApprenant();
+        let target = enrolled.find((item) => String(item.id) === String(id));
+        let enrollment = null;
+
+        if (!target) {
+          enrollment = await inscrireFormation(id);
+          const detail = await detailFormation(id);
+          target = {
+            ...detail,
+            progression: enrollment.progression ?? 0,
+            completed_modules: enrollment.completed_modules ?? [],
+            last_lesson_key: enrollment.last_lesson_key,
+          };
+        }
+
+        if (!alive) return;
+
+        const normalized = normaliserFormation(target);
+        const nextCompleted = {};
+        (target.completed_modules || []).forEach((key) => {
+          nextCompleted[String(key)] = true;
+        });
+
+        setFormation(normalized);
+        setCompleted(nextCompleted);
+
+        const lessons = normalized.modules.flatMap((module) => module.lessons);
+        const lastKey = target.last_lesson_key && lessons.some((lesson) => lesson.key === target.last_lesson_key)
+          ? target.last_lesson_key
+          : trouverDerniereLeconNonTerminee(lessons, nextCompleted, () => false)?.key;
+        setActiveKey(lastKey || lessons[0]?.key || "");
+      } catch {
+        setError("Impossible de charger cette formation. Vérifiez que vous êtes connecté comme apprenant.");
       } finally {
-        setChargement(false);
+        if (alive) setLoading(false);
       }
     };
 
-    charger();
+    load();
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
-  const modules = useMemo(() => {
-    const source = formation?.modules || [];
-    if (source.length) return source;
-    return [
-      { id: "intro", titre: "Introduction", contenu: formation?.description || "Découvrez les objectifs et les bases de cette formation." },
-      { id: "practice", titre: "Mise en pratique", contenu: "Passez à la pratique avec des exemples guidés et des étapes simples." },
-      { id: "summary", titre: "Résumé du cours", contenu: "Revoyez les points essentiels et préparez la suite de votre parcours." },
-    ];
-  }, [formation]);
-
-  const moduleCourant = modules[moduleActif] || modules[0];
-  const cleModule = (module, index) => String(module?.id ?? module?.titre ?? index);
-  const nbCompletes = modules.filter((module, index) => modulesCompletes[cleModule(module, index)]).length;
-  const progression = modules.length ? Math.round((nbCompletes / modules.length) * 100) : 0;
-
-  useEffect(() => {
-    if (progression === 100 && modules.length > 0 && !felicitationAffichee) {
-      setModalCoursTermine(true);
-      setFelicitationAffichee(true);
-    }
-  }, [progression, modules.length, felicitationAffichee]);
-
-  const basculerModule = (idModule) => {
-    setModulesCompletes((etat) => ({ ...etat, [idModule]: !etat[idModule] }));
-  };
-
-  const allerModule = (index) => {
-    setModuleActif(Math.min(Math.max(index, 0), modules.length - 1));
-  };
-
-  if (chargement) {
-    return <div className="course-player-loading">Chargement...</div>;
-  }
-
-  if (!formation) {
+  if (loading) {
     return (
-      <main className="course-player-error">
-        <p>Cette formation n'est pas dans votre espace apprenant.</p>
-        <Link to="/dashboard/apprenant">
-          <FontAwesomeIcon icon={faChevronLeft} /> Retour au dashboard
-        </Link>
+      <main className="learn-loading">
+        <FontAwesomeIcon icon={faSpinner} spin />
+        <span>Chargement de la formation...</span>
       </main>
     );
   }
 
+  if (error || !formation) {
+    return (
+      <main className="learn-error">
+        <p>{error || "Formation introuvable."}</p>
+        <Link to="/formations">Retour aux formations</Link>
+      </main>
+    );
+  }
+
+  const previousLesson = flatLessons[flatLessons.findIndex((lesson) => lesson.key === activeLesson?.key) - 1];
+  const nextLesson = flatLessons[flatLessons.findIndex((lesson) => lesson.key === activeLesson?.key) + 1];
+
   return (
-    <main className={`course-player-shell ${modalCoursTermine ? "course-player--complete" : ""}`}>
+    <main className="learn-page">
       <PublicNavbar
         menuItems={[
           { label: "Accueil", to: "/" },
           { label: "Formations", to: "/formations" },
           { label: "Dashboard", to: "/dashboard/apprenant" },
-          { label: "Mon profil", to: "/profil" },
         ]}
       />
 
-      <div className="course-player">
-        <aside className="course-player-sidebar">
-          <Link to="/dashboard/apprenant" className="course-player-back">
-            <FontAwesomeIcon icon={faChevronLeft} /> Retour
-          </Link>
-          <div className="course-player-sidebar-title">
-            <FontAwesomeIcon icon={faLayerGroup} />
-            <span>Modules du cours</span>
-          </div>
-          <div className="course-player-progress-mini">
-            <span>Progression</span>
-            <strong>{progression}%</strong>
-            <div className="course-player-progress-track">
-              <div style={{ width: `${progression}%` }} />
-            </div>
-          </div>
-          <ol className="course-player-steps">
-            {modules.map((module, index) => {
-              const fait = Boolean(modulesCompletes[cleModule(module, index)]);
-              const actif = index === moduleActif;
-              return (
-                <li key={cleModule(module, index)}>
-                  <button
-                    type="button"
-                    className={`course-player-step ${actif ? "active" : ""} ${fait ? "done" : ""}`}
-                    onClick={() => allerModule(index)}
-                  >
-                    <span className="course-player-step-dot">
-                      {fait ? <FontAwesomeIcon icon={faCheckCircle} /> : index + 1}
-                    </span>
-                    <span>
-                      <small>Module {index + 1}</small>
-                      {module.titre}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </aside>
+      <CourseHeader
+        formation={formation}
+        completedCount={completedCount}
+        totalLessons={flatLessons.length}
+        progression={progression}
+        onResume={resume}
+        onToggleSidebar={() => setDrawerOpen(true)}
+      />
 
-        <section className="course-player-main">
-          <header className="course-player-topbar">
-            <div>
-              <span className="course-player-kicker">
-                <FontAwesomeIcon icon={faBookOpen} /> Formation en cours
-              </span>
-              <h1>{formation.titre}</h1>
-            </div>
-            <div className="course-player-top-progress">
-              <span>{nbCompletes}/{modules.length} modules</span>
-              <div className="course-player-progress-track">
-                <div style={{ width: `${progression}%` }} />
-              </div>
-            </div>
-          </header>
+      <div className="learn-shell">
+        <CourseSidebar
+          modules={formation.modules}
+          activeKey={activeLesson?.key}
+          completed={completed}
+          isLocked={isLocked}
+          onSelect={selectLesson}
+          collapsed={sidebarCollapsed}
+          drawerOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        />
 
-          <article className="course-player-panel">
-            <div className="course-player-panel-head">
-              <span><FontAwesomeIcon icon={faPlay} /> Module {moduleActif + 1}</span>
-              <span><FontAwesomeIcon icon={faClock} /> 5 min</span>
-            </div>
-            <h2>{moduleCourant?.titre}</h2>
-            <p>{moduleCourant?.contenu || "Le contenu de ce module sera bientôt disponible."}</p>
-            <div className="course-player-check">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={Boolean(modulesCompletes[cleModule(moduleCourant, moduleActif)])}
-                  onChange={() => basculerModule(cleModule(moduleCourant, moduleActif))}
-                />
-                <span>Marquer ce module comme terminé</span>
-              </label>
-            </div>
-          </article>
+        <section className="learn-main">
+          <button type="button" className="learn-collapse-btn" onClick={() => setSidebarCollapsed((value) => !value)}>
+            {sidebarCollapsed ? "Afficher le programme" : "Réduire le programme"}
+          </button>
+          {saving && <p className="learn-saving">Sauvegarde...</p>}
 
-          <footer className="course-player-footer">
-            <button type="button" onClick={() => allerModule(moduleActif - 1)} disabled={moduleActif === 0}>
-              <FontAwesomeIcon icon={faArrowLeft} /> Précédent
-            </button>
-            <button type="button" className="next" onClick={() => allerModule(moduleActif + 1)} disabled={moduleActif === modules.length - 1}>
-              Suivant <FontAwesomeIcon icon={faArrowRight} />
-            </button>
-          </footer>
+          {activeLesson ? (
+            <>
+              <LessonContent
+                formation={formation}
+                module={activeLesson.module}
+                lesson={activeLesson}
+                progression={progression}
+                completedCount={completedCount}
+                totalLessons={flatLessons.length}
+                videoProgress={videoProgress[activeLesson.key] || 0}
+                onVideoProgress={(value) => setVideoProgress((previous) => ({ ...previous, [activeLesson.key]: value }))}
+                onComplete={completeLesson}
+              />
+              <LessonNavigation
+                previous={previousLesson}
+                next={nextLesson && !isLocked(nextLesson) ? nextLesson : null}
+                onPrevious={() => goTo(-1)}
+                onNext={() => goTo(1)}
+                onComplete={completeLesson}
+                isCompleted={Boolean(completed[activeLesson.key])}
+              />
+            </>
+          ) : (
+            <article className="learn-content-card">
+              <h2>Aucune leçon disponible</h2>
+            </article>
+          )}
         </section>
       </div>
 
-      {modalCoursTermine && (
-        <div className="course-complete-overlay" role="presentation">
-          <section className="course-complete-modal" role="dialog" aria-modal="true" aria-labelledby="course-complete-title">
-            <button
-              type="button"
-              className="course-complete-close"
-              aria-label="Fermer"
-              onClick={() => setModalCoursTermine(false)}
-            >
-              <FontAwesomeIcon icon={faXmark} />
-            </button>
-            <div className="course-complete-icon" aria-hidden="true">
-              <FontAwesomeIcon icon={faTrophy} />
-            </div>
-            <p className="course-complete-kicker">Progression 100%</p>
-            <h2 id="course-complete-title">Cours terminé, félicitations !</h2>
-            <p>Vous avez terminé tous les modules de cette formation. Vous pouvez revoir le contenu à votre rythme.</p>
-            <button type="button" className="course-complete-action" onClick={() => setModalCoursTermine(false)}>
-              Continuer
-            </button>
-          </section>
-        </div>
+      <ModuleCompletedModal
+        module={moduleDone}
+        onClose={() => setModuleDone(null)}
+        onContinue={() => {
+          setModuleDone(null);
+          if (nextLesson) selectLesson(nextLesson.key);
+        }}
+      />
+
+      {courseDone && (
+        <CourseCompletedModal
+          formation={formation}
+          modulesCount={formation.modules.length}
+          lessonsCount={flatLessons.length}
+          onClose={() => setCourseDone(false)}
+        />
       )}
     </main>
   );

@@ -7,6 +7,7 @@ import {
   faCompass,
   faGrip,
   faPen,
+  faPlus,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { deconnecter } from "../services/authApi";
@@ -31,6 +32,9 @@ function Sidebar() {
 
   const navigationPrincipale = [
     { label: "Dashboard", to: routeTableauDeBord, icon: faGrip },
+    ...(utilisateur?.role === "formateur"
+      ? [{ label: "Ajouter formation", to: "/creer-atelier", icon: faPlus }]
+      : []),
     { label: "Mes formations", to: "/mes-ateliers", icon: faBookOpen },
     { label: "Découvrir", to: "/formations", icon: faCompass },
     { label: "Mon profil", to: "/profil", icon: faUser },
@@ -63,7 +67,11 @@ function Sidebar() {
 
       <Link to="/profil" className="sidebar-user-card" aria-label="Voir mon profil">
         <span className="sidebar-avatar">
-          <FontAwesomeIcon icon={faUser} />
+          {utilisateur?.avatarUrl || utilisateur?.avatar_url ? (
+            <img src={utilisateur.avatarUrl || utilisateur.avatar_url} alt="" />
+          ) : (
+            <FontAwesomeIcon icon={faUser} />
+          )}
           <span className="sidebar-avatar-edit">
             <FontAwesomeIcon icon={faPen} />
           </span>

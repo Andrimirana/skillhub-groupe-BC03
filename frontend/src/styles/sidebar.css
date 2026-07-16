@@ -87,6 +87,14 @@
   height: 58px;
 }
 
+.sidebar-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
 .sidebar-avatar-edit {
   position: absolute;
   left: -1px;
@@ -253,4 +261,105 @@
 
 [data-theme="dark"] .sidebar-collapse-btn:hover {
   background: #172033;
+}
+
+/* Sidebar dashboard plus moderne */
+.sidebar {
+  width: 232px;
+  min-width: 232px;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 10px 0 30px rgba(30, 41, 79, 0.04);
+}
+
+.sidebar-collapse-btn {
+  margin: 16px 0 8px 18px;
+  border-radius: 8px;
+}
+
+.sidebar-user-card {
+  margin: 0 14px 28px;
+  padding: 8px 10px 22px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.sidebar-avatar {
+  width: 92px;
+  height: 92px;
+  border-width: 6px;
+  border-color: #e5ebf3;
+  background: linear-gradient(145deg, #2f4050, #42576a);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.sidebar-avatar > .svg-inline--fa {
+  width: 46px;
+  height: 46px;
+}
+
+.sidebar-avatar-edit {
+  left: -2px;
+  bottom: -2px;
+  width: 31px;
+  height: 31px;
+  border-color: #d8e0ea;
+  background: #ffffff;
+  color: #1f2a37;
+}
+
+.menu-top,
+.menu-bottom {
+  padding: 12px 10px;
+}
+
+.menu-bottom {
+  border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+.sidebar-item {
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #3f4d5f;
+  font-size: 0.86rem;
+}
+
+.sidebar-icon {
+  color: #667589;
+}
+
+.sidebar-item:hover,
+.sidebar-item.active {
+  color: var(--primary);
+  background: rgba(83, 99, 242, 0.09);
+}
+
+.sidebar-item.active .sidebar-icon,
+.sidebar-item:hover .sidebar-icon {
+  color: var(--primary);
+}
+
+.profile-sidebar.is-collapsed {
+  width: 82px;
+  min-width: 82px;
+}
+
+.profile-sidebar.is-collapsed .sidebar-user-card {
+  margin: 0 8px 18px;
+  padding: 8px 0 18px;
+}
+
+.profile-sidebar.is-collapsed .sidebar-avatar {
+  width: 52px;
+  height: 52px;
+}
+
+[data-theme="dark"] .sidebar {
+  border-right-color: rgba(148, 163, 184, 0.16);
+  background: #111827;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="dark"] .sidebar-user-card,
+[data-theme="dark"] .menu-bottom {
+  border-color: rgba(148, 163, 184, 0.16);
 }
