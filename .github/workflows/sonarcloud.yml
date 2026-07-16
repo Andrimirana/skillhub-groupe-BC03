@@ -103,7 +103,6 @@ jobs:
   sonarcloud:
     name: SonarCloud analysis
     runs-on: ubuntu-latest
-    continue-on-error: true
     needs:
       - frontend
       - laravel
@@ -130,6 +129,7 @@ jobs:
 
       - name: Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0
+        continue-on-error: true
         with:
           args: >
             -Dsonar.scanner.skipJreProvisioning=true
