@@ -2,161 +2,213 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Formation;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class FormationSeeder extends Seeder
 {
     public function run(): void
     {
+        Formation::query()->delete();
+
+        $formateurs = [
+            ['id' => 11, 'nom' => 'Sophie Martin'],
+            ['id' => 12, 'nom' => 'Karim Benali'],
+            ['id' => 13, 'nom' => 'Claire Dubois'],
+            ['id' => 14, 'nom' => 'Nicolas Moreau'],
+            ['id' => 15, 'nom' => 'Amina Diop'],
+            ['id' => 16, 'nom' => 'Julien Lefèvre'],
+            ['id' => 17, 'nom' => 'Camille Bernard'],
+            ['id' => 18, 'nom' => 'Thomas Leroy'],
+            ['id' => 19, 'nom' => 'Sarah Nguyen'],
+            ['id' => 20, 'nom' => 'Mehdi El Amrani'],
+        ];
+
         $formations = [
             [
-                'titre' => 'Développement Web avec Laravel',
-                'description' => 'Apprenez à créer des applications web robustes avec Laravel.',
-                'category' => 'Développement',
-                'price' => 0,
-                'duration' => 30,
-                'level' => 'beginner',
-            ],
-            [
-                'titre' => 'React pour les débutants',
-                'description' => 'Démarrez avec React et construisez des interfaces modernes.',
-                'category' => 'Front-end',
-                'price' => 0,
-                'duration' => 20,
-                'level' => 'beginner',
-            ],
-            [
-                'titre' => 'Vue.js et l\'écosystème Composition API',
-                'description' => 'Maîtrisez Vue 3 et la Composition API pour des apps réactives et maintenables.',
-                'category' => 'Front-end',
-                'price' => 80,
+                'titre' => 'Développement web avec React',
+                'description' => "Créez des interfaces modernes avec React : composants, hooks, appels API, organisation du code et mise en production d'une application complète.",
+                'category' => 'Développement web',
                 'duration' => 18,
-                'level' => 'intermediaire',
-            ],
-            [
-                'titre' => 'Node.js et API REST avec Express',
-                'description' => 'Construisez des API performantes avec Node.js, Express et MongoDB.',
-                'category' => 'Back-end',
-                'price' => 120,
-                'duration' => 25,
-                'level' => 'intermediaire',
-            ],
-            [
-                'titre' => 'Python pour la Data Science',
-                'description' => 'Analyse de données et visualisation avec Pandas, NumPy et Matplotlib.',
-                'category' => 'Data',
-                'price' => 150,
-                'duration' => 35,
                 'level' => 'beginner',
+                'image_url' => 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Découvrir React', 'Maîtriser les hooks', 'Connecter une API', 'Publier une application'],
             ],
             [
-                'titre' => 'Machine Learning avec Scikit-learn',
-                'description' => 'Apprenez à entraîner des modèles supervisés et non supervisés en Python.',
-                'category' => 'Data',
-                'price' => 220,
-                'duration' => 40,
-                'level' => 'advanced',
-            ],
-            [
-                'titre' => 'Docker et conteneurisation',
-                'description' => 'Créez, déployez et orchestrez vos applications avec Docker et Compose.',
-                'category' => 'DevOps',
-                'price' => 100,
-                'duration' => 15,
-                'level' => 'intermediaire',
-            ],
-            [
-                'titre' => 'Kubernetes en production',
-                'description' => 'Déployez et opérez un cluster Kubernetes pour des charges réelles.',
-                'category' => 'DevOps',
-                'price' => 280,
-                'duration' => 32,
-                'level' => 'advanced',
-            ],
-            [
-                'titre' => 'UX/UI Design avec Figma',
-                'description' => 'Concevez des interfaces utilisateur modernes et accessibles avec Figma.',
-                'category' => 'Design',
-                'price' => 90,
-                'duration' => 16,
-                'level' => 'beginner',
-            ],
-            [
-                'titre' => 'Cybersécurité : fondamentaux',
-                'description' => 'Comprenez les bases de la sécurité offensive et défensive sur le web.',
-                'category' => 'Sécurité',
-                'price' => 180,
-                'duration' => 28,
-                'level' => 'intermediaire',
-            ],
-            [
-                'titre' => 'TypeScript moderne',
-                'description' => 'Adoptez TypeScript dans vos projets React et Node pour un code plus sûr.',
-                'category' => 'Développement',
-                'price' => 70,
-                'duration' => 12,
-                'level' => 'intermediaire',
-            ],
-            [
-                'titre' => 'SQL avancé et optimisation',
-                'description' => 'Requêtes complexes, index, plans d\'exécution et tuning de performance.',
-                'category' => 'Data',
-                'price' => 110,
+                'titre' => 'Laravel et API REST',
+                'description' => "Construisez un backend Laravel professionnel avec routes, contrôleurs, modèles, migrations, validation, sécurité et endpoints REST.",
+                'category' => 'Développement web',
                 'duration' => 22,
-                'level' => 'advanced',
-            ],
-            [
-                'titre' => 'Next.js et rendu côté serveur',
-                'description' => 'Construisez des applications React performantes avec SSR et l\'App Router de Next.js.',
-                'category' => 'Front-end',
-                'price' => 130,
-                'duration' => 24,
                 'level' => 'intermediaire',
+                'image_url' => 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Structurer Laravel', 'Modèles et migrations', 'Créer une API REST', 'Sécuriser et tester'],
             ],
             [
-                'titre' => 'GraphQL avec Apollo',
-                'description' => 'Concevez des API GraphQL flexibles avec Apollo côté client et serveur.',
-                'category' => 'Back-end',
-                'price' => 140,
-                'duration' => 20,
-                'level' => 'intermediaire',
-            ],
-            [
-                'titre' => 'Tests automatisés en JavaScript',
-                'description' => 'Maîtrisez Jest, Vitest et Playwright pour tester vos applications JS de bout en bout.',
-                'category' => 'Développement',
-                'price' => 95,
-                'duration' => 18,
+                'titre' => 'UI Design moderne avec Figma',
+                'description' => "Concevez des interfaces propres et cohérentes avec Figma : grilles, composants, variantes, styles et responsive design.",
+                'category' => 'Design',
+                'duration' => 14,
                 'level' => 'beginner',
-            ],
-            [
-                'titre' => 'AWS pour les développeurs',
-                'description' => 'Déployez vos applications sur EC2, S3, Lambda et RDS pour des architectures scalables.',
-                'category' => 'DevOps',
-                'price' => 250,
-                'duration' => 30,
-                'level' => 'advanced',
+                'image_url' => 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Bases UI', 'Identité visuelle', 'Composants Figma', 'Maquette responsive'],
             ],
             [
                 'titre' => 'Marketing digital et SEO',
-                'description' => 'Boostez la visibilité de vos projets avec le SEO, l\'analytics et les réseaux sociaux.',
+                'description' => "Développez une stratégie digitale claire : mots-clés, contenu, référencement naturel, analytics et amélioration continue.",
                 'category' => 'Marketing',
-                'price' => 75,
-                'duration' => 14,
+                'duration' => 12,
                 'level' => 'beginner',
+                'image_url' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Stratégie marketing', 'SEO technique', 'Contenu qui convertit', 'Mesurer les résultats'],
+            ],
+            [
+                'titre' => 'Analyse de données avec Python',
+                'description' => "Explorez, nettoyez, analysez et visualisez des données avec Python, Pandas, NumPy et des graphiques lisibles.",
+                'category' => 'Data',
+                'duration' => 24,
+                'level' => 'intermediaire',
+                'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Environnement data', 'Nettoyage des données', 'Analyse Pandas', 'Visualisation'],
+            ],
+            [
+                'titre' => 'Docker pour développeurs',
+                'description' => "Comprenez Docker simplement : images, conteneurs, volumes, réseaux, Docker Compose et workflow de développement.",
+                'category' => 'DevOps',
+                'duration' => 16,
+                'level' => 'intermediaire',
+                'image_url' => 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Comprendre Docker', 'Créer une image', 'Composer plusieurs services', 'Préparer la production'],
+            ],
+            [
+                'titre' => 'Gestion de projet agile',
+                'description' => "Pilotez un projet avec backlog, priorisation, sprint, rituels agiles, suivi d’avancement et collaboration efficace.",
+                'category' => 'Management',
+                'duration' => 15,
+                'level' => 'beginner',
+                'image_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Comprendre l’agilité', 'Construire un backlog', 'Animer un sprint', 'Améliorer le flux'],
+            ],
+            [
+                'titre' => 'TypeScript pour applications modernes',
+                'description' => "Renforcez vos projets JavaScript avec TypeScript : types, interfaces, génériques, typage API et migration progressive.",
+                'category' => 'Développement web',
+                'duration' => 13,
+                'level' => 'intermediaire',
+                'image_url' => 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Configurer TypeScript', 'Types et interfaces', 'Génériques', 'Migrer un projet'],
+            ],
+            [
+                'titre' => 'Cybersécurité web fondamentale',
+                'description' => "Comprenez les risques essentiels du web : authentification, injections, XSS, permissions, bonnes pratiques et protection des données.",
+                'category' => 'DevOps',
+                'duration' => 20,
+                'level' => 'intermediaire',
+                'image_url' => 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Menaces courantes', 'Sécuriser les accès', 'Prévenir les failles web', 'Auditer une application'],
+            ],
+            [
+                'titre' => 'Bases de données SQL',
+                'description' => "Apprenez à modéliser, interroger et optimiser une base SQL : tables, relations, jointures, index et requêtes utiles.",
+                'category' => 'Data',
+                'duration' => 17,
+                'level' => 'beginner',
+                'image_url' => 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=1200&q=80',
+                'modules' => ['Modéliser les données', 'Écrire des requêtes', 'Jointures et relations', 'Index et optimisation'],
             ],
         ];
 
-        foreach ($formations as $formation) {
-            Formation::create(array_merge($formation, [
-                'date' => now(),
-                'statut' => 'Ouvert',
-                'vues' => 0,
-                'user_id' => 1,
-                'formateur_nom' => 'Formateur Test',
-                'apprenants_count' => 0,
-            ]));
+        foreach ($formations as $index => $cours) {
+            $formateur = $formateurs[$index % count($formateurs)];
+
+            $formation = Formation::query()->create([
+                'titre' => $cours['titre'],
+                'description' => $cours['description'],
+                'category' => $cours['category'],
+                'date' => now()->subDays(count($formations) - $index),
+                'statut' => 'Publié',
+                'duration' => $cours['duration'],
+                'level' => $cours['level'],
+                'image_url' => $cours['image_url'],
+                'vues' => 40 + ($index * 11),
+                'user_id' => $formateur['id'],
+                'formateur_nom' => $formateur['nom'],
+                'apprenants_count' => 25 + ($index * 8),
+            ]);
+
+            foreach ($cours['modules'] as $ordre => $titreModule) {
+                $formation->modules()->create([
+                    'titre' => $titreModule,
+                    'ordre' => $ordre + 1,
+                    'contenu' => json_encode($this->contenuModule($titreModule, $ordre, $cours), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ]);
+            }
         }
+    }
+
+    private function contenuModule(string $titreModule, int $index, array $cours): array
+    {
+        return [
+            'description' => "Module de la formation {$cours['titre']} : comprendre, pratiquer et valider les notions essentielles.",
+            'duration' => max(2, (int) ceil($cours['duration'] / count($cours['modules']))),
+            'visible' => true,
+            'debloquerApresPrecedent' => $index > 0,
+            'lessons' => [
+                [
+                    'titre' => "Introduction — {$titreModule}",
+                    'description' => 'Présentation des notions clés.',
+                    'type' => 'Texte',
+                    'duration' => 25,
+                    'ordre' => 1,
+                    'obligatoire' => true,
+                    'preview' => $index === 0,
+                    'contenu' => "Découvrez les bases de « {$titreModule} » avec des exemples simples.",
+                    'videoUrl' => '',
+                    'ressources' => [],
+                ],
+                [
+                    'titre' => "Atelier pratique — {$titreModule}",
+                    'description' => 'Mise en pratique guidée.',
+                    'type' => 'Exercice pratique',
+                    'duration' => 45,
+                    'ordre' => 2,
+                    'obligatoire' => true,
+                    'preview' => false,
+                    'contenu' => 'Réalisez un exercice court pour appliquer les concepts du module.',
+                    'videoUrl' => '',
+                    'ressources' => [],
+                ],
+            ],
+            'quizzes' => [
+                [
+                    'titre' => "Quiz — {$titreModule}",
+                    'scope' => $titreModule,
+                    'instructions' => 'Choisissez la meilleure réponse.',
+                    'tentatives' => 2,
+                    'scoreMinimum' => 70,
+                    'questions' => [
+                        [
+                            'enonce' => "Quel est l’objectif principal de « {$titreModule} » ?",
+                            'type' => 'Choix unique',
+                            'points' => 1,
+                            'explication' => 'L’objectif est de comprendre puis pratiquer une compétence précise.',
+                            'difficulte' => 'Facile',
+                            'reponses' => [
+                                ['texte' => 'Comprendre et appliquer les notions du module', 'correcte' => true],
+                                ['texte' => 'Ignorer les exercices', 'correcte' => false],
+                                ['texte' => 'Lire uniquement le titre', 'correcte' => false],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'progression' => [
+                'mode' => 'séquentielle',
+                'scoreFinal' => 70,
+                'terminerToutesLecons' => true,
+                'reussirTousQuiz' => false,
+            ],
+            'slug' => Str::slug($titreModule),
+        ];
     }
 }

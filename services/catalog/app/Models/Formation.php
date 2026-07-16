@@ -16,9 +16,9 @@ class Formation extends Model
         'category',
         'date',
         'statut',
-        'price',
         'duration',
         'level',
+        'image_url',
         'vues',
         'user_id',
         'formateur_nom',
@@ -29,7 +29,6 @@ class Formation extends Model
     {
         return [
             'date'     => 'date',
-            'price'    => 'decimal:2',
             'duration' => 'integer',
         ];
     }
