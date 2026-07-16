@@ -19,6 +19,7 @@ export async function verifierSession() {
       nom: profil.nom,
       email: profil.email,
       role: profil.role,
+      avatarUrl: profil.avatarUrl || profil.avatar_url || "",
     };
 
     const utilisateurLocal = recupererUtilisateur();

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faEye, faEyeSlash, faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { connecter, inscrire } from "../services/authApi";
-import { sauvegarderSession } from "../services/auth";
+import { sauvegarderSession, supprimerSession } from "../services/auth";
 import "../styles/auth-modal.css";
 
 const EMAIL_VALIDE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
@@ -101,6 +101,7 @@ function AuthModal({ modeInitial, onClose, onSuccess }) {
 
     setChargement(true);
     try {
+      supprimerSession();
       const donnees = mode === "connexion"
         ? await connecter(emailNormalise, motDePasse)
         : await inscrire(nom.trim(), emailNormalise, motDePasse, role);

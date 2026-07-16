@@ -61,6 +61,11 @@ export async function profilConnecte() {
   return reponse.data;
 }
 
+export async function modifierProfil({ nom, email, avatarUrl }) {
+  const reponse = await apiAuth.put("/profil", { nom, email, avatarUrl });
+  return reponse.data;
+}
+
 export async function deconnecter() {
   await apiAuth.post("/logout");
 }

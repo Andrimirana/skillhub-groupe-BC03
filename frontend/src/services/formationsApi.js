@@ -76,3 +76,11 @@ export async function listerFormationsApprenant() {
   const reponse = await inscriptionApi.get("/apprenant/formations");
   return reponse.data;
 }
+
+export async function mettreAJourProgressionFormation(idFormation, donnees) {
+  const reponse = await inscriptionApi.put(
+    `/formations/${idFormation}/progression`,
+    donnees,
+  );
+  return reponse.data;
+}

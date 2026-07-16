@@ -20,6 +20,8 @@ import {
 import { estConnecte, recupererUtilisateur } from "../services/auth";
 import PublicNavbar from "../components/PublicNavbar";
 import AuthModal from "../components/AuthModal";
+import EmptyState from "../components/EmptyState";
+import SkeletonGrid from "../components/SkeletonGrid";
 import "../styles/public.css";
 
 const IMAGES_COURS = [
@@ -129,15 +131,52 @@ function DetailFormation() {
   };
 
   if (chargement) {
-    return null;
+    return (
+      <div className="dp-page">
+        <PublicNavbar
+          menuItems={[
+            { label: "Accueil", to: "/" },
+            { label: "Formations", to: "/formations" },
+            { label: "À propos", href: "#" },
+            { label: "Contact", href: "#footer" },
+          ]}
+        />
+        <main className="dp-body">
+          <div className="dp-body-inner">
+            <SkeletonGrid count={4} />
+          </div>
+        </main>
+      </div>
+    );
   }
 
   if (!formation) {
-    return <main className="public-page"><p className="status-banner">Formation introuvable.</p></main>;
+    return (
+      <div className="public-page">
+        <PublicNavbar
+          menuItems={[
+            { label: "Accueil", to: "/" },
+            { label: "Formations", to: "/formations" },
+            { label: "À propos", href: "#" },
+            { label: "Contact", href: "#footer" },
+          ]}
+        />
+        <main className="dp-body">
+          <div className="dp-body-inner">
+            <EmptyState
+              icon={faFolderOpen}
+              title="Formation introuvable"
+              description="Cette formation n’existe pas ou n’est plus disponible."
+              action={<Link to="/formations" className="btn-create">Retour aux formations</Link>}
+            />
+          </div>
+        </main>
+      </div>
+    );
   }
 
   const modules = formation.modules || [];
-  const imagePrincipale = IMAGES_COURS[Number(id) % IMAGES_COURS.length];
+  const imagePrincipale = formation.image_url || formation.imageUrl || IMAGES_COURS[Number(id) % IMAGES_COURS.length];
 
   return (
     <div className="dp-page">
@@ -281,7 +320,7 @@ function DetailFormation() {
                 <article className="dp-reco-card" key={item.id}>
                   <Link to={`/formation/${item.id}`} className="dp-reco-link">
                     <div className="dp-reco-cover">
-                      <img src={IMAGES_COURS[(index + 1) % IMAGES_COURS.length]} alt="" className="dp-reco-img" />
+                      <img src={item.image_url || item.imageUrl || IMAGES_COURS[(index + 1) % IMAGES_COURS.length]} alt="" className="dp-reco-img" />
                     </div>
                     <div className="dp-reco-body">
                       <h3 className="dp-reco-nom">{item.titre}</h3>

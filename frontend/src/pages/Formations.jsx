@@ -1,10 +1,13 @@
 ﻿import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
+import { faBookOpen, faClock, faTriangleExclamation, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 import { listerFormations } from "../services/formationsApi";
-import { recupererUtilisateur } from "../services/auth";
+import { estConnecte, recupererUtilisateur } from "../services/auth";
 import PublicNavbar from "../components/PublicNavbar";
+import AuthModal from "../components/AuthModal";
+import EmptyState from "../components/EmptyState";
+import SkeletonGrid from "../components/SkeletonGrid";
 import "../styles/formations-page.css";
 
 const CATEGORIES = ["", "dev", "design", "business", "marketing"];
@@ -40,7 +43,12 @@ function mapperCategorie(category) {
     return "marketing";
   }
 
-  if (valeur.includes("data") || valeur.includes("devops")) {
+  if (
+    valeur.includes("business")
+    || valeur.includes("management")
+    || valeur.includes("data")
+    || valeur.includes("devops")
+  ) {
     return "business";
   }
 
@@ -52,14 +60,9 @@ function libelleHeures(nombreHeures) {
   return `${heures || 1} heure${heures > 1 ? "s" : ""} de cours`;
 }
 
-function obtenirPoints(description) {
-  if (!description) return [];
-  return description
-    .split(/[.;]/).map((s) => s.trim()).filter((s) => s.length > 8).slice(0, 3);
-}
-
 function Formations() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const modalRef = useRef(null);
   const [modalOuverte, setModalOuverte] = useState(false);
   const [recherche, setRecherche] = useState("");
@@ -67,7 +70,10 @@ function Formations() {
   const [niveau, setNiveau] = useState("");
   const [formations, setFormations] = useState([]);
   const [formationsFiltrees, setFormationsFiltrees] = useState([]);
+  const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(false);
+  const [authModal, setAuthModal] = useState(null);
+  const [formationDemandee, setFormationDemandee] = useState(null);
   const utilisateur = recupererUtilisateur();
   const estFormateur = utilisateur?.role === "formateur";
 
@@ -76,10 +82,21 @@ function Formations() {
   }, []);
 
   useEffect(() => {
+    const categorieUrl = searchParams.get("categorie") || "";
+    const niveauUrl = searchParams.get("niveau") || "";
+    const rechercheUrl = searchParams.get("recherche") || "";
+
+    setCategorie(CATEGORIES.includes(categorieUrl) ? categorieUrl : "");
+    setNiveau(niveauUrl);
+    setRecherche(rechercheUrl);
+  }, [searchParams]);
+
+  useEffect(() => {
     let actif = true;
 
     const charger = async () => {
       try {
+        setChargement(true);
         const data = await listerFormations();
 
         if (!actif) {
@@ -91,12 +108,12 @@ function Formations() {
           nom: item.titre || "Formation",
           description: item.description || "",
           formateur: item.formateur || "N/A",
-          prix: Number(item.price || 0),
           duree: Number(item.duration || 0),
           categorie: mapperCategorie(item.category),
           level: item.level || "beginner",
           apprenants: Number(item.apprenants || 0),
           vues: Number(item.vues || 0),
+          image_url: item.image_url || item.imageUrl || "",
         }));
 
         setFormations(normalisees);
@@ -110,6 +127,10 @@ function Formations() {
         setFormations([]);
         setFormationsFiltrees([]);
         setErreur(true);
+      } finally {
+        if (actif) {
+          setChargement(false);
+        }
       }
     };
 
@@ -146,6 +167,15 @@ function Formations() {
 
   const fermerModal = () => setModalOuverte(false);
   const soumettreModal = (e) => { e.preventDefault(); navigate("/inscription"); };
+  const commencerFormation = (idFormation) => {
+    if (!estConnecte()) {
+      setFormationDemandee(idFormation);
+      setAuthModal("connexion");
+      return;
+    }
+
+    navigate(`/apprendre/${idFormation}`);
+  };
 
   return (
     <>
@@ -196,13 +226,26 @@ function Formations() {
             </select>
           </aside>
           <div className="cards-container" id="cardsContainer" aria-live="polite">
-            {erreur && <p>Impossible de charger les formations.</p>}
-            {!erreur && formationsFiltrees.length === 0 && <p>Aucune formation trouvée.</p>}
-            {!erreur && formationsFiltrees.map((formation, index) => (
+            {chargement && <SkeletonGrid count={6} />}
+            {!chargement && erreur && (
+              <EmptyState
+                icon={faTriangleExclamation}
+                title="Impossible de charger les formations"
+                description="Vérifiez que le backend est lancé, puis réessayez dans quelques instants."
+              />
+            )}
+            {!chargement && !erreur && formationsFiltrees.length === 0 && (
+              <EmptyState
+                icon={faBookOpen}
+                title="Aucune formation trouvée"
+                description="Essayez une autre recherche ou retirez un filtre pour voir plus de résultats."
+              />
+            )}
+            {!chargement && !erreur && formationsFiltrees.map((formation, index) => (
               <article className="f-card" key={formation.id}>
                 <div className="f-card-cover">
                   <img
-                    src={IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
+                    src={formation.image_url || IMAGES_FORMATIONS[index % IMAGES_FORMATIONS.length]}
                     alt=""
                     loading="lazy"
                     aria-hidden="true"
@@ -214,17 +257,7 @@ function Formations() {
                     <span><FontAwesomeIcon icon={faClock} className="f-stat-icon" aria-hidden="true" /> {libelleHeures(formation.duree)}</span>
                     <span><FontAwesomeIcon icon={faUserGraduate} className="f-stat-icon" aria-hidden="true" /> {formation.apprenants || 0} apprenants</span>
                   </div>
-                  <p className="f-card-auteur">Par {formation.formateur || "Formateur SkillHub"}</p>
                   <hr className="f-card-sep" />
-                  <p className="f-card-learn-title">Ce que vous apprendrez</p>
-                  <ul className="f-card-bullets">
-                    {obtenirPoints(formation.description).map((point, i) => (
-                      <li key={i}>{point}</li>
-                    ))}
-                  </ul>
-                  {(!formation.description || obtenirPoints(formation.description).length === 0) && (
-                    <p className="f-card-no-desc">Aucune description disponible.</p>
-                  )}
                 </div>
                 <div className="f-card-footer">
                   {estFormateur ? (
@@ -232,7 +265,13 @@ function Formations() {
                   ) : (
                     <>
                       <Link to={`/formation/${formation.id}`} className="f-btn f-btn--info">Plus d'infos</Link>
-                      <Link to={`/apprendre/${formation.id}`} className="f-btn f-btn--start">Commencer</Link>
+                      <button
+                        type="button"
+                        className="f-btn f-btn--start"
+                        onClick={() => commencerFormation(formation.id)}
+                      >
+                        Commencer
+                      </button>
                     </>
                   )}
                 </div>
@@ -274,6 +313,27 @@ function Formations() {
         </div>
       )}
 
+      {authModal && (
+        <AuthModal
+          modeInitial={authModal}
+          onClose={() => {
+            setAuthModal(null);
+            setFormationDemandee(null);
+          }}
+          onSuccess={(donnees) => {
+            setAuthModal(null);
+            const role = donnees?.utilisateur?.role;
+
+            if (role === "apprenant" && formationDemandee) {
+              navigate(`/apprendre/${formationDemandee}`);
+              return;
+            }
+
+            navigate(role === "formateur" ? "/dashboard/formateur" : "/dashboard/apprenant");
+          }}
+        />
+      )}
+
       <footer className="footer" id="footer">
         <div className="footer-container">
           <div className="footer_logo-p">
@@ -283,19 +343,19 @@ function Formations() {
           <nav className="footer-nav" aria-label="Navigation du footer">
             <h2 className="footer-titre">Navigation</h2>
             <ul className="footer-liste">
-              <li><a href="#">Accueil</a></li>
-              <li><a href="#">Cours</a></li>
-              <li><a href="#">Communauté</a></li>
-              <li><a href="#">À propos</a></li>
+              <li><Link to="/">Accueil</Link></li>
+              <li><Link to="/formations">Cours</Link></li>
+              <li><Link to="/#temoignages">Communauté</Link></li>
+              <li><Link to="/#guide">À propos</Link></li>
             </ul>
           </nav>
           <div className="footer_categ">
             <h2 className="footer-titre">Catégories</h2>
             <ul className="footer-liste">
-              <li><a href="#">Développement web</a></li>
-              <li><a href="#">Design</a></li>
-              <li><a href="#">Marketing</a></li>
-              <li><a href="#">Management</a></li>
+              <li><Link to="/formations?categorie=dev">Développement web</Link></li>
+              <li><Link to="/formations?categorie=design">Design</Link></li>
+              <li><Link to="/formations?categorie=marketing">Marketing</Link></li>
+              <li><Link to="/formations?categorie=business">Management</Link></li>
             </ul>
           </div>
           <div className="footer-social">
