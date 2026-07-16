@@ -1,0 +1,14 @@
+{
+  "name": "skillhub-final",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev -- --host 0.0.0.0 --port 5174",
+    "frontend:dev": "npm --prefix frontend run dev -- --host 0.0.0.0 --port 5174",
+    "frontend:lint": "npm --prefix frontend run lint",
+    "frontend:build": "npm --prefix frontend run build",
+    "backend:up": "docker compose up -d db mongodb auth_api catalog_api inscription_api",
+    "backend:logs": "docker compose logs -f auth_api catalog_api inscription_api",
+    "backend:down": "docker compose down",
+    "backend:ps": "docker ps -a --filter name=skillhub_ --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\""
+  }
+}
