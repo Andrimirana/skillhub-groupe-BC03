@@ -53,8 +53,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
-          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, gd
+          php-version: "8.4"
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, gd, mongodb-1.21.0
           coverage: xdebug
 
       - name: Install dependencies
@@ -97,6 +97,7 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
+          cache-dependency-path: services/auth-java/pom.xml
 
       - name: Verify
         working-directory: services/auth-java
@@ -121,6 +122,7 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
+          cache-dependency-path: services/auth-java/pom.xml
 
       - name: Download catalog coverage
         uses: actions/download-artifact@v4
