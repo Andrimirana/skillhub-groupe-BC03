@@ -40,6 +40,9 @@ public class User {
     @Column(nullable = true)
     private String role = "apprenant";
 
+    @Column(name = "avatar_url", nullable = true)
+    private String avatarUrl;
+
     /** Adresse email — identifiant métier unique de l'utilisateur. */
     @Column(unique = true, nullable = false)
     private String email;
