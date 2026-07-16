@@ -91,6 +91,7 @@ public class TokenService {
                 .claim("userId", utilisateur.getId())
                 .claim("nom",  utilisateur.getName() != null ? utilisateur.getName() : utilisateur.getEmail())
                 .claim("role", utilisateur.getRole() != null ? utilisateur.getRole() : "apprenant")
+                .claim("avatarUrl", utilisateur.getAvatarUrl())
                 // On signe le JWT avec l'algorithme HS256.
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
@@ -118,6 +119,8 @@ public class TokenService {
         resultat.put("nom",   claims.getOrDefault("nom",  claims.getSubject()));
         resultat.put("email", claims.getSubject());
         resultat.put("role",  claims.getOrDefault("role", "apprenant"));
+        resultat.put("avatarUrl", claims.get("avatarUrl"));
+        resultat.put("avatar_url", claims.get("avatarUrl"));
         return resultat;
     }
 

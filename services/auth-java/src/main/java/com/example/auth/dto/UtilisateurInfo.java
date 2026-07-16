@@ -8,4 +8,4 @@ package com.example.auth.dto;
  * @param email adresse email
  * @param role  rôle : formateur ou apprenant
  */
-public record UtilisateurInfo(Long id, String nom, String email, String role) {}
+public record UtilisateurInfo(Long id, String nom, String email, String role, String avatarUrl) {}
