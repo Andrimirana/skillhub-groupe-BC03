@@ -20,7 +20,6 @@ class FormationModelTest extends TestCase
             'category' => 'dev',
             'date' => '2026-06-01',
             'statut' => 'Publié',
-            'price' => 99.99,
             'duration' => 10,
             'level' => 'beginner',
             'vues' => 100,
@@ -33,7 +32,6 @@ class FormationModelTest extends TestCase
 
         $this->assertDatabaseHas('formations', ['titre' => 'Formation Test']);
         $this->assertEquals('Formation Test', $formation->titre);
-        $this->assertEquals(99.99, $formation->price);
     }
 
     // Vérifie que le champ date est bien casté en instance Carbon par Eloquent.
@@ -43,15 +41,6 @@ class FormationModelTest extends TestCase
         
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $formation->date);
         $this->assertEquals('2026-07-15', $formation->date->toDateString());
-    }
-
-    // Vérifie que le prix est casté en décimal sous forme de chaîne avec deux décimales.
-    public function test_formation_casts_price_as_decimal(): void
-    {
-        $formation = Formation::factory()->create(['price' => 149.50]);
-        
-        $this->assertIsString($formation->price);
-        $this->assertEquals('149.50', $formation->price);
     }
 
     // Vérifie que la durée est castée en entier même quand fournie sous forme de chaîne.
