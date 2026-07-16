@@ -1,7 +1,7 @@
-# rule.md — Référence technique pour le projet SkillHub BC03
+# rule.md — Référence Copilot pour le projet SkillHub BC03
 
-> Fichier de référence technique pour comprendre l’architecture et les conventions du projet.
-
+> Fichier de référence généré automatiquement après analyse complète du dépôt.  
+> À utiliser comme contexte de base pour toute assistance sur ce projet.
 
 ---
 
