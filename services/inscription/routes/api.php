@@ -7,5 +7,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth.service')->group(function (): void {
     Route::post('/formations/{formationId}/inscription',    [EnrollmentController::class, 'store']);
     Route::delete('/formations/{formationId}/inscription',  [EnrollmentController::class, 'destroy']);
+    Route::put('/formations/{formationId}/progression',     [EnrollmentController::class, 'updateProgress']);
     Route::get('/apprenant/formations',                     [EnrollmentController::class, 'myCourses']);
 });
