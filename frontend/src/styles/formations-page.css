@@ -3,14 +3,6 @@
   padding: 0;
 }
 
-body {
-  background: var(--background);
-  color: var(--text-main);
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  font-size: 1.08rem;
-  line-height: 1.7;
-}
-
 /* Navbar via PublicNavbar component - styles in public-navbar.css */
 
 .hero {

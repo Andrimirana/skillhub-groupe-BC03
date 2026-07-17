@@ -115,6 +115,24 @@ function composerDescription(formulaire) {
   return blocs.filter(Boolean).join("\n\n");
 }
 
+function remplacerElement(collection, indexCible, transformer) {
+  return collection.map((element, index) => (index === indexCible ? transformer(element) : element));
+}
+
+function modifierQuestionDansQuiz(quiz, questionIndex, transformer) {
+  return {
+    ...quiz,
+    questions: remplacerElement(quiz.questions, questionIndex, transformer),
+  };
+}
+
+function modifierQuizDansFormulaire(etat, quizIndex, transformer) {
+  return {
+    ...etat,
+    quizzes: remplacerElement(etat.quizzes, quizIndex, transformer),
+  };
+}
+
 function CreerAtelier() {
   const navigate = useNavigate();
   const [etape, setEtape] = useState(0);
@@ -237,35 +255,18 @@ function CreerAtelier() {
   };
 
   const changerQuestion = (quizIndex, questionIndex, champ, valeur) => {
-    setFormulaire((etat) => ({
-      ...etat,
-      quizzes: etat.quizzes.map((quiz, i) => {
-        if (i !== quizIndex) return quiz;
-        return {
-          ...quiz,
-          questions: quiz.questions.map((question, j) => (j === questionIndex ? { ...question, [champ]: valeur } : question)),
-        };
-      }),
-    }));
+    setFormulaire((etat) => modifierQuizDansFormulaire(etat, quizIndex, (quiz) => (
+      modifierQuestionDansQuiz(quiz, questionIndex, (question) => ({ ...question, [champ]: valeur }))
+    )));
   };
 
   const changerReponse = (quizIndex, questionIndex, reponseIndex, champ, valeur) => {
-    setFormulaire((etat) => ({
-      ...etat,
-      quizzes: etat.quizzes.map((quiz, i) => {
-        if (i !== quizIndex) return quiz;
-        return {
-          ...quiz,
-          questions: quiz.questions.map((question, j) => {
-            if (j !== questionIndex) return question;
-            return {
-              ...question,
-              reponses: question.reponses.map((reponse, k) => (k === reponseIndex ? { ...reponse, [champ]: valeur } : reponse)),
-            };
-          }),
-        };
-      }),
-    }));
+    setFormulaire((etat) => modifierQuizDansFormulaire(etat, quizIndex, (quiz) => (
+      modifierQuestionDansQuiz(quiz, questionIndex, (question) => ({
+        ...question,
+        reponses: remplacerElement(question.reponses, reponseIndex, (reponse) => ({ ...reponse, [champ]: valeur })),
+      }))
+    )));
   };
 
   const checklist = useMemo(() => [
