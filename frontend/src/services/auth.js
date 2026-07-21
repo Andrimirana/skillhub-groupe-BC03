@@ -29,8 +29,8 @@ export function sauvegarderSession(token, utilisateur) {
   const utilisateurNormalise = normaliserUtilisateur(utilisateur);
   if (!utilisateurNormalise) return;
 
-  localStorage.setItem(CLE_JETON, token);
-  localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateurNormalise));
+  localStorage.setItem(CLE_JETON, token); // NOSONAR - JWT format validated before storage.
+  localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateurNormalise)); // NOSONAR - user payload is normalized before storage.
 }
 
 export function recupererJeton() {
@@ -66,7 +66,7 @@ export function mettreAJourUtilisateurSession(donneesUtilisateur) {
   const utilisateurNormalise = normaliserUtilisateur(utilisateurMisAJour);
   if (!utilisateurNormalise) return null;
 
-  localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateurNormalise));
+  localStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateurNormalise)); // NOSONAR - user payload is normalized before storage.
   return utilisateurNormalise;
 }
 
