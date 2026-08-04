@@ -94,6 +94,19 @@ class SkillhubControllerTest {
     }
 
     @Test
+    @DisplayName("S03b - POST /api/register refuse un role invalide")
+    void registerRoleInvalideRefuse() throws Exception {
+        mockMvc.perform(post("/api/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"nom":"Test","email":"role.invalide@example.com",
+                             "password":"TestPassword1!","passwordConfirm":"TestPassword1!",
+                             "role":"admin"}
+                            """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("S04 — POST /api/register email invalide → 400")
     void registerEmailInvalide() throws Exception {
         mockMvc.perform(post("/api/register")
@@ -158,6 +171,19 @@ class SkillhubControllerTest {
         authService.registerSkillhubUser(EMAIL, PASSWORD, PASSWORD, "Test User", "formateur");
         String token = doLogin(EMAIL, PASSWORD);
         mockMvc.perform(get("/api/profil")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(EMAIL))
+                .andExpect(jsonPath("$.nom").value("Test User"))
+                .andExpect(jsonPath("$.role").value("formateur"));
+    }
+
+    @Test
+    @DisplayName("S08b — GET /api/profile avec token valide → 200")
+    void profileAliasOk() throws Exception {
+        authService.registerSkillhubUser(EMAIL, PASSWORD, PASSWORD, "Test User", "formateur");
+        String token = doLogin(EMAIL, PASSWORD);
+        mockMvc.perform(get("/api/profile")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(EMAIL))

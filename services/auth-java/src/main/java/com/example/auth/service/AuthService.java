@@ -187,6 +187,14 @@ public class AuthService {
                     return new AuthenticationFailedException("Identifiants incorrects");
                 });
 
+        String statutCompte = utilisateur.getStatus() == null || utilisateur.getStatus().isBlank()
+                ? "actif"
+                : utilisateur.getStatus();
+        if (!"actif".equalsIgnoreCase(statutCompte)) {
+            journal.warn("Login refusé — compte non actif : {}", requete.email());
+            throw new AuthenticationFailedException("Ce compte est désactivé ou en attente.");
+        }
+
         // 3. Compte non verrouillé
         if (utilisateur.getLockUntil() != null && utilisateur.getLockUntil().isAfter(LocalDateTime.now())) {
             journal.warn("Login bloqué — compte verrouillé : {}", requete.email());
@@ -230,6 +238,7 @@ public class AuthService {
         // 9. Succès — réinitialisation compteur + émission jeton
         utilisateur.setFailedAttempts(0);
         utilisateur.setLockUntil(null);
+        utilisateur.setLastLoginAt(LocalDateTime.now());
         depotUtilisateurs.save(utilisateur);
 
         nonceAuth.setConsumed(true);
@@ -371,12 +380,26 @@ public class AuthService {
 
         String motDePasseChiffre = serviceCleMaitre.encrypt(motDePasse);
         User utilisateur = new User(email, motDePasseChiffre);
+        String roleNormalise = normaliserRole(role);
         utilisateur.setName(nom);
-        utilisateur.setRole(role != null ? role : "apprenant");
+        utilisateur.setRole(roleNormalise);
         depotUtilisateurs.save(utilisateur);
 
         journal.info("Inscription Skillhub réussie : {} (rôle={})", email, utilisateur.getRole());
         return serviceJeton.generate(utilisateur);
+    }
+
+    private String normaliserRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "apprenant";
+        }
+
+        String roleNormalise = role.trim().toLowerCase();
+        if (!roleNormalise.equals("apprenant") && !roleNormalise.equals("formateur")) {
+            throw new InvalidInputException("Rôle invalide");
+        }
+
+        return roleNormalise;
     }
 
     /**

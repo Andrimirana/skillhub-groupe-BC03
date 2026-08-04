@@ -131,7 +131,7 @@ public class SkillhubController {
      * @return HTTP 200 avec les claims utilisateur, ou HTTP 401 si token invalide
      */
     // @GetMapping : GET /api/profil � lecture du profil sans modification d'�tat.
-    @GetMapping("/profil")
+    @GetMapping({"/profil", "/profile"})
     public ResponseEntity<Map<String, Object>> profil(
             @RequestHeader("Authorization") String authHeader) {
         // On lit le token Bearer envoy� par le client.
@@ -147,7 +147,7 @@ public class SkillhubController {
      * Met à jour le profil de l'utilisateur connecté dans la base Auth.
      * Le rôle n'est volontairement pas modifiable depuis le profil.
      */
-    @PutMapping("/profil")
+    @PutMapping({"/profil", "/profile"})
     public ResponseEntity<?> updateProfil(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody Map<String, String> body) {

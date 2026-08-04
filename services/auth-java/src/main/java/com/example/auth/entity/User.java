@@ -40,8 +40,17 @@ public class User {
     @Column(nullable = true)
     private String role = "apprenant";
 
+    @Column(nullable = true)
+    private String status = "actif";
+
     @Column(name = "avatar_url", nullable = true)
     private String avatarUrl;
+
+    @Column(length = 1000)
+    private String bio;
+
+    @Column(length = 255)
+    private String expertise;
 
     /** Adresse email — identifiant métier unique de l'utilisateur. */
     @Column(unique = true, nullable = false)
@@ -64,6 +73,15 @@ public class User {
     /** Date jusqu'à laquelle le compte est verrouillé. Null si non verrouillé. */
     @Column(name = "lock_until")
     private LocalDateTime lockUntil;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @Column(name = "disabled_at")
+    private LocalDateTime disabledAt;
+
+    @Column(name = "disabled_reason", length = 500)
+    private String disabledReason;
 
     /** Date de création du compte. */
     @Column(name = "created_at", nullable = false)
