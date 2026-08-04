@@ -38,6 +38,10 @@ class EnrollmentController extends Controller
             return response()->json(['message' => 'Formation introuvable.'], 404);
         }
 
+        if (! in_array($reponseApi->json('statut'), ['Publié', 'published'], true)) {
+            return response()->json(['message' => 'Formation introuvable.'], 404);
+        }
+
         $inscription = Enrollment::query()->firstOrCreate([
             'utilisateur_id' => $utilisateurAuth['id'],
             'formation_id'   => $idFormation,
@@ -150,7 +154,6 @@ class EnrollmentController extends Controller
         }
 
         $donneesValidees = $requete->validate([
-            'progression'          => ['nullable', 'integer', 'min:0', 'max:100'],
             'completed_modules'    => ['nullable', 'array'],
             'completed_modules.*'  => ['string', 'max:255'],
             'last_lesson_key'      => ['nullable', 'string', 'max:255'],
@@ -165,14 +168,26 @@ class EnrollmentController extends Controller
             return response()->json(['message' => 'Inscription introuvable.'], 404);
         }
 
-        $modulesTermines = array_values(array_unique(
-            $donneesValidees['completed_modules'] ?? ($inscription->completed_modules ?? [])
-        ));
+        $formation = $this->chargerFormation($idFormation);
+        if (! $formation) {
+            return response()->json(['message' => 'Formation introuvable.'], 404);
+        }
+
+        $clesLecons = $this->clesLeconsFormation($formation);
+        $modulesTermines = $this->filtrerProgressionSequentielle(
+            $donneesValidees['completed_modules'] ?? ($inscription->completed_modules ?? []),
+            $clesLecons
+        );
+        $lastLessonKey = $donneesValidees['last_lesson_key'] ?? $inscription->last_lesson_key;
+        if ($lastLessonKey !== null && ! in_array($lastLessonKey, $clesLecons, true)) {
+            $lastLessonKey = $clesLecons[0] ?? null;
+        }
+        $progression = $this->calculerProgressionDepuisLecons($clesLecons, $modulesTermines);
 
         $inscription->update([
-            'progression'       => $donneesValidees['progression'] ?? $inscription->progression,
+            'progression'       => $progression,
             'completed_modules' => $modulesTermines,
-            'last_lesson_key'   => $donneesValidees['last_lesson_key'] ?? $inscription->last_lesson_key,
+            'last_lesson_key'   => $lastLessonKey,
         ]);
 
         $this->mongoLogger->log('course_progress_updated', [
@@ -189,5 +204,62 @@ class EnrollmentController extends Controller
             'completed_modules'  => $inscription->completed_modules ?? [],
             'last_lesson_key'    => $inscription->last_lesson_key,
         ]);
+    }
+
+    private function chargerFormation(int $idFormation): ?array
+    {
+        $urlCatalog = config('services.catalog.url');
+        $reponseApi = Http::get("{$urlCatalog}/api/formations/{$idFormation}");
+
+        if (! $reponseApi->ok()) {
+            return null;
+        }
+
+        return $reponseApi->json();
+    }
+
+    private function clesLeconsFormation(array $formation): array
+    {
+        $cles = [];
+        $modules = $formation['modules'] ?? [];
+        foreach ($modules as $indexModule => $module) {
+            $contenu = json_decode($module['contenu'] ?? '', true);
+            $lecons = is_array($contenu) && isset($contenu['lessons']) && is_array($contenu['lessons'])
+                ? $contenu['lessons']
+                : [[]];
+
+            foreach (array_values($lecons) as $indexLecon => $_lecon) {
+                $cles[] = sprintf('%s:lesson:%d', (string) ($module['id'] ?? $module['titre'] ?? $indexModule), $indexLecon);
+            }
+        }
+
+        return $cles;
+    }
+
+    private function filtrerProgressionSequentielle(array $leconsDemandees, array $clesLecons): array
+    {
+        $demandees = array_flip(array_map('strval', $leconsDemandees));
+        $validees = [];
+
+        foreach ($clesLecons as $cle) {
+            if (! isset($demandees[$cle])) {
+                break;
+            }
+
+            $validees[] = $cle;
+        }
+
+        return $validees;
+    }
+
+    private function calculerProgressionDepuisLecons(array $clesLecons, array $leconsTerminees): int
+    {
+        $totalLecons = count($clesLecons);
+
+        if ($totalLecons === 0) {
+            return 0;
+        }
+
+        return min(100, (int) round((count($leconsTerminees) / $totalLecons) * 100));
     }
 }
