@@ -2,7 +2,7 @@
 node_modules/
 vendor/
 
-# Variables d'environnement (jamais commiter .env)
+# Variables d'environnement
 .env
 .env.local
 .env.*.local
@@ -11,6 +11,7 @@ vendor/
 # Fichiers de build
 dist/
 build/
+target/
 public/hot
 public/storage
 
@@ -35,11 +36,18 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Docker
+# Logs
 *.log
+
+# Dumps SQL locaux
+*.sql
+!docker/mysql/init/01-create-databases.sql
 
 # PHP Composer
 composer.phar
+
+# Outils locaux installés pour le développement
+.tools/
 
 # MongoDB config local
 *.env.mongodb
