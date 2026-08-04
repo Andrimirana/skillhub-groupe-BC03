@@ -34,6 +34,15 @@ class FormationControllerTest extends TestCase
         ]);
     }
 
+    private function modulesValides(): array
+    {
+        return [
+            ['titre' => 'Module 1', 'contenu' => 'Contenu 1'],
+            ['titre' => 'Module 2', 'contenu' => 'Contenu 2'],
+            ['titre' => 'Module 3', 'contenu' => 'Contenu 3'],
+        ];
+    }
+
     // Vérifie que la liste publique des formations renvoie bien toutes les formations en base.
     public function test_list_formations_public(): void
     {
@@ -70,6 +79,7 @@ class FormationControllerTest extends TestCase
             'date'        => '2026-09-01',
             'duration'    => 20,
             'level'       => 'beginner',
+            'modules'     => $this->modulesValides(),
         ];
 
         $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $donneesFormation);
@@ -197,13 +207,13 @@ class FormationControllerTest extends TestCase
     }
 
     // Vérifie qu'un formateur connecté ne voit dans la liste publique que ses propres formations.
-    public function test_formateur_sees_only_own_formations_in_public_list(): void
+    public function test_formateur_sees_only_own_formations_in_my_formations(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         Formation::factory()->create(['user_id' => 1, 'titre' => 'Mine']);
         Formation::factory()->create(['user_id' => 99, 'titre' => 'Others']);
 
-        $reponse = $this->withToken('jeton-test')->getJson('/api/formations');
+        $reponse = $this->withToken('jeton-test')->getJson('/api/my-formations');
         $reponse->assertOk()->assertJsonCount(1);
     }
 
@@ -219,11 +229,7 @@ class FormationControllerTest extends TestCase
             'date' => '2026-09-01',
             'duration' => 10,
             'level' => 'beginner',
-            'modules' => [
-                ['titre' => 'Module 1', 'contenu' => 'Content 1'],
-                ['titre' => 'Module 2', 'contenu' => 'Content 2'],
-                ['titre' => 'Module 3', 'contenu' => 'Content 3'],
-            ]
+            'modules' => $this->modulesValides(),
         ];
 
         $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $data);
@@ -261,6 +267,42 @@ class FormationControllerTest extends TestCase
         $reponse->assertOk()->assertJsonStructure(['modules']);
     }
 
+    public function test_public_show_hides_unpublished_formation(): void
+    {
+        $formation = Formation::factory()->create(['statut' => 'Brouillon']);
+
+        $this->getJson("/api/formations/{$formation->id}")
+            ->assertNotFound();
+    }
+
+    public function test_public_show_never_exposes_correct_quiz_answers(): void
+    {
+        $formation = Formation::factory()->create(['statut' => 'Publié']);
+        Module::factory()->create([
+            'formation_id' => $formation->id,
+            'contenu' => json_encode([
+                'lessons' => [['titre' => 'Leçon 1', 'contenu' => 'Lire']],
+                'finalQuizzes' => [[
+                    'titre' => 'Quiz final',
+                    'questions' => [[
+                        'enonce' => 'Question',
+                        'reponses' => [
+                            ['texte' => 'Bonne réponse', 'correcte' => true],
+                            ['texte' => 'Mauvaise réponse', 'correcte' => false],
+                        ],
+                    ]],
+                ]],
+            ]),
+        ]);
+
+        $reponse = $this->getJson("/api/formations/{$formation->id}");
+
+        $reponse->assertOk();
+        $this->assertStringNotContainsString('correcte', $reponse->getContent());
+        $this->assertStringNotContainsString('is_correct', $reponse->getContent());
+        $this->assertStringNotContainsString('answer_key', $reponse->getContent());
+    }
+
     // Vérifie que la suppression d'une formation supprime aussi ses modules en cascade.
     public function test_delete_formation_also_deletes_modules(): void
     {
@@ -285,6 +327,7 @@ class FormationControllerTest extends TestCase
             'date' => '2026-09-01',
             'duration' => 10,
             'level' => 'invalid_level',
+            'modules' => $this->modulesValides(),
         ];
 
         $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $data);

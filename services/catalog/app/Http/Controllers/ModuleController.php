@@ -26,7 +26,11 @@ class ModuleController extends Controller
     // Les méthodes suivantes sont accessibles uniquement aux formateurs propriétaires de la formation.
     public function index(Formation $formation): JsonResponse
     {
-        $modules = $formation->modules()->get()->map(fn (Module $m) => $this->presenterModule($m));
+        if (! in_array($formation->statut, ['Publié', 'published'], true)) {
+            return response()->json(['message' => 'Formation introuvable.'], 404);
+        }
+
+        $modules = $formation->modules()->get()->map(fn (Module $m) => $this->presenterModule($m, true));
 
         return response()->json($modules);
     }
@@ -134,14 +138,40 @@ class ModuleController extends Controller
     /**
      * Formate un module en tableau simple pour les réponses JSON de l'API.
      */
-    private function presenterModule(Module $module): array
+    private function presenterModule(Module $module, bool $masquerReponsesCorrectes = false): array
     {
         return [
             'id'           => $module->id,
             'titre'        => $module->titre,
-            'contenu'      => $module->contenu,
+            'contenu'      => $masquerReponsesCorrectes ? $this->contenuApprenant($module->contenu) : $module->contenu,
             'ordre'        => $module->ordre,
             'formation_id' => $module->formation_id,
         ];
+    }
+
+    private function contenuApprenant(?string $contenu): string
+    {
+        $donnees = json_decode((string) $contenu, true);
+        if (! is_array($donnees)) {
+            return (string) $contenu;
+        }
+
+        return json_encode($this->retirerReponsesCorrectes($donnees), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    private function retirerReponsesCorrectes(array $donnees): array
+    {
+        foreach ($donnees as $cle => $valeur) {
+            if (in_array($cle, ['correcte', 'is_correct', 'correct_answer', 'answer_key'], true)) {
+                unset($donnees[$cle]);
+                continue;
+            }
+
+            if (is_array($valeur)) {
+                $donnees[$cle] = $this->retirerReponsesCorrectes($valeur);
+            }
+        }
+
+        return $donnees;
     }
 }

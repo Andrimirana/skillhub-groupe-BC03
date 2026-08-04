@@ -37,7 +37,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Laravel et API REST',
-                'description' => "Construisez un backend Laravel professionnel avec routes, contrôleurs, modèles, migrations, validation, sécurité et endpoints REST.",
+                'description' => 'Construisez un backend Laravel professionnel avec routes, contrôleurs, modèles, migrations, validation, sécurité et endpoints REST.',
                 'category' => 'Développement web',
                 'duration' => 22,
                 'level' => 'intermediaire',
@@ -46,7 +46,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'UI Design moderne avec Figma',
-                'description' => "Concevez des interfaces propres et cohérentes avec Figma : grilles, composants, variantes, styles et responsive design.",
+                'description' => 'Concevez des interfaces propres et cohérentes avec Figma : grilles, composants, variantes, styles et responsive design.',
                 'category' => 'Design',
                 'duration' => 14,
                 'level' => 'beginner',
@@ -55,7 +55,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Marketing digital et SEO',
-                'description' => "Développez une stratégie digitale claire : mots-clés, contenu, référencement naturel, analytics et amélioration continue.",
+                'description' => 'Développez une stratégie digitale claire : mots-clés, contenu, référencement naturel, analytics et amélioration continue.',
                 'category' => 'Marketing',
                 'duration' => 12,
                 'level' => 'beginner',
@@ -64,7 +64,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Analyse de données avec Python',
-                'description' => "Explorez, nettoyez, analysez et visualisez des données avec Python, Pandas, NumPy et des graphiques lisibles.",
+                'description' => 'Explorez, nettoyez, analysez et visualisez des données avec Python, Pandas, NumPy et des graphiques lisibles.',
                 'category' => 'Data',
                 'duration' => 24,
                 'level' => 'intermediaire',
@@ -73,7 +73,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Docker pour développeurs',
-                'description' => "Comprenez Docker simplement : images, conteneurs, volumes, réseaux, Docker Compose et workflow de développement.",
+                'description' => 'Comprenez Docker simplement : images, conteneurs, volumes, réseaux, Docker Compose et workflow de développement.',
                 'category' => 'DevOps',
                 'duration' => 16,
                 'level' => 'intermediaire',
@@ -82,16 +82,16 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Gestion de projet agile',
-                'description' => "Pilotez un projet avec backlog, priorisation, sprint, rituels agiles, suivi d’avancement et collaboration efficace.",
+                'description' => "Pilotez un projet avec backlog, priorisation, sprint, rituels agiles, suivi d'avancement et collaboration efficace.",
                 'category' => 'Management',
                 'duration' => 15,
                 'level' => 'beginner',
                 'image_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
-                'modules' => ['Comprendre l’agilité', 'Construire un backlog', 'Animer un sprint', 'Améliorer le flux'],
+                'modules' => ["Comprendre l'agilité", 'Construire un backlog', 'Animer un sprint', 'Améliorer le flux'],
             ],
             [
                 'titre' => 'TypeScript pour applications modernes',
-                'description' => "Renforcez vos projets JavaScript avec TypeScript : types, interfaces, génériques, typage API et migration progressive.",
+                'description' => 'Renforcez vos projets JavaScript avec TypeScript : types, interfaces, génériques, typage API et migration progressive.',
                 'category' => 'Développement web',
                 'duration' => 13,
                 'level' => 'intermediaire',
@@ -100,7 +100,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Cybersécurité web fondamentale',
-                'description' => "Comprenez les risques essentiels du web : authentification, injections, XSS, permissions, bonnes pratiques et protection des données.",
+                'description' => 'Apprenez à reconnaître les risques courants du web et à renforcer une application avec des pratiques simples et efficaces.',
                 'category' => 'DevOps',
                 'duration' => 20,
                 'level' => 'intermediaire',
@@ -109,7 +109,7 @@ class FormationSeeder extends Seeder
             ],
             [
                 'titre' => 'Bases de données SQL',
-                'description' => "Apprenez à modéliser, interroger et optimiser une base SQL : tables, relations, jointures, index et requêtes utiles.",
+                'description' => 'Apprenez à modéliser, interroger et optimiser une base SQL : tables, relations, jointures, index et requêtes utiles.',
                 'category' => 'Data',
                 'duration' => 17,
                 'level' => 'beginner',
@@ -119,30 +119,33 @@ class FormationSeeder extends Seeder
         ];
 
         foreach ($formations as $index => $cours) {
-            $formateur = $formateurs[$index % count($formateurs)];
+            $this->creerFormation($cours, $formateurs[$index], $index);
+        }
+    }
 
-            $formation = Formation::query()->create([
-                'titre' => $cours['titre'],
-                'description' => $cours['description'],
-                'category' => $cours['category'],
-                'date' => now()->subDays(count($formations) - $index),
-                'statut' => 'Publié',
-                'duration' => $cours['duration'],
-                'level' => $cours['level'],
-                'image_url' => $cours['image_url'],
-                'vues' => 40 + ($index * 11),
-                'user_id' => $formateur['id'],
-                'formateur_nom' => $formateur['nom'],
-                'apprenants_count' => 25 + ($index * 8),
+    private function creerFormation(array $cours, array $formateur, int $index): void
+    {
+        $formation = Formation::query()->create([
+            'titre' => $cours['titre'],
+            'description' => $cours['description'],
+            'category' => $cours['category'],
+            'date' => now()->subDays(10 - $index),
+            'statut' => 'Publié',
+            'duration' => $cours['duration'],
+            'level' => $cours['level'],
+            'image_url' => $cours['image_url'],
+            'vues' => 40 + ($index * 11),
+            'user_id' => $formateur['id'],
+            'formateur_nom' => $formateur['nom'],
+            'apprenants_count' => 25 + ($index * 8),
+        ]);
+
+        foreach ($cours['modules'] as $ordre => $titreModule) {
+            $formation->modules()->create([
+                'titre' => $titreModule,
+                'ordre' => $ordre + 1,
+                'contenu' => json_encode($this->contenuModule($titreModule, $ordre, $cours), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ]);
-
-            foreach ($cours['modules'] as $ordre => $titreModule) {
-                $formation->modules()->create([
-                    'titre' => $titreModule,
-                    'ordre' => $ordre + 1,
-                    'contenu' => json_encode($this->contenuModule($titreModule, $ordre, $cours), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                ]);
-            }
         }
     }
 
@@ -153,55 +156,8 @@ class FormationSeeder extends Seeder
             'duration' => max(2, (int) ceil($cours['duration'] / count($cours['modules']))),
             'visible' => true,
             'debloquerApresPrecedent' => $index > 0,
-            'lessons' => [
-                [
-                    'titre' => "Introduction — {$titreModule}",
-                    'description' => 'Présentation des notions clés.',
-                    'type' => 'Texte',
-                    'duration' => 25,
-                    'ordre' => 1,
-                    'obligatoire' => true,
-                    'preview' => $index === 0,
-                    'contenu' => "Découvrez les bases de « {$titreModule} » avec des exemples simples.",
-                    'videoUrl' => '',
-                    'ressources' => [],
-                ],
-                [
-                    'titre' => "Atelier pratique — {$titreModule}",
-                    'description' => 'Mise en pratique guidée.',
-                    'type' => 'Exercice pratique',
-                    'duration' => 45,
-                    'ordre' => 2,
-                    'obligatoire' => true,
-                    'preview' => false,
-                    'contenu' => 'Réalisez un exercice court pour appliquer les concepts du module.',
-                    'videoUrl' => '',
-                    'ressources' => [],
-                ],
-            ],
-            'quizzes' => [
-                [
-                    'titre' => "Quiz — {$titreModule}",
-                    'scope' => $titreModule,
-                    'instructions' => 'Choisissez la meilleure réponse.',
-                    'tentatives' => 2,
-                    'scoreMinimum' => 70,
-                    'questions' => [
-                        [
-                            'enonce' => "Quel est l’objectif principal de « {$titreModule} » ?",
-                            'type' => 'Choix unique',
-                            'points' => 1,
-                            'explication' => 'L’objectif est de comprendre puis pratiquer une compétence précise.',
-                            'difficulte' => 'Facile',
-                            'reponses' => [
-                                ['texte' => 'Comprendre et appliquer les notions du module', 'correcte' => true],
-                                ['texte' => 'Ignorer les exercices', 'correcte' => false],
-                                ['texte' => 'Lire uniquement le titre', 'correcte' => false],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
+            'lessons' => $this->lecons($titreModule, $index),
+            'quizzes' => $this->quiz($titreModule),
             'progression' => [
                 'mode' => 'séquentielle',
                 'scoreFinal' => 70,
@@ -209,6 +165,63 @@ class FormationSeeder extends Seeder
                 'reussirTousQuiz' => false,
             ],
             'slug' => Str::slug($titreModule),
+        ];
+    }
+
+    private function lecons(string $titreModule, int $index): array
+    {
+        return [
+            [
+                'titre' => "Introduction - {$titreModule}",
+                'description' => 'Présentation des notions clés.',
+                'type' => 'Texte',
+                'duration' => 25,
+                'ordre' => 1,
+                'obligatoire' => true,
+                'preview' => $index === 0,
+                'contenu' => "Découvrez les bases de « {$titreModule} » avec des exemples simples.",
+                'videoUrl' => '',
+                'ressources' => [],
+            ],
+            [
+                'titre' => "Atelier pratique - {$titreModule}",
+                'description' => 'Mise en pratique guidée.',
+                'type' => 'Exercice pratique',
+                'duration' => 45,
+                'ordre' => 2,
+                'obligatoire' => true,
+                'preview' => false,
+                'contenu' => 'Réalisez un exercice court pour appliquer les concepts du module.',
+                'videoUrl' => '',
+                'ressources' => [],
+            ],
+        ];
+    }
+
+    private function quiz(string $titreModule): array
+    {
+        return [
+            [
+                'titre' => "Quiz - {$titreModule}",
+                'scope' => $titreModule,
+                'instructions' => 'Choisissez la meilleure réponse.',
+                'tentatives' => 2,
+                'scoreMinimum' => 70,
+                'questions' => [
+                    [
+                        'enonce' => "Quel est l'objectif principal de « {$titreModule} » ?",
+                        'type' => 'Choix unique',
+                        'points' => 1,
+                        'explication' => 'L’objectif est de comprendre puis pratiquer une compétence précise.',
+                        'difficulte' => 'Facile',
+                        'reponses' => [
+                            ['texte' => 'Comprendre et appliquer les notions du module', 'correcte' => true],
+                            ['texte' => 'Ignorer les exercices', 'correcte' => false],
+                            ['texte' => 'Lire uniquement le titre', 'correcte' => false],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }
