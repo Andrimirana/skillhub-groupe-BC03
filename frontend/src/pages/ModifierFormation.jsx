@@ -7,6 +7,19 @@ import "../styles/layout.css";
 
 const MODULE_VIDE = { titre: "", contenu: "" };
 
+const creerModulesMinimum = (modules = []) => {
+  const modulesNormalises = modules.map((module) => ({
+    titre: module.titre ?? "",
+    contenu: module.contenu ?? "",
+  }));
+
+  while (modulesNormalises.length < 3) {
+    modulesNormalises.push({ ...MODULE_VIDE });
+  }
+
+  return modulesNormalises;
+};
+
 function ModifierFormation() {
   const { idFormation } = useParams();
   const navigate = useNavigate();
@@ -23,7 +36,7 @@ function ModifierFormation() {
     duration: "",
     level: "beginner",
     image_url: "",
-    modules: [{ ...MODULE_VIDE }],
+    modules: creerModulesMinimum(),
   });
 
   useEffect(() => {
@@ -45,10 +58,7 @@ function ModifierFormation() {
           duration: String(formationCible.duration ?? ""),
           level: formationCible.level ?? "beginner",
           image_url: formationCible.image_url ?? formationCible.imageUrl ?? "",
-          modules: (formationCible.modules?.length ? formationCible.modules : [{ ...MODULE_VIDE }]).map((module) => ({
-            titre: module.titre ?? "",
-            contenu: module.contenu ?? "",
-          })),
+          modules: creerModulesMinimum(formationCible.modules?.length ? formationCible.modules : []),
         });
         setFormationChargee(true);
       } catch {
@@ -102,8 +112,8 @@ function ModifierFormation() {
     if (!["beginner", "intermediaire", "advanced"].includes(formulaire.level)) {
       return "Le niveau sélectionné est invalide.";
     }
-    if (!Array.isArray(formulaire.modules) || formulaire.modules.length < 1) {
-      return "La formation doit contenir au minimum 1 module.";
+    if (!Array.isArray(formulaire.modules) || formulaire.modules.length < 3) {
+      return "La formation doit contenir au minimum 3 modules.";
     }
     if (formulaire.modules.some((module) => !module.titre.trim() || !module.contenu.trim())) {
       return "Chaque module doit avoir un titre et un contenu.";
@@ -243,7 +253,7 @@ function ModifierFormation() {
                     <div key={`module-edit-${index}`} className="module-editor-block">
                       <div className="module-editor-head">
                         <strong>Module {index + 1}</strong>
-                        {formulaire.modules.length > 1 && (
+                        {formulaire.modules.length > 3 && (
                           <button type="button" className="btn-link-danger" onClick={() => supprimerModule(index)} aria-label={`Supprimer le module ${index + 1}`}>
                             ×
                           </button>

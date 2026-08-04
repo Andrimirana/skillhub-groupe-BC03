@@ -166,3 +166,20 @@
 [data-theme="dark"] .btn-delete:hover {
   background: rgba(220, 53, 69, 0.36);
 }
+
+/* Harmonisation tableaux */
+.table-card,
+.dashboard-layout table {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.dashboard-layout th,
+.table-card th {
+  background: var(--color-surface-soft);
+}
+
+.dashboard-layout tr:hover td,
+.table-card tr:hover td {
+  background: rgba(79, 70, 229, 0.035);
+}

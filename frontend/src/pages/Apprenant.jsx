@@ -26,7 +26,6 @@ import {
 } from "../services/formationsApi";
 import { recupererUtilisateur } from "../services/auth";
 import "../styles/layout.css";
-import "../styles/atelierCard.css";
 
 const IMAGES_FORMATIONS = [
   "/assets/images/learning/learning-hero.jpg",
@@ -246,7 +245,6 @@ function Apprenant() {
                     <article className="continue-card">
                       <img src={formationActive.image_url || formationActive.imageUrl || IMAGES_FORMATIONS[0]} alt="" aria-hidden="true" />
                       <div>
-                        <span className="dashboard-badge">{formationActive.category || "Formation"}</span>
                         <h4>{formationActive.titre}</h4>
                         <p>{prochainModule ? `Prochain module : ${prochainModule.titre}` : "Vous pouvez revoir cette formation à votre rythme."}</p>
                         <div className="dashboard-progress-track">

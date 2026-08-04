@@ -1,32 +1,9 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-
-body {
-    background: var(--background);
-    color: var(--text-main);
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    font-size: 1.08rem;
-    line-height: 1.7;
-    background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(246, 249, 255, 0.9)),
-        radial-gradient(circle at top left, rgba(91, 61, 246, 0.10), transparent 26%),
-        radial-gradient(circle at top right, rgba(255, 179, 71, 0.10), transparent 24%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'%3E%3Cg fill='none' stroke='%235b3df6' stroke-opacity='0.08' stroke-width='1.2'%3E%3Cpath d='M0 120 Q400 30 800 120 T1600 120'/%3E%3Cpath d='M0 300 Q400 210 800 300 T1600 300'/%3E%3Cpath d='M0 480 Q400 390 800 480 T1600 480'/%3E%3Cpath d='M0 660 Q400 570 800 660 T1600 660'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: cover, auto, auto, cover;
-    background-attachment: fixed;
-}
-
 /* En-tête principal du site */
 header {
     position: sticky;
     top: 0;
     z-index: 1000;
     background: var(--surface);
-    backdrop-filter: blur(10px);
     border-radius: 0 0 18px 18px;
     box-shadow: var(--shadow);
     margin-bottom: 36px;
@@ -70,35 +47,9 @@ header {
     transform: translateY(-1px);
 }
 
-.btn-login {
-    background: linear-gradient(135deg, #4ba1f2, #404594);
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-size: 18px;
-    box-shadow: 0 12px 24px rgba(64, 69, 148, 0.18);
-}
-
-.btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 30px rgba(64, 69, 148, 0.24);
-}
-
 .bouton-inscription {
     display: flex;
     align-items: center;
-}
-
-.btn-logout {
-    background: linear-gradient(135deg, #e05252, #b91c1c);
-    box-shadow: 0 12px 24px rgba(185, 28, 28, 0.18);
-}
-
-.btn-logout:hover {
-    box-shadow: 0 16px 30px rgba(185, 28, 28, 0.26);
 }
 
 /*menu burger */
@@ -171,35 +122,7 @@ header {
     position: absolute;
     inset: 0;
     background: linear-gradient(130deg, rgba(75, 161, 242, 0.06), transparent 38%, rgba(64, 69, 148, 0.07));
-    mix-blend-mode: multiply;
     pointer-events: none;
-}
-
-.hero-badge-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 22px;
-}
-
-.hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.86);
-    border: 1px solid #dce5fb;
-    border-radius: 999px;
-    color: #22345c;
-    font-size: 0.95rem;
-    box-shadow: 0 10px 24px rgba(44, 65, 120, 0.11);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.hero-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(44, 65, 120, 0.14);
 }
 
 .illustration {
@@ -236,7 +159,7 @@ header {
     font-size: 3.4rem;
     font-weight: 600;
     line-height: 1.2;
-    font-family: "Monserrat", sans-serif;
+    font-family: var(--font-main);
     opacity: 0;
     animation: fadeUp 1.5s ease forwards;
 }
@@ -246,7 +169,7 @@ header {
     background: linear-gradient(to right, #4ba1f2, #404594, #381766);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-family: "Pacifico", cursive;
+    font-family: var(--font-main);
 }
 
 .hero-texte {
@@ -255,7 +178,7 @@ header {
     animation: fadeUp 1.5s ease forwards;
     opacity: 0;
     color: #0A1F44;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
     max-width: 760px;
 }
 
@@ -310,7 +233,6 @@ header {
     border: 1px solid #e4eaff;
     border-radius: 18px;
     padding: 18px;
-    backdrop-filter: blur(8px);
     box-shadow: 0 14px 30px rgba(29, 46, 88, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -391,7 +313,7 @@ header {
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     margin-right: 10px;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -440,7 +362,7 @@ header {
     padding: 1rem;
     margin-left: 20px;
     color: #0A1F44;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
 }
 
 .guide-cartes {
@@ -494,7 +416,7 @@ header {
     font-size: 1.6rem;
     font-weight: 800;
     color: rgba(64, 69, 148, 0.10);
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
     line-height: 1;
     pointer-events: none;
     user-select: none;
@@ -530,19 +452,15 @@ header {
 
 .guide-fa-icon {
     font-size: 1.3rem;
-    display: inline-block !important;
+    display: inline-block;
 }
 
 /* Réactive les icônes FA dans les badges de rôle */
-.guide-role .svg-inline--fa {
-    display: inline-block !important;
-}
-
 .guide-titre {
     font-size: 1rem;
     font-weight: 600;
     color: #0A1F44;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
 }
 
 .guide-texte {
@@ -550,13 +468,13 @@ header {
     font-weight: 400;
     color: #0A1F44;
     padding: 1rem;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
 }
 
 .valeurs {
     min-height: 400px;
     padding: 2rem;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
     width: 95%;
     margin: 0 auto;
 }
@@ -602,7 +520,7 @@ header {
     font-weight: 700;
     color: #0A1F44;
     margin-bottom: 0.25rem;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
 }
 
 .valeurs-liste li p {
@@ -618,7 +536,7 @@ header {
     padding: 1rem;
     margin-left: 20px;
     color: #0A1F44;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
 }
 
 .valeurs_container {
@@ -664,7 +582,7 @@ header {
     width: 95%;
     margin: 24px auto;
     border-radius: 28px;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
     overflow: hidden;
 }
 
@@ -684,19 +602,13 @@ header {
     color: #fff;
 }
 
-.temoignages-kicker {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    color: #fff !important;
-}
-
 .temoignages-gauche h2 {
     font-size: 1.9rem;
     font-weight: 800;
     color: #fff;
     line-height: 1.25;
     margin: 1rem 0 1.5rem;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
 }
 
 .temoignages-nav {
@@ -780,7 +692,7 @@ header {
     font-size: 2.5rem;
     line-height: 1;
     color: #4f46e5;
-    font-family: Georgia, serif;
+    font-family: var(--font-main);
     font-weight: 700;
 }
 
@@ -815,7 +727,7 @@ header {
 
 /* Icônes FA dans les boutons nav témoignages */
 .temoignage-btn .svg-inline--fa {
-    display: inline-block !important;
+    display: inline-block;
 }
 
 @keyframes carouselFadeSoft {
@@ -929,14 +841,6 @@ header {
         font-size: 2.2rem;
     }
 
-    .hero-badge-row {
-        gap: 8px;
-    }
-
-    .hero-badge {
-        font-size: 0.85rem;
-    }
-
     .btn {
         width: 100%;
         margin-right: 0;
@@ -969,7 +873,7 @@ header {
     min-height: 400px;
     padding: 2rem 1rem;
     background-color: rgba(228, 234, 255, 0.5);
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
     margin: 0 auto;
 }
 
@@ -1055,7 +959,7 @@ header {
     min-height: auto;
     padding: 1.5rem 1rem;
     background-color: rgba(228, 234, 255, 0.5);
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
 }
 
 .inscription h2 {
@@ -1064,7 +968,7 @@ header {
     font-size: 1.5rem;
     font-weight: 600;
     color: #0A1F44;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
 }
 
 form {
@@ -1137,7 +1041,6 @@ button:hover {
     position: fixed;
     inset: 0;
     background: rgba(7, 18, 43, 0.58);
-    backdrop-filter: blur(7px);
     z-index: 1000;
     animation: modalFadeIn 0.22s ease;
 }
@@ -1155,7 +1058,7 @@ button:hover {
     padding: 2rem 2rem 1.5rem;
     box-shadow: 0 32px 72px rgba(8, 23, 61, 0.30);
     animation: modalPopIn 0.24s ease;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
 }
 
 .modal-header-icon {
@@ -1321,7 +1224,7 @@ body.no-scroll {
     min-height: 300px;
     display: flex;
     flex-direction: column;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-main);
 }
 
 .footer-container {
@@ -1355,7 +1258,7 @@ body.no-scroll {
     font-weight: 600;
     margin-bottom: 0.8rem;
     color: #FBFBFB;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
     opacity: 0.8;
 }
 
@@ -1472,12 +1375,6 @@ body.no-scroll {
 
     .liens-navigation.active {
         display: flex;
-    }
-
-    .btn-login {
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
     }
 
     .hero {
@@ -1652,7 +1549,7 @@ body.no-scroll {
 
 /* ===== Accueil overrides (latest) ===== */
 .hero {
-    background: transparent !important;
+    background: transparent;
     border: none;
     box-shadow: none;
 }
@@ -1684,25 +1581,6 @@ body.no-scroll {
 
 .guide-apprenants {
     align-items: flex-start;
-}
-
-.guide-role {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #2e4380;
-    background: #e8efff;
-    border: 1px solid #cfdcff;
-    border-radius: 999px;
-    padding: 6px 14px;
-    margin: 2px 0 10px;
-}
-
-.guide-formateurs .guide-role {
-    align-self: flex-end;
-}
-
-.guide-apprenants .guide-role {
-    align-self: flex-start;
 }
 
 .valeurs {
@@ -1757,7 +1635,7 @@ body.no-scroll {
 
 /* Réactive les icônes FA dans les boutons carousel formations */
 .formations-btn .svg-inline--fa {
-    display: inline-block !important;
+    display: inline-block;
 }
 
 .formations-slide-track {
@@ -1863,7 +1741,7 @@ body.no-scroll {
 }
 
 .featured-card .f-stat-icon {
-    display: inline-block !important;
+    display: inline-block;
     color: #64748b;
     margin-right: 4px;
 }
@@ -2055,10 +1933,6 @@ body.no-scroll {
         align-items: stretch;
     }
 
-    .guide-formateurs .guide-role,
-    .guide-apprenants .guide-role {
-        align-self: flex-start;
-    }
 }
 
 /* ===== Simplified section separators + Coursera-like testimonials ===== */
@@ -2259,7 +2133,7 @@ body.no-scroll {
 .hero {
     background:
         linear-gradient(120deg, rgba(10, 31, 68, 0.56), rgba(58, 78, 142, 0.35)),
-        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat !important;
+        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat;
     border-radius: 24px;
     border: 1px solid rgba(228, 236, 255, 0.5);
     box-shadow: 0 24px 52px rgba(15, 32, 72, 0.24);
@@ -2269,7 +2143,6 @@ body.no-scroll {
 .hero-titre,
 .hero-texte {
     color: #f4f7ff;
-    text-shadow: 0 8px 26px rgba(4, 15, 38, 0.34);
 }
 
 .progresse {
@@ -2372,7 +2245,7 @@ body.no-scroll {
 }
 
 .hero {
-    width: min(1180px, 100%) !important;
+    width: min(1180px, 100%);
     min-height: 680px;
     align-items: flex-start;
     justify-content: center;
@@ -2383,7 +2256,7 @@ body.no-scroll {
     text-align: left;
     background:
         linear-gradient(100deg, rgba(8, 15, 35, 0.96) 0%, rgba(22, 25, 68, 0.91) 49%, rgba(30, 41, 59, 0.58) 100%),
-        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat !important;
+        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat;
     box-shadow:
         0 1px 2px rgba(15, 23, 42, 0.08),
         0 30px 80px rgba(15, 23, 42, 0.25);
@@ -2420,33 +2293,15 @@ body.no-scroll {
     display: none;
 }
 
-.hero-kicker,
-.section-kicker {
-    width: fit-content;
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 8px 13px;
-    border: 1px solid rgba(103, 232, 249, 0.25);
-    border-radius: 999px;
-    color: #cffafe;
-    background: rgba(8, 145, 178, 0.14);
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 0.065em;
-    text-transform: uppercase;
-}
-
 .hero-titre {
     max-width: 820px;
     margin: 24px 0 0;
     color: #ffffff;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
     font-size: clamp(2.8rem, 6vw, 5rem);
     font-weight: 700;
     line-height: 1.06;
     letter-spacing: -0.06em;
-    text-shadow: none;
 }
 
 .progresse {
@@ -2454,7 +2309,7 @@ body.no-scroll {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
 }
 
 .hero-texte {
@@ -2463,7 +2318,6 @@ body.no-scroll {
     color: rgba(226, 232, 240, 0.84);
     font-size: clamp(1rem, 1.6vw, 1.15rem);
     line-height: 1.75;
-    text-shadow: none;
 }
 
 .hero-boutons {
@@ -2498,7 +2352,6 @@ body.no-scroll {
     border: 1px solid rgba(255, 255, 255, 0.25);
     color: #f8fafc;
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
 }
 
 .hero-boutons .btn-apprenant:hover {
@@ -2535,7 +2388,7 @@ body.no-scroll {
 
 .hero-preuves strong {
     color: #f8fafc;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
     font-size: 0.93rem;
 }
 
@@ -2563,14 +2416,6 @@ body.no-scroll {
     border-bottom: 1px solid #e2e8f0;
 }
 
-.section-kicker {
-    padding: 6px 10px;
-    border-color: #c7d2fe;
-    color: #4338ca;
-    background: #eef2ff;
-    font-size: 0.69rem;
-}
-
 .guide-header,
 .valeurs-header,
 .temoignages {
@@ -2584,7 +2429,7 @@ body.no-scroll {
     margin: 12px 0 30px;
     padding: 0;
     color: #0f172a;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-main);
     font-size: clamp(2rem, 4vw, 2.8rem);
     font-weight: 700;
     line-height: 1.15;
@@ -2621,26 +2466,6 @@ body.no-scroll {
 
 .guide-apprenants {
     background: linear-gradient(145deg, rgba(236, 254, 255, 0.82), rgba(255, 255, 255, 0.88));
-}
-
-.guide-role,
-.guide-formateurs .guide-role,
-.guide-apprenants .guide-role {
-    align-self: flex-start;
-    margin: 0 0 3px;
-    padding: 6px 10px;
-    border: 1px solid #c7d2fe;
-    border-radius: 999px;
-    color: #4338ca;
-    background: #eef2ff;
-    font-size: 0.72rem;
-    font-weight: 800;
-}
-
-.guide-apprenants .guide-role {
-    border-color: #a5f3fc;
-    color: #0e7490;
-    background: #ecfeff;
 }
 
 .guide-carte {
@@ -2868,12 +2693,6 @@ body.no-scroll {
     color: #f1f5f9;
 }
 
-[data-theme="dark"] .section-kicker {
-    border-color: rgba(129, 140, 248, 0.35);
-    color: #c7d2fe;
-    background: rgba(79, 70, 229, 0.16);
-}
-
 [data-theme="dark"] .guide-column,
 [data-theme="dark"] .guide-carte,
 [data-theme="dark"] .valeur-item,
@@ -3002,7 +2821,7 @@ body.no-scroll {
 
 /* ===== Ajustements épurés : cartes compactes et alignements ===== */
 .hero {
-    border: none !important;
+    border: none;
     border-radius: 26px;
 }
 
@@ -3018,7 +2837,7 @@ body.no-scroll {
 .valeurs-header h2,
 .temoignages h2,
 .featured-formations .valeurs-header h2 {
-    text-align: left !important;
+    text-align: left;
 }
 
 .guide-column,
@@ -3109,17 +2928,17 @@ body.no-scroll {
 /* Hero pleine largeur, sans espace blanc autour de l'image. */
 #contenu {
     width: 100%;
-    padding: 0 !important;
+    padding: 0;
     margin: 0;
     background: transparent;
 }
 
 #contenu .hero {
-    width: 100% !important;
+    width: 100%;
     max-width: none;
     min-height: calc(100vh - 66px);
     margin: 0;
-    border: 0 !important;
+    border: 0;
     border-radius: 0;
     background-position: center;
     background-size: cover;
@@ -3127,7 +2946,7 @@ body.no-scroll {
 
 @media (max-width: 820px) {
     #contenu {
-        padding: 0 !important;
+        padding: 0;
     }
 
     #contenu .hero {
@@ -3213,7 +3032,7 @@ body.no-scroll {
 
 .featured-rating .svg-inline--fa,
 .featured-meta .svg-inline--fa {
-    display: inline-block !important;
+    display: inline-block;
 }
 
 .featured-card h3 {
@@ -3397,7 +3216,7 @@ body.no-scroll {
 .accueil-page {
     background: var(--background);
     color: var(--text-main);
-    font-family: "Inter", "Montserrat", "Segoe UI", Arial, sans-serif;
+    font-family: var(--font-main);
 }
 
 .hero-titre,
@@ -3469,8 +3288,7 @@ body.no-scroll {
 }
 
 .hero-boutons,
-.hero-preuves,
-.hero-badge-row {
+.hero-preuves {
     justify-content: center;
 }
 

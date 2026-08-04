@@ -19,7 +19,11 @@ function Sidebar() {
   const location = useLocation();
   const utilisateur = recupererUtilisateur();
   const [repliee, setRepliee] = useState(false);
-  const routeTableauDeBord = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
+  const routeTableauDeBord = utilisateur?.role === "administrateur" || utilisateur?.role === "admin"
+    ? "/admin/utilisateurs"
+    : utilisateur?.role === "apprenant"
+      ? "/dashboard/apprenant"
+      : "/dashboard/formateur";
 
   const gererDeconnexion = async () => {
     try {

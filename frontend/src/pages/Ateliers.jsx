@@ -5,7 +5,6 @@ import AtelierCard from "../components/AtelierCard";
 import { listerFormationsApprenant, listerMesFormations } from "../services/formationsApi";
 import { recupererUtilisateur } from "../services/auth";
 import "../styles/layout.css";
-import "../styles/atelierCard.css";
 
 const IMAGES_FORMATIONS = [
   "/assets/images/learning/learning-hero.jpg",

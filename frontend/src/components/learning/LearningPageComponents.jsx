@@ -34,7 +34,6 @@ export function CourseHeader({ formation, completedCount, totalLessons, progress
         <FontAwesomeIcon icon={faBars} /> Programme
       </button>
       <div>
-        <span className="learn-kicker">Apprendre la formation</span>
         <h1>{formation.titre}</h1>
         <p>{completedCount} leçon{completedCount > 1 ? "s" : ""} terminée{completedCount > 1 ? "s" : ""} sur {totalLessons} — {progression}%</p>
       </div>
@@ -170,7 +169,7 @@ TextLesson.propTypes = {
   lesson: PropTypes.object.isRequired,
 };
 
-export function VideoLesson({ lesson, videoProgress, onVideoProgress }) {
+export function VideoLesson({ lesson }) {
   return (
     <div className="learn-video">
       <div className="learn-video-player">
@@ -180,22 +179,17 @@ export function VideoLesson({ lesson, videoProgress, onVideoProgress }) {
           <div><FontAwesomeIcon icon={faPlay} /><span>Vidéo de la leçon</span></div>
         )}
       </div>
-      <label>
-        Progression de lecture : {videoProgress}%
-        <input type="range" min="0" max="100" value={videoProgress} onChange={(event) => onVideoProgress(Number(event.target.value))} />
-      </label>
+      <p>{lesson.description || "Regardez la vidéo puis marquez la leçon comme terminée."}</p>
     </div>
   );
 }
 
 VideoLesson.propTypes = {
   lesson: PropTypes.object.isRequired,
-  videoProgress: PropTypes.number.isRequired,
-  onVideoProgress: PropTypes.func.isRequired,
 };
 
 export function DocumentLesson({ lesson }) {
-  const url = lesson.url || lesson.videoUrl || "#";
+  const url = lesson.pdfUrl || lesson.url || lesson.videoUrl || "#";
 
   return (
     <div className="learn-document">
@@ -258,7 +252,7 @@ export function QuizLesson({ quiz, onSuccess }) {
     return (
       <div className="learn-quiz-intro">
         <h3>{quiz.titre || "Quiz"}</h3>
-        <p>{quiz.instructions || "Répondez aux questions pour valider la leçon."}</p>
+        <p>{quiz.description || quiz.instructions || "Répondez aux questions pour valider ce quiz final."}</p>
         <div className="learn-quiz-meta">
           <span>{questions.length} question{questions.length > 1 ? "s" : ""}</span>
           <span>Score minimum {quiz.scoreMinimum || 70}%</span>
@@ -320,7 +314,54 @@ QuizLesson.propTypes = {
   onSuccess: PropTypes.func.isRequired,
 };
 
-export function LessonContent({ formation, module, lesson, progression, completedCount, totalLessons, videoProgress, onVideoProgress, onComplete }) {
+export function FinalQuizzesSection({ quizzes, completed, onQuizSuccess }) {
+  const premierNonTermine = quizzes.findIndex((_, index) => !completed[index]);
+
+  if (!quizzes.length) {
+    return (
+      <article className="learn-content-card learn-final-quizzes">
+        <h2>Quiz de fin de formation</h2>
+        <p>Aucun quiz final n’est configuré pour cette formation.</p>
+      </article>
+    );
+  }
+
+  return (
+    <section className="learn-content-card learn-final-quizzes" aria-labelledby="final-quizzes-title">
+      <h2 id="final-quizzes-title">Quiz de fin de formation</h2>
+      <p>Les quiz se passent dans l’ordre après toutes les leçons.</p>
+      {quizzes.map((quiz, index) => {
+        const verrouille = index > 0 && !completed[index - 1];
+        const termine = Boolean(completed[index]);
+        const actif = index === premierNonTermine && !verrouille;
+
+        return (
+          <article className={`learn-final-quiz ${termine ? "is-done" : ""}`} key={`${quiz.titre}-${index}`}>
+            <div className="learn-final-quiz-head">
+              <span>{termine ? <FontAwesomeIcon icon={faCheck} /> : verrouille ? <FontAwesomeIcon icon={faLock} /> : index + 1}</span>
+              <div>
+                <h3>{quiz.titre || `Quiz final ${index + 1}`}</h3>
+                <p>{quiz.description || "Validez ce quiz pour continuer."}</p>
+                <small>{quiz.questions?.length || 0} question(s) · Score minimum {quiz.scoreMinimum || 70}% · {quiz.tentatives || 1} tentative(s)</small>
+              </div>
+            </div>
+            {actif && <QuizLesson quiz={quiz} onSuccess={() => onQuizSuccess(index)} />}
+            {termine && <strong className="learn-quiz-done">Quiz réussi</strong>}
+            {verrouille && <p className="learn-quiz-locked">Terminez le quiz précédent pour débloquer celui-ci.</p>}
+          </article>
+        );
+      })}
+    </section>
+  );
+}
+
+FinalQuizzesSection.propTypes = {
+  quizzes: PropTypes.array.isRequired,
+  completed: PropTypes.object.isRequired,
+  onQuizSuccess: PropTypes.func.isRequired,
+};
+
+export function LessonContent({ module, lesson, progression, completedCount, totalLessons, onComplete }) {
   const quiz = useMemo(() => {
     if (String(lesson.type).toLowerCase().includes("quiz")) return lesson.quiz || module.quizzes?.[0];
     return null;
@@ -332,7 +373,6 @@ export function LessonContent({ formation, module, lesson, progression, complete
     <article className="learn-content-card">
       <div className="learn-content-top">
         <div>
-          <span className="learn-kicker">{formation.titre}</span>
           <h2>{lesson.titre}</h2>
           <p>{module.titre} · {lesson.type} · {lesson.duration || 5} min</p>
         </div>
@@ -343,7 +383,7 @@ export function LessonContent({ formation, module, lesson, progression, complete
       </div>
       <ProgressBar value={progression} />
 
-      {type.includes("vid") && <VideoLesson lesson={lesson} videoProgress={videoProgress} onVideoProgress={onVideoProgress} />}
+      {type.includes("vid") && <VideoLesson lesson={lesson} />}
       {(type.includes("texte") || type.includes("exercice") || type.includes("projet")) && <TextLesson lesson={lesson} />}
       {(type.includes("document") || type.includes("pdf")) && <DocumentLesson lesson={lesson} />}
       {type.includes("quiz") && <QuizLesson quiz={quiz} onSuccess={onComplete} />}
@@ -358,14 +398,11 @@ export function LessonContent({ formation, module, lesson, progression, complete
 }
 
 LessonContent.propTypes = {
-  formation: PropTypes.object.isRequired,
   module: PropTypes.object.isRequired,
   lesson: PropTypes.object.isRequired,
   progression: PropTypes.number.isRequired,
   completedCount: PropTypes.number.isRequired,
   totalLessons: PropTypes.number.isRequired,
-  videoProgress: PropTypes.number.isRequired,
-  onVideoProgress: PropTypes.func.isRequired,
   onComplete: PropTypes.func.isRequired,
 };
 

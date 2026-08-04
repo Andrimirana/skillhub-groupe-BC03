@@ -10,11 +10,12 @@ import Ateliers from "./pages/Ateliers";
 import Accueil from "./pages/Accueil";
 import Formations from "./pages/Formations";
 import Profil from "./pages/Profil";
+import AdminUsersPage from "./pages/AdminUsersPage";
 import NotFound from "./pages/NotFound";
 import RouteProtegee from "./components/RouteProtegee";
 import { verifierSession } from "./services/session";
-import "./styles/premium-refresh.css";
-import "./styles/Bouton.css";
+import "./styles/minimal-refactor.css";
+import "./styles/dashboard-clean.css";
 
 // Hook partagé pour vérifier la session utilisateur
 function useVerifierSession() {
@@ -63,7 +64,12 @@ function RedirectionAccueil() {
     return <Navigate to="/" replace />;
   }
 
-  const routeTableauDeBord = resultatSession.utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
+  const role = resultatSession.utilisateur?.role;
+  const routeTableauDeBord = role === "administrateur" || role === "admin"
+    ? "/admin/utilisateurs"
+    : role === "apprenant"
+      ? "/dashboard/apprenant"
+      : "/dashboard/formateur";
   return <Navigate to={routeTableauDeBord} replace />;
 }
 
@@ -75,8 +81,8 @@ export default function App() {
         <Route path="/formations" element={<Formations />} />
         <Route path="/formation/:id" element={<DetailFormation />} />
 
-        <Route path="/connexion" element={<Navigate to="/" replace />} />
-        <Route path="/inscription" element={<Navigate to="/" replace />} />
+        <Route path="/connexion" element={<Navigate to="/?auth=connexion" replace />} />
+        <Route path="/inscription" element={<Navigate to="/?auth=inscription" replace />} />
 
         <Route element={<RouteProtegee rolesAutorises={["formateur"]} />}>
           <Route path="/dashboard/formateur" element={<Formateur />} />
@@ -89,6 +95,10 @@ export default function App() {
           <Route path="/dashboard/apprenant" element={<Apprenant />} />
           <Route path="/apprendre/:id" element={<SuiviFormation />} />
           <Route path="/apprenant" element={<Navigate to="/dashboard/apprenant" replace />} />
+        </Route>
+
+        <Route element={<RouteProtegee rolesAutorises={["administrateur", "admin"]} />}>
+          <Route path="/admin/utilisateurs" element={<AdminUsersPage />} />
         </Route>
 
         <Route element={<RouteProtegee />}>

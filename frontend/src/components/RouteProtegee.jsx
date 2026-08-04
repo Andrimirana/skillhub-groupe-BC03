@@ -38,13 +38,17 @@ function RouteProtegee({ rolesAutorises = [] }) {
   }
 
   if (!etatSession.estAuthentifie) {
-    return <Navigate to="/connexion" replace />;
+    return <Navigate to="/?auth=connexion" replace />;
   }
 
   const utilisateur = etatSession.utilisateur;
 
   if (rolesAutorises.length > 0 && !rolesAutorises.includes(utilisateur.role)) {
-    const routeDashboard = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
+    const routeDashboard = utilisateur?.role === "administrateur" || utilisateur?.role === "admin"
+      ? "/admin/utilisateurs"
+      : utilisateur?.role === "apprenant"
+        ? "/dashboard/apprenant"
+        : "/dashboard/formateur";
     return <Navigate to={routeDashboard} replace />;
   }
 

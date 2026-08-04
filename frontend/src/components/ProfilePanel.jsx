@@ -136,7 +136,6 @@ function ProfilePanel({ formationsCount, titleId }) {
           </div>
 
           <div className="profile-main-info">
-            <p className="profile-kicker">Profil SkillHub</p>
             <h1 id={titleId}>{utilisateur.nom || "Utilisateur SkillHub"}</h1>
             <div className="profile-inline-meta">
               <span><FontAwesomeIcon icon={faEnvelope} /> {utilisateur.email || "email non renseigné"}</span>

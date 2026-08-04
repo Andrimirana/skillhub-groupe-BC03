@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChalkboard, faBullhorn, faMagnifyingGlass, faGraduationCap, faChevronLeft, faChevronRight, faClock, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 import { recupererUtilisateur } from "../services/auth";
@@ -51,7 +51,11 @@ function libelleHeures(nombreHeures) {
 
 // Page d'accueil principale du site
 function Accueil() {
-  const [authModal, setAuthModal] = useState(null);
+  const [parametresRecherche, setParametresRecherche] = useSearchParams();
+  const [authModal, setAuthModal] = useState(() => {
+    const modeAuth = new URLSearchParams(window.location.search).get("auth");
+    return ["connexion", "inscription"].includes(modeAuth) ? modeAuth : null;
+  });
   const [pointActif, setPointActif] = useState(0);
   const [formationActive, setFormationActive] = useState(0);
   const [directionTemoignages, setDirectionTemoignages] = useState("");
@@ -67,6 +71,15 @@ function Accueil() {
   useEffect(() => {
     document.title = "SkillHub";
   }, []);
+
+  useEffect(() => {
+    const modeAuth = parametresRecherche.get("auth");
+    if (!["connexion", "inscription"].includes(modeAuth)) return;
+
+    const prochainsParametres = new URLSearchParams(parametresRecherche);
+    prochainsParametres.delete("auth");
+    setParametresRecherche(prochainsParametres, { replace: true });
+  }, [parametresRecherche, setParametresRecherche]);
 
   // Charge les formations à mettre en avant
   useEffect(() => {
@@ -194,15 +207,10 @@ function Accueil() {
 
       <section className="guide" id="guide" aria-labelledby="guide-title">
         <div className="guide-header">
-          <span className="section-kicker">Un parcours simple</span>
           <h2 id="guide-title">Comment ça marche ?</h2>
         </div>
         <div className="guide-cartes">
           <div className="guide-column guide-formateurs">
-            <p className="guide-role">
-              <FontAwesomeIcon icon={faChalkboard} aria-hidden="true" style={{ marginRight: "6px" }} />
-              Formateurs
-            </p>
             <article className="guide-carte">
               <span className="guide-step">01</span>
               <div className="carte-header">
@@ -236,10 +244,6 @@ function Accueil() {
             </article>
           </div>
           <div className="guide-column guide-apprenants">
-            <p className="guide-role">
-              <FontAwesomeIcon icon={faGraduationCap} aria-hidden="true" style={{ marginRight: "6px" }} />
-              Apprenants
-            </p>
             <article className="guide-carte">
               <span className="guide-step">01</span>
               <div className="carte-header">
@@ -281,7 +285,6 @@ function Accueil() {
           </div>
           <div className="valeurs-contenu">
             <div className="valeurs-header">
-              <span className="section-kicker">Notre engagement</span>
               <h2 id="valeurs-title">Nos valeurs</h2>
             </div>
             <ul className="valeurs-liste">
@@ -305,7 +308,6 @@ function Accueil() {
       <section className="temoignages" id="temoignages" aria-labelledby="temoignages-title">
         <div className="temoignages-inner">
           <div className="temoignages-gauche">
-            <span className="section-kicker temoignages-kicker">Témoignages</span>
             <h2 id="temoignages-title">Ils nous font<br />confiance</h2>
             <div className="temoignages-nav">
               <button
@@ -344,7 +346,6 @@ function Accueil() {
 
       <section className="valeurs featured-formations" aria-labelledby="formations-mises-en-avant-title">
         <div className="valeurs-header">
-          <span className="section-kicker">À découvrir maintenant</span>
           <h2 id="formations-mises-en-avant-title">Formations populaires</h2>
         </div>
         {!erreurFormations && formationsMisesEnAvant.length > 0 && (

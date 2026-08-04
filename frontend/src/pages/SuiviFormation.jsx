@@ -7,6 +7,7 @@ import {
   CourseCompletedModal,
   CourseHeader,
   CourseSidebar,
+  FinalQuizzesSection,
   LessonContent,
   LessonNavigation,
   ModuleCompletedModal,
@@ -29,8 +30,12 @@ function lireJson(valeur) {
 }
 
 function normaliserFormation(formation) {
+  const finalQuizzes = [];
   const modules = (formation.modules || []).map((module, moduleIndex) => {
     const contenu = lireJson(module.contenu) || {};
+    if (Array.isArray(contenu.finalQuizzes)) {
+      finalQuizzes.push(...contenu.finalQuizzes);
+    }
     const lessonsSource = Array.isArray(contenu.lessons) && contenu.lessons.length > 0
       ? contenu.lessons
       : [{
@@ -45,9 +50,6 @@ function normaliserFormation(formation) {
       id: module.id,
       titre: module.titre || `Module ${moduleIndex + 1}`,
       duration: Number(contenu.duration || 0),
-      progression: contenu.progression || {},
-      debloquerApresPrecedent: contenu.debloquerApresPrecedent ?? moduleIndex > 0,
-      quizzes: contenu.quizzes || [],
       lessons: [],
     };
 
@@ -62,13 +64,14 @@ function normaliserFormation(formation) {
       duration: Number(lesson.duration || 5),
       contenu: lesson.contenu || lesson.description || "",
       description: lesson.description || "",
-      ressources: lesson.ressources || [],
+      videoUrl: lesson.videoUrl || "",
+      pdfUrl: lesson.pdfUrl || lesson.url || "",
     }));
 
     return normalizedModule;
   });
 
-  return { ...formation, modules };
+  return { ...formation, modules, finalQuizzes };
 }
 
 function trouverDerniereLeconNonTerminee(lessons, completed, isLocked) {
@@ -87,7 +90,7 @@ function SuiviFormation() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [moduleDone, setModuleDone] = useState(null);
   const [courseDone, setCourseDone] = useState(false);
-  const [videoProgress, setVideoProgress] = useState({});
+  const [quizDone, setQuizDone] = useState({});
 
   const flatLessons = useMemo(
     () => (formation?.modules || []).flatMap((module) => module.lessons.map((lesson) => ({ ...lesson, module }))),
@@ -96,25 +99,21 @@ function SuiviFormation() {
   const activeLesson = flatLessons.find((lesson) => lesson.key === activeKey) || flatLessons[0] || null;
   const completedCount = flatLessons.filter((lesson) => completed[lesson.key]).length;
   const progression = flatLessons.length ? Math.round((completedCount / flatLessons.length) * 100) : 0;
+  const allLessonsCompleted = flatLessons.length > 0 && completedCount === flatLessons.length;
 
   const isLocked = (lesson) => {
     if (!lesson) return true;
     if (lesson.moduleIndex === 0 && lesson.lessonIndex === 0) return false;
-    const module = formation?.modules?.[lesson.moduleIndex];
-    const sequential = module?.progression?.mode === "séquentielle" || module?.debloquerApresPrecedent;
-    if (!sequential) return false;
     const previous = flatLessons[flatLessons.findIndex((item) => item.key === lesson.key) - 1];
     return previous ? !completed[previous.key] : false;
   };
 
   const persist = async (nextCompleted = completed, nextKey = activeKey) => {
     const nextCompletedKeys = Object.keys(nextCompleted).filter((key) => nextCompleted[key]);
-    const nextProgress = flatLessons.length ? Math.round((nextCompletedKeys.length / flatLessons.length) * 100) : 0;
     setSaving(true);
     try {
       await mettreAJourProgressionFormation(id, {
         completed_modules: nextCompletedKeys,
-        progression: nextProgress,
         last_lesson_key: nextKey,
       });
     } finally {
@@ -142,7 +141,7 @@ function SuiviFormation() {
 
     persist(nextCompleted, nextLesson?.key || activeLesson.key).catch(() => {});
 
-    if (allCompleted) {
+    if (allCompleted && (formation.finalQuizzes || []).length === 0) {
       setCourseDone(true);
     } else if (moduleCompleted) {
       setModuleDone(module);
@@ -162,6 +161,14 @@ function SuiviFormation() {
   const resume = () => {
     const lesson = trouverDerniereLeconNonTerminee(flatLessons, completed, isLocked);
     if (lesson) selectLesson(lesson.key);
+  };
+
+  const terminerQuiz = (quizIndex) => {
+    const prochainsQuiz = { ...quizDone, [quizIndex]: true };
+    setQuizDone(prochainsQuiz);
+    if ((formation.finalQuizzes || []).every((_, index) => prochainsQuiz[index])) {
+      setCourseDone(true);
+    }
   };
 
   useEffect(() => {
@@ -277,14 +284,11 @@ function SuiviFormation() {
           {activeLesson ? (
             <>
               <LessonContent
-                formation={formation}
                 module={activeLesson.module}
                 lesson={activeLesson}
                 progression={progression}
                 completedCount={completedCount}
                 totalLessons={flatLessons.length}
-                videoProgress={videoProgress[activeLesson.key] || 0}
-                onVideoProgress={(value) => setVideoProgress((previous) => ({ ...previous, [activeLesson.key]: value }))}
                 onComplete={completeLesson}
               />
               <LessonNavigation
@@ -295,6 +299,13 @@ function SuiviFormation() {
                 onComplete={completeLesson}
                 isCompleted={Boolean(completed[activeLesson.key])}
               />
+              {allLessonsCompleted && (
+                <FinalQuizzesSection
+                  quizzes={formation.finalQuizzes || []}
+                  completed={quizDone}
+                  onQuizSuccess={terminerQuiz}
+                />
+              )}
             </>
           ) : (
             <article className="learn-content-card">

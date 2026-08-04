@@ -190,7 +190,7 @@
 }
 
 .sidebar-btn {
-  font-family: inherit;
+  font-family: var(--font-main);
 }
 
 .sidebar-logout:hover {
@@ -362,4 +362,26 @@
 [data-theme="dark"] .sidebar-user-card,
 [data-theme="dark"] .menu-bottom {
   border-color: rgba(148, 163, 184, 0.16);
+}
+
+/* Harmonisation sidebar dashboard */
+.dashboard-layout .sidebar {
+  background:
+    linear-gradient(180deg, rgba(79, 70, 229, 0.03), transparent 160px),
+    var(--color-surface);
+}
+
+.dashboard-layout .sidebar-user-card {
+  background: var(--color-surface-soft);
+}
+
+.dashboard-layout .sidebar-item.active {
+  color: var(--color-primary);
+  background: var(--primary-soft);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.dashboard-layout .sidebar-item:hover {
+  color: var(--color-primary);
+  background: var(--primary-soft);
 }

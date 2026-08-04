@@ -33,12 +33,6 @@ const IMAGES_COURS = [
   "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
 ];
 
-function libelleNiveau(level) {
-  if (level === "advanced") return "Niveau avancé";
-  if (level === "intermediaire") return "Niveau intermédiaire";
-  return "Niveau débutant";
-}
-
 function libelleHeures(nombreHeures) {
   const heures = Number(nombreHeures || 0);
   return `${heures || 1} heure${heures > 1 ? "s" : ""}`;
@@ -191,7 +185,6 @@ function DetailFormation() {
 
       <div className="dp-hero">
         <div className="dp-hero-inner">
-          <span className={`dp-level dp-level--${formation.level}`}>{libelleNiveau(formation.level)}</span>
           <h1 className="dp-hero-title">{formation.titre}</h1>
           <p className="dp-hero-desc">
             {formation.description || "Un parcours clair, pratique et progressif pour développer vos compétences."}

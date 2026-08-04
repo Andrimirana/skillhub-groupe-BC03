@@ -1,7 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
-/* Variables CSS globales */
+/* Variables globales */
 :root {
+    --font-main: "Inter", sans-serif;
+    --color-primary: var(--primary);
+    --color-primary-dark: var(--primary-dark);
+    --color-secondary: var(--accent);
+    --color-accent: var(--skill-green, var(--success));
+    --color-background: var(--background);
+    --color-surface: var(--surface);
+    --color-surface-soft: var(--surface-soft);
+    --color-text: var(--text-main);
+    --color-text-muted: var(--text-muted);
+    --color-border: var(--border);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-danger: var(--danger);
+    --panel-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+    --panel-shadow-hover: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --panel-radius: 12px;
+    --container: 1200px;
     --primary: #2563eb;
     --primary-dark: #1d4ed8;
     --primary-light: #eafbff;
@@ -17,7 +35,7 @@
     --text-main: #0f3b5d;
     --text-muted: #5f7c8f;
     --border: #d8eef5;
-    --shadow: 0 18px 45px rgba(37, 99, 235, 0.08);
+    --shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
 }
 
 /* Mode sombre global */
@@ -34,7 +52,7 @@
     --text-main: #eaf8ff;
     --text-muted: #9fc2d2;
     --border: rgba(216, 238, 245, 0.16);
-    --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] body {
@@ -44,8 +62,8 @@
 
 [data-theme="dark"] .hero {
     background:
-        linear-gradient(120deg, rgba(5, 10, 30, 0.80), rgba(20, 30, 80, 0.60)),
-        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat !important;
+        linear-gradient(120deg, rgba(5, 10, 30, 0.8), rgba(20, 30, 80, 0.6)),
+        url("/assets/images/learning/learning-hero.jpg") center/cover no-repeat;
 }
 
 [data-theme="dark"] .hero-titre,
@@ -106,6 +124,29 @@ html {
     box-sizing: inherit;
 }
 
+body,
+button,
+input,
+select,
+textarea,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span,
+label,
+small,
+strong,
+li,
+td,
+th {
+    font-family: var(--font-main);
+}
+
 /* Interface volontairement sans pictogrammes décoratifs. */
 a {
     color: var(--primary);
@@ -123,7 +164,7 @@ button,
 input,
 select,
 textarea {
-    font-family: inherit;
+    font-family: var(--font-main);
     font-size: inherit;
     border-radius: 8px;
     border: 1px solid var(--border);

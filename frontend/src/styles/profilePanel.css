@@ -65,15 +65,6 @@
   padding-top: 22px;
 }
 
-.profile-kicker {
-  margin: 0 0 5px;
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .profile-main-info h1 {
   margin: 0;
   color: var(--text-main);
@@ -250,7 +241,6 @@
   place-items: center;
   padding: 22px;
   background: rgba(15, 23, 42, 0.62);
-  backdrop-filter: blur(10px);
   animation: profileModalFade 160ms ease-out;
 }
 
@@ -751,19 +741,19 @@
 .profile-modal--simple .profile-simple-form input,
 .profile-modal--simple .profile-simple-actions,
 .profile-modal--simple .profile-cancel-btn {
-  background: #ffffff !important;
+  background: #ffffff;
 }
 
 .profile-modal.profile-modal--simple {
-  background-image: none !important;
+  background-image: none;
 }
 
 .profile-modal--simple .profile-modal-close {
-  background: transparent !important;
+  background: transparent;
 }
 
 .profile-modal--simple .profile-modal-close:hover {
-  background: transparent !important;
+  background: transparent;
 }
 
 [data-theme="dark"] .profile-modal.profile-modal--simple,
@@ -772,26 +762,26 @@
 [data-theme="dark"] .profile-modal--simple .profile-simple-form input,
 [data-theme="dark"] .profile-modal--simple .profile-simple-actions,
 [data-theme="dark"] .profile-modal--simple .profile-cancel-btn {
-  background: #1f2538 !important;
+  background: #1f2538;
 }
 
 /* Modale profil façon formulaire simple */
 .profile-modal.profile-modal--simple {
   position: relative;
-  width: min(570px, calc(100vw - 32px)) !important;
-  padding: 30px 30px 28px !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-  border-radius: 18px !important;
+  width: min(570px, calc(100vw - 32px));
+  padding: 30px 30px 28px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
   color: #111827;
-  background: #ffffff !important;
-  background-image: none !important;
-  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.18) !important;
+  background: #ffffff;
+  background-image: none;
+  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.18);
 }
 
 .profile-modal--simple .profile-simple-title {
   margin: 0 0 26px;
   color: #111827;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-main);
   font-size: clamp(2rem, 4vw, 2.35rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -799,14 +789,14 @@
 }
 
 .profile-modal--simple .profile-modal-close {
-  position: absolute !important;
+  position: absolute;
   top: 28px;
   right: 28px;
   width: 32px;
   height: 32px;
   border: 0;
   color: #3f3f46;
-  background: transparent !important;
+  background: transparent;
   box-shadow: none;
   font-size: 2rem;
   font-weight: 300;
@@ -815,15 +805,15 @@
 
 .profile-modal--simple .profile-modal-close:hover {
   color: #111827;
-  background: transparent !important;
+  background: transparent;
 }
 
 .profile-modal--simple .profile-simple-form--split {
-  display: grid !important;
+  display: grid;
   grid-template-columns: 120px minmax(0, 1fr);
   gap: 28px;
-  padding: 0 !important;
-  background: #ffffff !important;
+  padding: 0;
+  background: #ffffff;
 }
 
 .profile-simple-avatar-panel {
@@ -893,7 +883,7 @@
   border-radius: 8px;
   padding: 0 15px;
   color: #111827;
-  background: #ffffff !important;
+  background: #ffffff;
   font-size: 0.95rem;
   font-weight: 500;
   outline: none;
@@ -915,7 +905,7 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 12px;
-  background: #ffffff !important;
+  background: #ffffff;
 }
 
 .profile-modal--simple .profile-simple-actions .profile-cancel-btn,
@@ -931,12 +921,12 @@
 
 .profile-modal--simple .profile-simple-actions .profile-cancel-btn {
   color: #475569;
-  background: #ffffff !important;
+  background: #ffffff;
 }
 
 .profile-modal--simple .profile-simple-actions .profile-save-btn {
   color: #ffffff;
-  background: var(--primary) !important;
+  background: var(--primary);
 }
 
 [data-theme="dark"] .profile-modal.profile-modal--simple,
@@ -945,7 +935,7 @@
 [data-theme="dark"] .profile-modal--simple .profile-simple-fields input,
 [data-theme="dark"] .profile-simple-avatar-edit,
 [data-theme="dark"] .profile-modal--simple .profile-simple-actions .profile-cancel-btn {
-  background: #1f2538 !important;
+  background: #1f2538;
 }
 
 [data-theme="dark"] .profile-modal--simple .profile-simple-title,
@@ -956,7 +946,7 @@
 
 @media (max-width: 620px) {
   .profile-modal.profile-modal--simple {
-    padding: 26px 22px 24px !important;
+    padding: 26px 22px 24px;
   }
 
   .profile-modal--simple .profile-simple-form--split {
@@ -980,100 +970,100 @@
 
 /* Modale profil ultra simple */
 .profile-modal.profile-modal--simple {
-  width: min(420px, calc(100vw - 32px)) !important;
-  padding: 24px !important;
-  border: 1px solid #dddddd !important;
-  border-radius: 8px !important;
-  color: #111111 !important;
-  background: #ffffff !important;
-  background-image: none !important;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.14) !important;
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  color: #111111;
+  background: #ffffff;
+  background-image: none;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.14);
 }
 
 .profile-modal--simple .profile-simple-title {
-  margin: 0 0 20px !important;
+  margin: 0 0 20px;
   padding-right: 34px;
-  color: #111111 !important;
-  font-family: inherit !important;
-  font-size: 1.35rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0 !important;
-  line-height: 1.25 !important;
+  color: #111111;
+  font-family: var(--font-main);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.25;
 }
 
 .profile-modal--simple .profile-modal-close {
-  position: absolute !important;
-  top: 16px !important;
-  right: 16px !important;
-  width: 28px !important;
-  height: 28px !important;
-  border: 0 !important;
-  color: #333333 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  font-size: 1.6rem !important;
-  line-height: 1 !important;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  color: #333333;
+  background: transparent;
+  box-shadow: none;
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
 .profile-modal--simple .profile-simple-form {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 14px !important;
-  padding: 0 !important;
-  background: #ffffff !important;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0;
+  background: #ffffff;
 }
 
 .profile-modal--simple .profile-simple-form label {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 6px !important;
-  color: #111111 !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #111111;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .profile-modal--simple .profile-simple-form input {
-  width: 100% !important;
-  height: 42px !important;
-  border: 1px solid #cccccc !important;
-  border-radius: 4px !important;
-  padding: 0 10px !important;
-  color: #111111 !important;
-  background: #ffffff !important;
-  box-shadow: none !important;
-  font: inherit !important;
+  width: 100%;
+  height: 42px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 0 10px;
+  color: #111111;
+  background: #ffffff;
+  box-shadow: none;
+  font: inherit;
 }
 
 .profile-modal--simple .profile-simple-form input:focus {
-  border-color: #111111 !important;
-  outline: 1px solid #111111 !important;
-  box-shadow: none !important;
+  border-color: #111111;
+  outline: 1px solid #111111;
+  box-shadow: none;
 }
 
 .profile-modal--simple .profile-simple-actions {
-  display: flex !important;
-  justify-content: flex-end !important;
-  gap: 8px !important;
-  margin-top: 8px !important;
-  background: #ffffff !important;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  background: #ffffff;
 }
 
 .profile-modal--simple .profile-simple-actions .profile-cancel-btn,
 .profile-modal--simple .profile-simple-actions .profile-save-btn {
-  min-width: auto !important;
-  min-height: 36px !important;
-  border: 1px solid #cccccc !important;
-  border-radius: 4px !important;
-  padding: 0 12px !important;
-  color: #111111 !important;
-  background: #ffffff !important;
-  box-shadow: none !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
+  min-width: auto;
+  min-height: 36px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 0 12px;
+  color: #111111;
+  background: #ffffff;
+  box-shadow: none;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .profile-modal--simple .profile-simple-actions .profile-save-btn {
-  border-color: #111111 !important;
+  border-color: #111111;
 }
 
 [data-theme="dark"] .profile-modal.profile-modal--simple,
@@ -1082,14 +1072,14 @@
 [data-theme="dark"] .profile-modal--simple .profile-simple-actions,
 [data-theme="dark"] .profile-modal--simple .profile-simple-actions .profile-cancel-btn,
 [data-theme="dark"] .profile-modal--simple .profile-simple-actions .profile-save-btn {
-  color: #f8fafc !important;
-  background: #111827 !important;
+  color: #f8fafc;
+  background: #111827;
 }
 
 [data-theme="dark"] .profile-modal--simple .profile-simple-title,
 [data-theme="dark"] .profile-modal--simple .profile-simple-form label,
 [data-theme="dark"] .profile-modal--simple .profile-modal-close {
-  color: #f8fafc !important;
+  color: #f8fafc;
 }
 
 /* Profil inspiration job platform */
@@ -1137,7 +1127,7 @@
   width: 34px;
   height: 34px;
   border: 0;
-  border-radius: 50% !important;
+  border-radius: 50%;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
@@ -1206,7 +1196,7 @@
 .profile-job-actions .profile-edit-btn {
   min-height: 38px;
   padding: 9px 17px;
-  border-radius: 999px !important;
+  border-radius: 999px;
   color: #ffffff;
   background: #101827;
   box-shadow: none;
@@ -1218,7 +1208,7 @@
   align-items: center;
   gap: 7px;
   border: 1px solid #101827;
-  border-radius: 999px !important;
+  border-radius: 999px;
   padding: 9px 16px;
   color: #101827;
   background: #ffffff;

@@ -19,7 +19,11 @@ import "../styles/public-navbar.css";
 function PublicNavbar({ menuItems = [] }) {
   const navigate = useNavigate();
   const utilisateur = recupererUtilisateur();
-  const routeDashboard = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
+  const routeDashboard = utilisateur?.role === "administrateur" || utilisateur?.role === "admin"
+    ? "/admin/utilisateurs"
+    : utilisateur?.role === "apprenant"
+      ? "/dashboard/apprenant"
+      : "/dashboard/formateur";
   const [menuOuvert, setMenuOuvert] = useState(false);
   const [menuProfilOuvert, setMenuProfilOuvert] = useState(false);
   const [authModal, setAuthModal] = useState(null);

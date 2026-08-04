@@ -192,3 +192,17 @@
   border-color: rgba(148, 163, 184, 0.2);
   background: var(--surface);
 }
+
+/* Harmonisation états vides */
+.empty-state {
+  min-height: 180px;
+  border-style: dashed;
+  background:
+    radial-gradient(circle at top left, rgba(34, 184, 207, 0.08), transparent 30%),
+    var(--color-surface);
+}
+
+.empty-state-icon {
+  color: var(--color-primary);
+  background: var(--primary-soft);
+}
