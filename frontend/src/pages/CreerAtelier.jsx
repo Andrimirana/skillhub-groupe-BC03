@@ -761,18 +761,18 @@ function CreerAtelier() {
                   <FontAwesomeIcon icon={faXmark} /> Annuler
                 </Link>
                 <button type="button" className="btn-secondary" onClick={() => publier("Brouillon")} disabled={chargement}>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Enregistrer comme brouillon
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Brouillon
                 </button>
                 <button type="button" className="btn-secondary" onClick={() => setEtape((actuel) => Math.max(actuel - 1, 0))} disabled={etape === 0}>
-                  <FontAwesomeIcon icon={faArrowLeft} /> Étape précédente
+                  <FontAwesomeIcon icon={faArrowLeft} /> Précédent
                 </button>
                 {etape < ETAPES.length - 1 ? (
                   <button type="button" className="btn-create" onClick={() => setEtape((actuel) => Math.min(actuel + 1, ETAPES.length - 1))}>
-                    Étape suivante <FontAwesomeIcon icon={faArrowRight} />
+                    Suivant <FontAwesomeIcon icon={faArrowRight} />
                   </button>
                 ) : (
                   <button type="button" className="btn-create" onClick={() => publier("Publié")} disabled={chargement}>
-                    <FontAwesomeIcon icon={faRocket} /> {chargement ? "Publication..." : "Publier la formation"}
+                    <FontAwesomeIcon icon={faRocket} /> {chargement ? "Publication..." : "Publier"}
                   </button>
                 )}
               </div>

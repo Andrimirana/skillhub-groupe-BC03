@@ -1105,18 +1105,8 @@ small.error {
 }
 
 button {
-    display: block;
-    margin: 20px auto 0;
-    padding: 10px 50px;
-    background: #404594;
-    color: white;
-    border: none;
-    border-radius: 4px;
+    font: inherit;
     cursor: pointer;
-}
-
-button:hover {
-    background: #133066;
 }
 
 #envoiReussi {

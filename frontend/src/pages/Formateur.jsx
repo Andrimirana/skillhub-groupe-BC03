@@ -8,7 +8,6 @@ import {
   faEye,
   faLayerGroup,
   faPenToSquare,
-  faPlus,
   faTriangleExclamation,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
@@ -120,12 +119,6 @@ function Formateur() {
         <DashboardNavbar />
 
         <section className="page-content">
-          <div className="page-head page-head--with-action page-head--compact dashboard-page-head">
-            <Link to="/creer-atelier" className="btn-create btn-icon-only" aria-label="Ajouter une formation" title="Ajouter une formation">
-              <FontAwesomeIcon icon={faPlus} aria-hidden="true" />
-            </Link>
-          </div>
-
           <div className="dashboard-hero dashboard-hero--formateur">
             <div className="dashboard-hero-copy">
               <span className="dashboard-eyebrow">Espace formateur</span>

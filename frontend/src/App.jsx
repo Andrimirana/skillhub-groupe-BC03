@@ -15,6 +15,7 @@ import RouteProtegee from "./components/RouteProtegee";
 import { verifierSession } from "./services/session";
 import "./styles/premium-refresh.css";
 import "./styles/Bouton.css";
+import "./styles/theme-sobre.css";
 
 // Hook partagé pour vérifier la session utilisateur
 function useVerifierSession() {

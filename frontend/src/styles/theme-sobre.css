@@ -1,0 +1,1041 @@
+/*
+ * Theme sobre SkillHub
+ * Chargee en dernier : palette neutre, un seul bleu, pas de degrades,
+ * boutons de meme taille et bien alignes.
+ */
+
+:root {
+  --primary: #2f5bd3;
+  --primary-dark: #2449ad;
+  --primary-light: #eef2fb;
+  --accent: #2f5bd3;
+  --accent-dark: #2449ad;
+  --accent-light: #eef2fb;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #dc2626;
+  --background: #f7f8fa;
+  --surface: #ffffff;
+  --surface-soft: #f3f4f6;
+  --surface-blue: #f3f4f6;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px rgba(17, 24, 39, 0.06);
+  --shadow-strong: 0 4px 12px rgba(17, 24, 39, 0.08);
+  --gradient-primary: #2f5bd3;
+  --gradient-soft: #ffffff;
+  --gradient-hero: #f3f4f6;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --btn-hauteur: 42px;
+}
+
+[data-theme="dark"] {
+  --primary: #7b9cf0;
+  --primary-dark: #6487e8;
+  --primary-light: rgba(123, 156, 240, 0.12);
+  --accent: #7b9cf0;
+  --accent-dark: #6487e8;
+  --accent-light: rgba(123, 156, 240, 0.12);
+  --background: #0f1115;
+  --surface: #171a21;
+  --surface-soft: #1f232c;
+  --surface-blue: #1f232c;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border: #2a2f3a;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --gradient-primary: #7b9cf0;
+  --gradient-soft: #171a21;
+  --gradient-hero: #171a21;
+}
+
+/* ---------- Fond general ---------- */
+
+html,
+body,
+.dashboard-layout,
+.app-container,
+.app-layout,
+.dp-page,
+.learning-page,
+.learn-page {
+  background: var(--background) !important;
+  background-image: none !important;
+}
+
+body {
+  color: var(--text-main);
+}
+
+/* Supprime les formes decoratives des sections */
+.hero::before,
+.hero::after,
+.formations-hero::before,
+.dp-hero::before,
+.progression-hero::before,
+.dashboard-hero::before,
+.dashboard-hero::after,
+.hero-transition::before,
+.f-card-cover::after,
+.dp-reco-cover::after,
+.detail-reco-cover::after,
+.atelier-card-image-wrap::after,
+.page-title::after {
+  display: none !important;
+}
+
+/* ---------- Barre de navigation publique ---------- */
+
+.public-navbar-header {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ---------- Bandeaux (hero) ---------- */
+
+.hero,
+#contenu .hero,
+.formations-hero,
+.dp-hero,
+.progression-hero,
+.profile-cover,
+.builder-hero,
+.suivi-hero {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+.hero .illustration {
+  display: none !important;
+}
+
+.hero .hero-titre,
+.hero-titre,
+#contenu .hero .title h1,
+.title h1,
+.formations-hero h1,
+.dp-hero-title {
+  color: var(--text-main) !important;
+  text-shadow: none !important;
+  letter-spacing: -0.02em !important;
+}
+
+html body .hero .hero-titre .progresse,
+.progresse {
+  background: none !important;
+  color: var(--primary) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.hero-texte,
+.hero p,
+#contenu .hero p,
+#contenu .hero .title p,
+.formations-hero p,
+.dp-hero-desc {
+  color: var(--text-muted) !important;
+  text-shadow: none !important;
+}
+
+.dp-hero-meta span {
+  background: var(--surface-soft) !important;
+  border-color: var(--border) !important;
+  color: var(--text-main) !important;
+  font-weight: 600 !important;
+}
+
+/* Petites etiquettes au-dessus des titres */
+.section-kicker,
+.dashboard-eyebrow {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-soft) !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Tableaux de bord ---------- */
+
+.dashboard-hero,
+.dashboard-hero--formateur {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow) !important;
+  color: var(--text-main) !important;
+}
+
+.dashboard-hero h3,
+.dashboard-hero-card span {
+  color: var(--text-main) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.dashboard-hero p,
+.dashboard-hero-card small,
+.dashboard-hero-card em {
+  color: var(--text-muted) !important;
+}
+
+.dashboard-hero-card {
+  background: var(--surface-soft) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.dashboard-hero + .summary_dash {
+  margin-top: 16px !important;
+}
+
+.summary_card,
+.dashboard-panel,
+.atelier-card,
+.featured-card,
+.f-card,
+.dp-card,
+.dp-reco-card,
+.guide-carte,
+.temoignage-card,
+.learn-content-card,
+.empty-state {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.summary_card:hover,
+.atelier-card:hover,
+.featured-card:hover,
+.f-card:hover,
+.dp-reco-card:hover,
+.guide-carte:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-strong) !important;
+}
+
+/* Icones colorees : une seule teinte discrete */
+.guide-icon-wrapper,
+.guide-icon-wrapper--formateur,
+.guide-icon-wrapper--apprenant,
+.hero-highlight-icon,
+.hero-stat-icon,
+.profile-modal-icon,
+.course-complete-icon,
+.not-found-icon {
+  background: var(--primary-light) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+/* Couvertures et avatars sans degrade */
+.f-card-cover,
+.dp-reco-cover,
+.detail-reco-cover,
+.featured-thumb,
+.f-card-thumb,
+.teacher-course-cover,
+.profile-job-cover,
+.profile-modal-cover,
+.atelier-card-image {
+  background: var(--surface-soft) !important;
+  background-image: none !important;
+}
+
+.public-navbar-profile,
+.public-profile-avatar,
+.sidebar-avatar,
+.profile-simple-avatar,
+.f-card-avatar,
+.featured-avatar {
+  background: var(--primary-light) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+/* Barres de progression */
+.progress-fill,
+.progression-bar-fill,
+.course-player-progress-track > div,
+.profile-progress > div {
+  background: var(--primary) !important;
+  background-image: none !important;
+}
+
+/* Badges "Gratuit" */
+.featured-free,
+.f-card-gratuit,
+.dp-card-free {
+  background: var(--surface-soft) !important;
+  background-image: none !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* ---------- Barre laterale ---------- */
+
+.sidebar-item.active,
+.sidebar-item:hover {
+  background: var(--primary-light) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Accueil ---------- */
+
+.guide,
+.valeurs,
+.guide-formateurs,
+.guide-apprenants,
+.temoignage-container,
+.formations {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.temoignages-gauche {
+  background: var(--surface-soft) !important;
+  background-image: none !important;
+  color: var(--text-main) !important;
+  border-right: 1px solid var(--border);
+}
+
+.temoignages-gauche h2 {
+  color: var(--text-main) !important;
+}
+
+.temoignage-btn,
+.formations-btn {
+  width: 40px !important;
+  height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  background: var(--surface) !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.temoignage-btn--actif,
+.temoignage-btn:hover,
+.formations-btn:hover {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.footer {
+  height: auto !important;
+  background: #111827 !important;
+  background-image: none !important;
+}
+
+.guide-role {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-soft) !important;
+  color: var(--text-muted) !important;
+}
+
+/* ---------- Boutons : meme hauteur, meme forme, bien alignes ---------- */
+
+.btn,
+.btn-create,
+.btn-secondary,
+.btn-primary,
+.btn-formateur,
+.btn-apprenant,
+.btn-discover,
+.btn-edit,
+.btn-delete,
+.f-btn,
+.dp-cta,
+.dp-reco-btn,
+.login-btn,
+.signup-btn,
+.dashboard-btn,
+.logout-btn,
+.profile-save-btn,
+.profile-edit-btn,
+.profile-cancel-btn,
+.profile-light-btn,
+.learn-complete-btn,
+.avis-envoyer {
+  min-height: var(--btn-hauteur) !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 18px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.93rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+  cursor: pointer;
+}
+
+/* Bouton principal */
+.btn-create,
+.btn-primary,
+.btn-formateur,
+.hero-boutons .btn-formateur,
+.f-btn--start,
+.dp-cta--start,
+.dp-reco-btn--start,
+.signup-btn,
+.dashboard-btn,
+.profile-save-btn,
+.learn-complete-btn,
+.avis-envoyer {
+  border: 1px solid var(--primary) !important;
+  background: var(--primary) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+.btn-create:hover,
+.btn-primary:hover,
+.btn-formateur:hover,
+.hero-boutons .btn-formateur:hover,
+.f-btn--start:hover,
+.dp-cta--start:hover,
+.dp-reco-btn--start:hover,
+.signup-btn:hover,
+.dashboard-btn:hover,
+.profile-save-btn:hover,
+.learn-complete-btn:hover,
+.avis-envoyer:hover {
+  border-color: var(--primary-dark) !important;
+  background: var(--primary-dark) !important;
+  color: #ffffff !important;
+}
+
+/* Bouton secondaire */
+.btn-secondary,
+.btn-apprenant,
+.hero-boutons .btn-apprenant,
+.featured-formations > div:last-child .btn-apprenant,
+.btn-discover,
+.btn-edit,
+.f-btn--info,
+.dp-cta--back,
+.dp-reco-btn--info,
+.login-btn,
+.logout-btn,
+.profile-edit-btn,
+.profile-cancel-btn,
+.profile-light-btn {
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  color: var(--text-main) !important;
+  backdrop-filter: none !important;
+}
+
+.btn-secondary:hover,
+.btn-apprenant:hover,
+.hero-boutons .btn-apprenant:hover,
+.featured-formations > div:last-child .btn-apprenant:hover,
+.btn-discover:hover,
+.btn-edit:hover,
+.f-btn--info:hover,
+.dp-cta--back:hover,
+.dp-reco-btn--info:hover,
+.login-btn:hover,
+.logout-btn:hover,
+.profile-edit-btn:hover,
+.profile-cancel-btn:hover,
+.profile-light-btn:hover {
+  border-color: #c4c9d2 !important;
+  background: var(--surface-soft) !important;
+  color: var(--text-main) !important;
+}
+
+/* Bouton de suppression */
+.btn-delete {
+  border: 1px solid #f3c4c4 !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  color: var(--danger) !important;
+}
+
+.btn-delete:hover {
+  background: #fdf2f2 !important;
+}
+
+.btn-compact {
+  min-height: 34px !important;
+  padding: 0 12px !important;
+  font-size: 0.85rem !important;
+}
+
+.btn-icon-only {
+  width: var(--btn-hauteur) !important;
+  padding: 0 !important;
+}
+
+/* Bouton theme clair / sombre */
+.theme-btn {
+  width: 38px !important;
+  height: 38px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  background: var(--surface) !important;
+  background-image: none !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+/* Groupes de boutons : alignes et espaces de facon reguliere */
+.hero-boutons,
+.dashboard-hero-actions,
+.f-card-footer,
+.dp-reco-footer,
+.toolbar,
+.builder-actions-bar,
+.public-navbar-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.hero-boutons {
+  justify-content: center !important;
+}
+
+.f-card-footer > *,
+.dp-reco-footer > * {
+  flex: 1 1 0 !important;
+}
+
+.dp-card .dp-cta {
+  width: 100% !important;
+  margin-top: 10px !important;
+}
+
+/* ---------- Mode sombre : surfaces neutres ---------- */
+
+[data-theme="dark"] .footer {
+  background: #0b0d11 !important;
+}
+
+[data-theme="dark"] .btn-delete {
+  border-color: rgba(220, 38, 38, 0.45) !important;
+}
+
+[data-theme="dark"] .btn-delete:hover {
+  background: rgba(220, 38, 38, 0.12) !important;
+}
+
+/* ---------- Catalogue ---------- */
+
+#contenu .hero {
+  min-height: 0 !important;
+  padding-top: 110px !important;
+  padding-bottom: 40px !important;
+}
+
+#search-bar,
+.search-bar input,
+.filtre select,
+.filtre input {
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.filtre {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* ---------- Page detail d'une formation ---------- */
+
+.dp-level,
+.dp-level--beginner,
+.dp-level--intermediaire,
+.dp-level--advanced {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-soft) !important;
+  color: var(--text-main) !important;
+}
+
+.dp-icon,
+.dp-icon--green,
+.dp-module-chevron {
+  color: var(--text-muted) !important;
+}
+
+.dp-tab {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border-bottom: 2px solid transparent !important;
+  box-shadow: none !important;
+}
+
+.dp-tab.active {
+  background: transparent !important;
+  color: var(--text-main) !important;
+  border-bottom-color: var(--primary) !important;
+}
+
+.dp-module-num {
+  background: var(--surface-soft) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.dp-module,
+.dp-tabs {
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Cartes de resume et panneaux ---------- */
+
+.summary_card::after,
+.summary_card::before,
+.dashboard-panel::after,
+.dashboard-panel::before {
+  display: none !important;
+}
+
+.summary_icon,
+.summary_card--blue .summary_icon,
+.summary_card--cyan .summary_icon,
+.summary_card--turquoise .summary_icon,
+.summary_card--green .summary_icon {
+  background: var(--surface-soft) !important;
+  background-image: none !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.summary_card strong,
+.summary_card .summary_value {
+  color: var(--text-main) !important;
+}
+
+.sidebar-avatar {
+  border: 1px solid var(--border) !important;
+  outline: none !important;
+}
+
+.sidebar-logout,
+.sidebar-logout:hover {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+}
+
+.sidebar-logout:hover {
+  background: var(--surface-soft) !important;
+  color: var(--danger) !important;
+}
+
+.dashboard-badge {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-soft) !important;
+  color: var(--text-main) !important;
+}
+
+.summary_card p {
+  color: var(--text-main) !important;
+  -webkit-text-fill-color: currentColor !important;
+  background: none !important;
+}
+
+.summary_card h3 {
+  color: var(--text-main) !important;
+}
+
+.summary_card small {
+  color: var(--text-muted) !important;
+}
+
+/* Barre de recherche des tableaux de bord : champ et bouton sur la meme ligne */
+.toolbar {
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+}
+
+.search-container {
+  flex: 1 1 260px;
+  display: grid !important;
+  gap: 6px !important;
+}
+
+.search-container label {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
+.search-field input,
+#search-input {
+  width: 100% !important;
+  height: var(--btn-hauteur) !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  background: var(--surface) !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.search-field input:focus,
+#search-input:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+}
+
+/* Carte "Continuer l'apprentissage" : image + texte, bouton en dessous */
+.continue-card {
+  grid-template-columns: 140px minmax(0, 1fr) !important;
+  align-items: start !important;
+}
+
+.continue-card img {
+  height: 100px !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.continue-card .btn-create {
+  grid-column: 1 / -1 !important;
+  justify-self: start !important;
+  margin: 0 !important;
+}
+
+.continue-card .dashboard-badge {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dashboard-progress-track {
+  background: var(--surface-soft) !important;
+}
+
+.continue-card .dashboard-progress-track > div,
+.dashboard-progress-overview .dashboard-progress-track > div,
+.dashboard-progress-track > div {
+  background: var(--primary) !important;
+}
+
+.progress-ring {
+  background:
+    radial-gradient(circle at center, var(--surface) 58%, transparent 59%),
+    conic-gradient(var(--primary) var(--progress, 0deg), var(--border) 0) !important;
+}
+
+/* ---------- Creation / modification de formation ---------- */
+
+.builder-hero,
+.builder-hero * {
+  text-shadow: none !important;
+}
+
+.builder-hero h2,
+.builder-hero strong {
+  color: var(--text-main) !important;
+}
+
+.builder-hero p,
+.builder-hero span:not(.dashboard-eyebrow),
+.builder-hero small {
+  color: var(--text-muted) !important;
+}
+
+.builder-hero > div:last-child,
+.builder-progress-card,
+.builder-hero-card {
+  background: var(--surface-soft) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.builder-module-card .module-editor-head {
+  background: var(--surface-soft) !important;
+  background-image: none !important;
+  color: var(--text-main) !important;
+}
+
+.builder-progress-line {
+  background: var(--border) !important;
+}
+
+.builder-progress-line i {
+  background: var(--primary) !important;
+  background-image: none !important;
+}
+
+/* Titres plus sobres */
+.dashboard-hero h3,
+.builder-hero h2 {
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.hero .hero-titre,
+.hero-titre {
+  font-weight: 700 !important;
+}
+
+.builder-step.is-active .builder-step-num,
+.builder-step.is-active > span:first-child {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.builder-step.is-done > span:first-child {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea,
+.form-create input,
+.form-create select,
+.form-create textarea {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  background: var(--surface) !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.form-section input:focus,
+.form-section select:focus,
+.form-section textarea:focus,
+.form-create input:focus,
+.form-create select:focus,
+.form-create textarea:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+}
+
+/* Barre d'actions de la creation : Annuler a gauche, le reste a droite */
+.builder-actions-bar {
+  justify-content: flex-end !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-strong) !important;
+  backdrop-filter: none !important;
+}
+
+.builder-actions-bar > :first-child {
+  margin-right: auto !important;
+}
+
+.builder-upload-zone,
+.builder-image-preview {
+  border: 1px dashed var(--border) !important;
+  background: var(--surface-soft) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.builder-upload-zone > .svg-inline--fa {
+  color: var(--text-muted) !important;
+}
+
+.section-kicker,
+.dashboard-eyebrow {
+  width: fit-content !important;
+  max-width: 100%;
+}
+
+.search-field {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* ---------- Profil ---------- */
+
+.profile-cover {
+  min-height: 90px !important;
+  height: 90px !important;
+  background: var(--surface-soft) !important;
+}
+
+.profile-avatar {
+  background: var(--primary-light) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+  border: 4px solid var(--surface) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.profile-hero-card,
+.profile-info-card,
+.profile-completion {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.profile-completion {
+  background: var(--surface-soft) !important;
+}
+
+.profile-kicker,
+.profile-skill-tags span {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-soft) !important;
+  color: var(--text-muted) !important;
+}
+
+.profile-modal {
+  background: var(--surface) !important;
+  background-image: none !important;
+}
+
+.profile-kicker {
+  width: fit-content !important;
+}
+
+/* ---------- Suivi de cours ---------- */
+
+.learn-kicker {
+  color: var(--text-muted) !important;
+}
+
+.learn-header-card,
+.learn-module,
+.learn-sidebar,
+.learn-quiz {
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  background-image: none !important;
+}
+
+.learn-navigation button,
+.learn-actions button,
+.learn-modal-actions button,
+.learn-collapse-btn,
+.learn-sidebar-toggle {
+  min-height: var(--btn-hauteur);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-main);
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.learn-navigation button.is-primary,
+.learn-actions button.is-primary,
+.learn-modal-actions button.is-primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.learn-navigation button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.learn-navigation {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.learn-navigation .is-primary:hover,
+.learn-quiz button:hover,
+.learn-quiz-intro button:hover,
+.learn-modal button:hover,
+.learn-modal a:hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  color: #ffffff !important;
+}
+
+.learn-navigation button:not(.is-primary):hover {
+  background: var(--surface-soft) !important;
+  color: var(--text-main) !important;
+}
+
+.avis-form {
+  width: 100%;
+  max-width: none !important;
+  justify-self: stretch !important;
+  box-sizing: border-box;
+}
+
+/* ---------- Mode sombre : barre laterale et navigation ---------- */
+
+.sidebar,
+.profile-sidebar,
+.dashboard-navbar,
+.dashboard-topbar,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .profile-sidebar,
+[data-theme="dark"] .dashboard-navbar {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: none !important;
+}
+
+[data-theme="dark"] .sidebar-item.active,
+[data-theme="dark"] .sidebar-item:hover {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+[data-theme="dark"] .sidebar-item,
+[data-theme="dark"] .sidebar-title,
+[data-theme="dark"] .sidebar-user-card {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .public-navbar-header,
+[data-theme="dark"] .theme-btn {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text-main) !important;
+}
