@@ -1,0 +1,647 @@
+/*
+ * Identite, typographie et interactions SkillHub
+ * Chargee apres theme-sobre.css : focus clavier, survols, retours au clic,
+ * etats vides et de chargement, adaptation mobile et reduction des animations.
+ */
+
+body {
+  font-family: var(--police-texte) !important;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+.hero-titre,
+.dp-hero-title,
+.page-title {
+  font-family: var(--police-titre) !important;
+  color: var(--text-main);
+  letter-spacing: -0.015em;
+}
+
+h2 {
+  line-height: 1.25;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* Etoiles et encouragements : couleur d'accent chaude */
+.etoile--pleine,
+.avis-etoile--active {
+  color: var(--accent) !important;
+}
+
+/* Lien d'evitement visible au clavier uniquement */
+.lien-evitement {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 4000;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform var(--transition);
+}
+
+.lien-evitement:focus {
+  transform: translateY(0);
+}
+
+/* Focus clavier bien visible sur tous les elements interactifs */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px !important;
+  box-shadow: var(--focus) !important;
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Survol et clic : retours courts et discrets */
+.btn,
+.btn-create,
+.btn-secondary,
+.btn-primary,
+.btn-formateur,
+.btn-apprenant,
+.btn-discover,
+.btn-edit,
+.btn-delete,
+.btn-danger-plein,
+.f-btn,
+.dp-cta,
+.dp-reco-btn,
+.login-btn,
+.signup-btn,
+.dashboard-btn,
+.logout-btn,
+.profile-save-btn,
+.profile-edit-btn,
+.profile-cancel-btn,
+.profile-light-btn,
+.learn-complete-btn,
+.avis-envoyer,
+.learn-navigation button,
+.temoignage-btn,
+.formations-btn,
+.theme-btn {
+  transition: background-color var(--transition), border-color var(--transition),
+    color var(--transition), box-shadow var(--transition), transform 0.08s ease !important;
+}
+
+.btn:active:not(:disabled),
+.btn-create:active:not(:disabled),
+.btn-secondary:active:not(:disabled),
+.btn-primary:active:not(:disabled),
+.btn-formateur:active,
+.btn-apprenant:active,
+.btn-delete:active:not(:disabled),
+.btn-danger-plein:active,
+.f-btn:active:not(:disabled),
+.dp-cta:active:not(:disabled),
+.dp-reco-btn:active,
+.login-btn:active,
+.signup-btn:active,
+.avis-envoyer:active:not(:disabled),
+.learn-navigation button:active:not(:disabled),
+.temoignage-btn:active,
+.formations-btn:active {
+  transform: scale(0.97) !important;
+}
+
+button:disabled,
+.btn-create:disabled,
+.btn-secondary:disabled,
+.f-btn:disabled,
+.dp-cta:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+
+/* Cartes : leger relief au survol */
+.f-card,
+.featured-card,
+.dp-reco-card,
+.atelier-card,
+.guide-carte,
+.summary_card,
+.temoignage-card {
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition) !important;
+}
+
+.f-card:hover,
+.featured-card:hover,
+.dp-reco-card:hover,
+.atelier-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #d9d3c9 !important;
+  box-shadow: var(--shadow-strong) !important;
+}
+
+[data-theme="dark"] .f-card:hover,
+[data-theme="dark"] .featured-card:hover,
+[data-theme="dark"] .dp-reco-card:hover,
+[data-theme="dark"] .atelier-card:hover {
+  border-color: #3a404c !important;
+}
+
+.f-card-cover img,
+.dp-reco-cover img {
+  transition: transform 0.35s ease;
+}
+
+.f-card:hover .f-card-cover img,
+.dp-reco-card:hover .dp-reco-cover img,
+.featured-card:hover .f-card-cover img {
+  transform: scale(1.03);
+}
+
+/* Liens de navigation */
+.public-navbar a,
+.sidebar-item,
+.dashboard-navbar a {
+  transition: color var(--transition), background-color var(--transition) !important;
+}
+
+/* Barres de progression */
+.barre-progression,
+.dashboard-progress-track,
+.learn-progress {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-soft) !important;
+}
+
+.barre-progression > div,
+.dashboard-progress-track > div,
+.learn-progress > div {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary) !important;
+  transition: width 0.5s ease;
+}
+
+/* Listes de statistiques du tableau de bord formateur */
+.stat-liste {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stat-ligne {
+  display: grid;
+  gap: 6px;
+}
+
+.stat-ligne-entete {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stat-ligne-entete strong {
+  font-size: 0.95rem;
+}
+
+.stat-ligne-entete span {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.stat-ligne small,
+.inscription-ligne small {
+  color: var(--text-muted);
+}
+
+.inscription-ligne {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.inscription-ligne div {
+  display: grid;
+  min-width: 0;
+}
+
+.inscription-ligne strong,
+.inscription-ligne small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inscription-avatar {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.inscription-progression {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+/* Fil d'Ariane dans les en-tetes */
+.dp-hero-inner .fil-ariane,
+.learn-header .fil-ariane {
+  margin-bottom: 10px;
+}
+
+.dp-hero-inner .fil-ariane ol {
+  justify-content: center;
+}
+
+/* Etat vide et chargement */
+.empty-state {
+  padding: 32px 24px !important;
+  text-align: center;
+}
+
+.empty-state-icon {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+.empty-state h3 {
+  margin: 12px 0 6px;
+  font-size: 1.05rem;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+}
+
+.skeleton-cover,
+.skeleton-line,
+.skeleton-actions span {
+  background: linear-gradient(90deg, var(--surface-soft) 0%, var(--border) 50%, var(--surface-soft) 100%) !important;
+  background-size: 200% 100% !important;
+  animation: chargementReflet 1.3s ease-in-out infinite !important;
+}
+
+@keyframes chargementReflet {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* Messages de formulaire */
+.error,
+p.error,
+small.error,
+.avis-erreur {
+  color: var(--danger) !important;
+  font-size: 0.88rem;
+}
+
+.status-banner,
+.dp-message {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--text-main);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9a9fa6;
+}
+
+/* ---------- Adaptation tablette et mobile ---------- */
+
+@media (max-width: 900px) {
+  .page-content {
+    padding-inline: 16px !important;
+  }
+
+  .dashboard-hero {
+    grid-template-columns: 1fr !important;
+    padding: 22px !important;
+  }
+
+  .summary_dash {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .summary_dash {
+    gap: 10px !important;
+  }
+
+  .hero-boutons,
+  .dashboard-hero-actions,
+  .confirm-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .hero-boutons > *,
+  .dashboard-hero-actions > *,
+  .confirm-actions > * {
+    width: 100% !important;
+  }
+
+  .builder-actions-bar {
+    position: static !important;
+  }
+
+  .builder-actions-bar > * {
+    flex: 1 1 calc(50% - 10px) !important;
+  }
+
+  .builder-actions-bar > :first-child {
+    margin-right: 0 !important;
+  }
+
+  .toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .hero .hero-titre,
+  .hero-titre {
+    font-size: clamp(2rem, 9vw, 2.6rem) !important;
+  }
+}
+
+/* ---------- Preference de reduction des animations ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Zone d'image de couverture : empilee quand la place manque */
+@media (max-width: 1200px) {
+  .builder-upload-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Liste de verification avant publication : alignee a gauche */
+.builder-checklist button {
+  width: 100%;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-main);
+  text-align: left;
+  font-weight: 600;
+}
+
+.builder-checklist button:hover {
+  background: var(--surface-soft);
+}
+
+.builder-checklist .is-ok .svg-inline--fa {
+  color: var(--success) !important;
+}
+
+.builder-checklist .is-missing .svg-inline--fa {
+  color: var(--accent) !important;
+}
+
+.builder-success-icon {
+  background: var(--success) !important;
+  background-image: none !important;
+}
+
+/* Cartes du catalogue : informations faciles a parcourir */
+.carte-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.carte-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.carte-badge--niveau {
+  background: var(--surface-soft);
+  color: var(--text-muted);
+}
+
+.carte-lien-titre {
+  color: inherit;
+  text-decoration: none;
+}
+
+.carte-lien-titre:hover {
+  color: var(--primary);
+}
+
+.carte-description {
+  display: -webkit-box;
+  margin: 4px 0 6px;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.carte-formateur {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.catalogue-compteur {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Action principale dans l'en-tete de la page formation */
+.dp-hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.dp-hero-actions:empty {
+  display: none;
+}
+
+/* Programme du cours : titres et informations sur des lignes distinctes */
+.learn-module summary > div,
+.learn-lesson > div {
+  display: grid !important;
+  gap: 2px;
+  min-width: 0;
+}
+
+.learn-module summary small,
+.learn-lesson small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.learn-lesson {
+  width: 100%;
+  display: grid !important;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-main);
+  text-align: left;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.learn-lesson:hover:not(:disabled) {
+  background: var(--surface-soft);
+}
+
+.learn-lesson.is-active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.learn-lesson.is-done > span:first-child {
+  color: var(--success);
+}
+
+.learn-lesson strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.88rem;
+}
+
+/* En-tete du cours non collant : il ne recouvre plus la lecon */
+.learn-header {
+  position: static !important;
+}
+
+/* Fenetres de felicitations du cours */
+.learn-modal {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--surface) !important;
+  box-shadow: 0 20px 50px rgba(31, 35, 40, 0.2) !important;
+}
+
+.learn-modal > svg {
+  color: var(--accent) !important;
+}
+
+.learn-modal-close {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text-muted) !important;
+}
+
+.learn-modal-close:hover {
+  background: var(--surface-soft) !important;
+  color: var(--text-main) !important;
+}
+
+.learn-progress > div,
+.learn-module .learn-progress > div {
+  background: var(--success) !important;
+}
+
+/* Tableau de gestion */
+table thead,
+table th {
+  background: var(--surface-soft) !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+}
+
+table td,
+table th {
+  border-color: var(--border) !important;
+}
+
+table tbody tr {
+  transition: background-color var(--transition);
+}
+
+table tbody tr:hover {
+  background: var(--surface-soft);
+}
+
+@media (max-width: 600px) {
+  #contenu .hero {
+    padding-top: 96px !important;
+    padding-bottom: 28px !important;
+  }
+
+  .filtre {
+    padding: 16px !important;
+  }
+}

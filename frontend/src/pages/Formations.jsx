@@ -19,6 +19,12 @@ const IMAGES_FORMATIONS = [
   "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
 ];
 
+const LIBELLES_NIVEAUX = {
+  beginner: "Débutant",
+  intermediaire: "Intermédiaire",
+  advanced: "Avancé",
+};
+
 function libelleHeures(nombreHeures) {
   const heures = Number(nombreHeures || 0);
   return `${heures || 1} heure${heures > 1 ? "s" : ""} de cours`;
@@ -71,7 +77,7 @@ function Formations() {
           id: item.id,
           nom: item.titre || "Formation",
           description: item.description || "",
-          formateur: item.formateur || "N/A",
+          formateur: item.formateur || "Formateur SkillHub",
           duree: Number(item.duration || 0),
           categorie: item.category || "",
           level: item.level || "beginner",
@@ -196,12 +202,18 @@ function Formations() {
             </select>
           </aside>
           <div className="cards-container" id="cardsContainer" aria-live="polite">
+            {!chargement && !erreur && formations.length > 0 && (
+              <p className="catalogue-compteur">
+                {formationsFiltrees.length} formation{formationsFiltrees.length > 1 ? "s" : ""}
+                {formationsFiltrees.length !== formations.length ? ` sur ${formations.length}` : ""}
+              </p>
+            )}
             {chargement && <SkeletonGrid count={6} />}
             {!chargement && erreur && (
               <EmptyState
                 icon={faTriangleExclamation}
                 title="Impossible de charger les formations"
-                description="Vérifiez que le backend est lancé, puis réessayez dans quelques instants."
+                description="Le serveur ne répond pas pour le moment. Réessayez dans quelques instants."
               />
             )}
             {!chargement && !erreur && formationsFiltrees.length === 0 && (
@@ -209,6 +221,15 @@ function Formations() {
                 icon={faBookOpen}
                 title="Aucune formation trouvée"
                 description="Essayez une autre recherche ou retirez un filtre pour voir plus de résultats."
+                action={(
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => { setRecherche(""); setCategorie(""); setNiveau(""); }}
+                  >
+                    Réinitialiser les filtres
+                  </button>
+                )}
               />
             )}
             {!chargement && !erreur && formationsFiltrees.map((formation, index) => (
@@ -222,7 +243,15 @@ function Formations() {
                   />
                 </div>
                 <div className="f-card-body">
-                  <h3 className="f-card-titre">{formation.nom}</h3>
+                  <div className="carte-badges">
+                    {formation.categorie && <span className="carte-badge">{formation.categorie}</span>}
+                    <span className="carte-badge carte-badge--niveau">{LIBELLES_NIVEAUX[formation.level] || "Tous niveaux"}</span>
+                  </div>
+                  <h3 className="f-card-titre">
+                    <Link to={`/formation/${formation.id}`} className="carte-lien-titre">{formation.nom}</Link>
+                  </h3>
+                  {formation.description && <p className="carte-description">{formation.description}</p>}
+                  <p className="carte-formateur">Par {formation.formateur}</p>
                   <div className="f-card-stats">
                     <span><FontAwesomeIcon icon={faClock} className="f-stat-icon" aria-hidden="true" /> {libelleHeures(formation.duree)}</span>
                     <span><FontAwesomeIcon icon={faUserGraduate} className="f-stat-icon" aria-hidden="true" /> {formation.apprenants || 0} apprenants</span>
@@ -231,7 +260,7 @@ function Formations() {
                 </div>
                 <div className="f-card-footer">
                   {estFormateur ? (
-                    <span className="f-btn f-btn--disabled">Réservé aux apprenants</span>
+                    <Link to={`/formation/${formation.id}`} className="f-btn f-btn--info">Voir la formation</Link>
                   ) : (
                     <>
                       <Link to={`/formation/${formation.id}`} className="f-btn f-btn--info">Plus d'infos</Link>

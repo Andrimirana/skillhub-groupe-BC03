@@ -19,6 +19,7 @@ import {
   mettreAJourProgressionFormation,
 } from "../services/formationsApi";
 import "../styles/suiviFormation.css";
+import { notifierErreur, notifierSucces } from "../services/feedback";
 
 function lireJson(valeur) {
   if (!valeur || typeof valeur !== "string") return null;
@@ -142,7 +143,11 @@ function SuiviFormation() {
     const allCompleted = flatLessons.every((lesson) => nextCompleted[lesson.key]);
     const nextLesson = flatLessons[flatLessons.findIndex((lesson) => lesson.key === activeLesson.key) + 1];
 
-    persist(nextCompleted, nextLesson?.key || activeLesson.key).catch(() => {});
+    persist(nextCompleted, nextLesson?.key || activeLesson.key)
+      .then(() => {
+        if (!allCompleted && !moduleCompleted) notifierSucces("Leçon terminée, bravo !");
+      })
+      .catch(() => notifierErreur("Votre progression n'a pas pu être enregistrée. Réessayez."));
 
     if (allCompleted) {
       setCourseDone(true);

@@ -13,12 +13,14 @@ import {
 import { deconnecter } from "../services/authApi";
 import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import "../styles/sidebar.css";
+import { notifierInfo } from "../services/feedback";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const utilisateur = recupererUtilisateur();
-  const [repliee, setRepliee] = useState(false);
+  // Menu replié par défaut sur mobile et tablette pour laisser la place au contenu
+  const [repliee, setRepliee] = useState(() => window.matchMedia?.("(max-width: 900px)").matches ?? false);
   const routeTableauDeBord = utilisateur?.role === "apprenant" ? "/dashboard/apprenant" : "/dashboard/formateur";
 
   const gererDeconnexion = async () => {
@@ -26,6 +28,7 @@ function Sidebar() {
       await deconnecter();
     } catch { /* ignore */ } finally {
       supprimerSession();
+      notifierInfo("Vous êtes déconnecté. À bientôt !");
       navigate("/", { replace: true });
     }
   };
@@ -45,6 +48,9 @@ function Sidebar() {
       <Link
         to={item.to}
         className={`sidebar-item ${location.pathname === item.to ? "active" : ""}`}
+        aria-label={item.label}
+        aria-current={location.pathname === item.to ? "page" : undefined}
+        title={item.label}
       >
         <FontAwesomeIcon icon={item.icon} className="sidebar-icon" />
         <span className="sidebar-title">{item.label}</span>
@@ -86,7 +92,7 @@ function Sidebar() {
 
         <ul className="menu-bottom">
           <li>
-            <button type="button" className="sidebar-item sidebar-btn sidebar-logout" onClick={gererDeconnexion}>
+            <button type="button" className="sidebar-item sidebar-btn sidebar-logout" onClick={gererDeconnexion} aria-label="Déconnexion" title="Déconnexion">
               <FontAwesomeIcon icon={faArrowRightFromBracket} className="sidebar-icon" />
               <span className="sidebar-title">Déconnexion</span>
             </button>

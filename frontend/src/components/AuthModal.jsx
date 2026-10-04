@@ -6,6 +6,7 @@ import { faEnvelope, faEye, faEyeSlash, faKey, faUser } from "@fortawesome/free-
 import { connecter, inscrire } from "../services/authApi";
 import { sauvegarderSession, supprimerSession } from "../services/auth";
 import "../styles/auth-modal.css";
+import { messageErreurApi, notifierSucces } from "../services/feedback";
 
 const EMAIL_VALIDE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
 const MOT_DE_PASSE_VALIDE = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -265,6 +266,10 @@ function AuthModal({ modeInitial, onClose, onSuccess }) {
 
   const terminerAuthentification = (donnees) => {
     sauvegarderSession(donnees.token, donnees.utilisateur);
+    const prenom = (donnees.utilisateur?.nom || "").split(" ")[0];
+    notifierSucces(mode === "connexion"
+      ? `Bon retour${prenom ? `, ${prenom}` : ""} !`
+      : `Bienvenue sur SkillHub${prenom ? `, ${prenom}` : ""} !`);
     onClose();
     if (onSuccess) {
       onSuccess(donnees);
@@ -293,7 +298,9 @@ function AuthModal({ modeInitial, onClose, onSuccess }) {
         : await inscrire(nom.trim(), emailNormalise, motDePasse, role);
       terminerAuthentification(donnees);
     } catch (error) {
-      setErreur(error.response?.data?.message || `${mode === "connexion" ? "Connexion" : "Inscription"} impossible.`);
+      setErreur(messageErreurApi(error, mode === "connexion"
+        ? "Email ou mot de passe incorrect."
+        : "Inscription impossible. Vérifiez les informations saisies."));
     } finally {
       setChargement(false);
     }

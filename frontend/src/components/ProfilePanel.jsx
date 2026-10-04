@@ -14,6 +14,7 @@ import {
 import { recupererJeton, recupererUtilisateur, sauvegarderSession } from "../services/auth";
 import { modifierProfil, profilConnecte } from "../services/authApi";
 import "../styles/profilePanel.css";
+import { messageErreurApi, notifierSucces } from "../services/feedback";
 
 function ProfilePanel({ formationsCount, titleId }) {
   const utilisateurInitial = recupererUtilisateur() || {};
@@ -114,9 +115,10 @@ function ProfilePanel({ formationsCount, titleId }) {
       setUtilisateur(utilisateurMisAJour);
       sauvegarderSession(reponse.token || recupererJeton(), utilisateurMisAJour);
       setEdition(false);
-      setMessage("Profil mis à jour dans la base de données.");
+      setMessage("Profil mis à jour.");
+      notifierSucces("Profil mis à jour.");
     } catch (e) {
-      setErreur(e.response?.data?.message || "Impossible de mettre à jour le profil.");
+      setErreur(messageErreurApi(e, "Impossible de mettre à jour le profil."));
     } finally {
       setSauvegarde(false);
     }

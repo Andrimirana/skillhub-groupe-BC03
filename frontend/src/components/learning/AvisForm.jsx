@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { donnerAvis } from "../../services/formationsApi";
+import { messageErreurApi, notifierSucces } from "../../services/feedback";
 
 // Formulaire permettant à un apprenant inscrit de noter la formation
 function AvisForm({ idFormation, noteInitiale, commentaireInitial }) {
@@ -31,8 +32,9 @@ function AvisForm({ idFormation, noteInitiale, commentaireInitial }) {
       setEnvoiEnCours(true);
       await donnerAvis(idFormation, note, commentaire.trim());
       setMessage("Merci, votre avis a été enregistré.");
+      notifierSucces("Merci pour votre avis !");
     } catch (e) {
-      setErreur(e.response?.data?.message || "Impossible d'enregistrer votre avis.");
+      setErreur(messageErreurApi(e, "Impossible d'enregistrer votre avis."));
     } finally {
       setEnvoiEnCours(false);
     }

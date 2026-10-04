@@ -19,9 +19,10 @@ import Searchbar from "../components/Searchbar";
 import EmptyState from "../components/EmptyState";
 import SkeletonGrid from "../components/SkeletonGrid";
 import AtelierCard from "../components/AtelierCard";
-import { listerMesFormations, supprimerFormation } from "../services/formationsApi";
+import { listerMesFormations, statistiquesFormateur, supprimerFormation } from "../services/formationsApi";
 import { recupererUtilisateur } from "../services/auth";
 import "../styles/layout.css";
+import { confirmer, messageErreurApi, notifierErreur, notifierSucces } from "../services/feedback";
 
 function Formateur() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ function Formateur() {
   const [erreurChargement, setErreurChargement] = useState("");
   const [suppressionEnCours, setSuppressionEnCours] = useState(null);
   const [formations, setFormations] = useState([]);
+  const [statistiques, setStatistiques] = useState({ formations: [], inscriptions_recentes: [] });
 
   useEffect(() => {
     const chargerFormations = async () => {
@@ -38,6 +40,14 @@ function Formateur() {
         setErreurChargement("");
         const donnees = await listerMesFormations();
         setFormations(donnees);
+
+        if (donnees.length > 0) {
+          try {
+            setStatistiques(await statistiquesFormateur(donnees.map((formation) => formation.id)));
+          } catch {
+            setStatistiques({ formations: [], inscriptions_recentes: [] });
+          }
+        }
       } catch {
         setErreurChargement("Impossible de charger les formations depuis le backend.");
       } finally {
@@ -49,13 +59,24 @@ function Formateur() {
   }, []);
 
   const gererSuppression = async (idFormation) => {
+    const formation = formations.find((item) => item.id === idFormation);
+    const accord = await confirmer({
+      titre: "Supprimer cette formation ?",
+      message: `« ${formation?.titre || "Cette formation"} » et ses modules seront supprimés définitivement. Les apprenants n'y auront plus accès.`,
+      libelleConfirmer: "Supprimer",
+      danger: true,
+    });
+
+    if (!accord) return;
+
     setSuppressionEnCours(idFormation);
 
     try {
       await supprimerFormation(idFormation);
-      setFormations((precedentes) => precedentes.filter((formation) => formation.id !== idFormation));
+      setFormations((precedentes) => precedentes.filter((item) => item.id !== idFormation));
+      notifierSucces("Formation supprimée.");
     } catch (e) {
-      setErreurChargement(e.response?.data?.message || "Impossible de supprimer cette formation.");
+      notifierErreur(messageErreurApi(e, "Impossible de supprimer cette formation."));
     } finally {
       setSuppressionEnCours(null);
     }
@@ -67,8 +88,19 @@ function Formateur() {
 
   const prenom = (utilisateur?.nom || utilisateur?.email || "formateur").split(" ")[0];
   const totalApprenants = formations.reduce((total, formation) => total + (formation.apprenants ?? formation.apprenants_count ?? 0), 0);
-  const totalModules = formations.reduce((total, formation) => total + (formation.modules?.length || 0), 0);
+  const totalModules = formations.reduce((total, formation) => total + (formation.modules?.length || formation.modules_count || 0), 0);
   const totalVues = formations.reduce((total, formation) => total + (formation.vues ?? 0), 0);
+  const statsParFormation = useMemo(
+    () => new Map(statistiques.formations.map((stat) => [stat.formation_id, stat])),
+    [statistiques],
+  );
+  const titreFormation = (idFormation) => formations.find((formation) => formation.id === idFormation)?.titre || "Formation";
+  const progressionApprenants = formations
+    .map((formation) => ({ formation, stat: statsParFormation.get(formation.id) }))
+    .filter(({ stat }) => stat && stat.inscrits > 0)
+    .sort((a, b) => b.stat.inscrits - a.stat.inscrits)
+    .slice(0, 5);
+
   const formationLaPlusSuivie = useMemo(
     () => [...formations].sort((a, b) => (b.apprenants ?? 0) - (a.apprenants ?? 0))[0] || null,
     [formations],
@@ -219,12 +251,32 @@ function Formateur() {
                       <h3>Progression des apprenants</h3>
                     </div>
                   </div>
-                  <EmptyState
-                    compact
-                    icon={faChartLine}
-                    title="Aucune donnée de progression disponible."
-                    description="Les progressions détaillées apparaîtront lorsque ces données seront fournies par l’API."
-                  />
+                  {progressionApprenants.length === 0 ? (
+                    <EmptyState
+                      compact
+                      icon={faChartLine}
+                      title="Pas encore d'apprenants"
+                      description="La progression moyenne de chaque formation s'affichera dès les premières inscriptions."
+                    />
+                  ) : (
+                    <ul className="stat-liste">
+                      {progressionApprenants.map(({ formation, stat }) => (
+                        <li key={formation.id} className="stat-ligne">
+                          <div className="stat-ligne-entete">
+                            <strong>{formation.titre}</strong>
+                            <span>{stat.progression_moyenne}%</span>
+                          </div>
+                          <div className="barre-progression" role="progressbar" aria-valuenow={stat.progression_moyenne} aria-valuemin={0} aria-valuemax={100} aria-label={`Progression moyenne de ${formation.titre}`}>
+                            <div style={{ width: `${stat.progression_moyenne}%` }} />
+                          </div>
+                          <small>
+                            {stat.inscrits} inscrit{stat.inscrits > 1 ? "s" : ""} · {stat.termines} terminé{stat.termines > 1 ? "s" : ""}
+                            {stat.note_moyenne ? ` · ${stat.note_moyenne}/5` : ""}
+                          </small>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </section>
 
                 <section className="dashboard-panel">
@@ -234,12 +286,32 @@ function Formateur() {
                       <h3>Inscriptions récentes</h3>
                     </div>
                   </div>
-                  <EmptyState
-                    compact
-                    icon={faUsers}
-                    title="Aucune inscription récente."
-                    description="Le détail des inscriptions apparaîtra ici dès qu’il sera disponible."
-                  />
+                  {statistiques.inscriptions_recentes.length === 0 ? (
+                    <EmptyState
+                      compact
+                      icon={faUsers}
+                      title="Aucune inscription pour le moment"
+                      description="Les nouveaux apprenants de vos formations apparaîtront ici."
+                    />
+                  ) : (
+                    <ul className="stat-liste">
+                      {statistiques.inscriptions_recentes.map((inscription) => (
+                        <li key={`${inscription.nom}-${inscription.formation_id}-${inscription.date_inscription}`} className="inscription-ligne">
+                          <span className="inscription-avatar" aria-hidden="true">
+                            {inscription.nom.split(" ").filter(Boolean).slice(0, 2).map((mot) => mot[0].toUpperCase()).join("")}
+                          </span>
+                          <div>
+                            <strong>{inscription.nom}</strong>
+                            <small>
+                              {titreFormation(inscription.formation_id)}
+                              {inscription.date_inscription ? ` · ${new Date(inscription.date_inscription).toLocaleDateString("fr-FR")}` : ""}
+                            </small>
+                          </div>
+                          <span className="inscription-progression">{inscription.progression}%</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </section>
               </div>
 

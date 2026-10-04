@@ -18,6 +18,8 @@ import {
   faVideo,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import FilAriane from "../ui/FilAriane";
+import { messageProgression } from "../../utils/progression";
 
 export function ProgressBar({ value }) {
   return <div className="learn-progress"><span style={{ width: `${Math.min(100, Math.max(0, value))}%` }} /></div>;
@@ -34,9 +36,15 @@ export function CourseHeader({ formation, completedCount, totalLessons, progress
         <FontAwesomeIcon icon={faBars} /> Programme
       </button>
       <div>
-        <span className="learn-kicker">Apprendre la formation</span>
+        <FilAriane
+          etapes={[
+            { libelle: "Mon espace", lien: "/dashboard/apprenant" },
+            { libelle: "Formation", lien: `/formation/${formation.id}` },
+            { libelle: formation.titre },
+          ]}
+        />
         <h1>{formation.titre}</h1>
-        <p>{completedCount} leçon{completedCount > 1 ? "s" : ""} terminée{completedCount > 1 ? "s" : ""} sur {totalLessons} — {progression}%</p>
+        <p>{completedCount} leçon{completedCount > 1 ? "s" : ""} terminée{completedCount > 1 ? "s" : ""} sur {totalLessons} · {messageProgression(progression)}</p>
       </div>
       <div className="learn-header-card">
         <strong>{progression}%</strong>

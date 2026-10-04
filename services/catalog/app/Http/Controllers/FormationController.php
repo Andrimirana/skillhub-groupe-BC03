@@ -254,6 +254,10 @@ class FormationController extends Controller
             'formateur'   => $formation->formateur_nom,
         ];
 
+        if ($formation->relationLoaded('modules')) {
+            $donnees['modules_count'] = $formation->modules->count();
+        }
+
         if ($inclureUserId) {
             $donnees['user_id'] = $formation->user_id;
         }

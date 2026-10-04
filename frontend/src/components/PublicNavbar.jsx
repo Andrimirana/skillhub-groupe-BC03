@@ -15,6 +15,7 @@ import { recupererUtilisateur, supprimerSession } from "../services/auth";
 import { appliquerTheme, recupererTheme } from "../services/theme";
 import AuthModal from "./AuthModal";
 import "../styles/public-navbar.css";
+import { notifierInfo } from "../services/feedback";
 
 function PublicNavbar({ menuItems = [] }) {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ function PublicNavbar({ menuItems = [] }) {
       await deconnecter();
     } catch { /* ignore */ } finally {
       supprimerSession();
+      notifierInfo("Vous êtes déconnecté. À bientôt !");
       navigate("/", { replace: true });
     }
   };

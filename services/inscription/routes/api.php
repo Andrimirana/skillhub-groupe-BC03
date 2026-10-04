@@ -14,4 +14,5 @@ Route::middleware('auth.service')->group(function (): void {
     Route::put('/formations/{formationId}/progression',     [EnrollmentController::class, 'updateProgress']);
     Route::get('/apprenant/formations',                     [EnrollmentController::class, 'myCourses']);
     Route::put('/formations/{formationId}/avis',            [EnrollmentController::class, 'donnerAvis']);
+    Route::get('/formateur/statistiques',                   [EnrollmentController::class, 'statistiquesFormateur']);
 });

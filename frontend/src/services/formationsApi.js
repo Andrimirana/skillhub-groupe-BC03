@@ -95,6 +95,13 @@ export async function donnerAvis(idFormation, note, commentaire) {
   return reponse.data;
 }
 
+export async function statistiquesFormateur(idsFormations) {
+  const reponse = await inscriptionApi.get("/formateur/statistiques", {
+    params: { ids: idsFormations.join(",") },
+  });
+  return reponse.data;
+}
+
 export async function listerAvisRecents(limite = 8) {
   const reponse = await inscriptionApi.get("/avis", { params: { limit: limite } });
   return reponse.data;

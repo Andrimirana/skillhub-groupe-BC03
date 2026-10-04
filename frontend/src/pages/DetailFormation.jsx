@@ -25,6 +25,8 @@ import AuthModal from "../components/AuthModal";
 import EmptyState from "../components/EmptyState";
 import SkeletonGrid from "../components/SkeletonGrid";
 import "../styles/public.css";
+import { messageErreurApi, notifierErreur, notifierSucces } from "../services/feedback";
+import FilAriane from "../components/ui/FilAriane";
 
 const IMAGES_COURS = [
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
@@ -130,12 +132,14 @@ function DetailFormation() {
     try {
       setInscriptionEnCours(true);
       await inscrireFormation(id);
-      setMessage("Inscription réussie. Redirection vers le suivi...");
+      setMessage("Inscription réussie. Redirection vers le cours...");
+      notifierSucces("Inscription confirmée. Votre première leçon vous attend.");
       setEstInscrit(true);
       setTimeout(() => navigate(`/apprendre/${id}`), 500);
     } catch (e) {
-      const texte = e.response?.data?.message || "Impossible de suivre cette formation.";
+      const texte = messageErreurApi(e, "Impossible de suivre cette formation.");
       setMessage(texte);
+      notifierErreur(texte);
     } finally {
       setInscriptionEnCours(false);
     }
@@ -202,6 +206,13 @@ function DetailFormation() {
 
       <div className="dp-hero">
         <div className="dp-hero-inner">
+          <FilAriane
+            etapes={[
+              { libelle: "Catalogue", lien: "/formations" },
+              ...(formation.category ? [{ libelle: formation.category, lien: `/formations?categorie=${encodeURIComponent(formation.category)}` }] : []),
+              { libelle: formation.titre },
+            ]}
+          />
           <span className={`dp-level dp-level--${formation.level}`}>{libelleNiveau(formation.level)}</span>
           <h1 className="dp-hero-title">{formation.titre}</h1>
           <p className="dp-hero-desc">
@@ -214,6 +225,15 @@ function DetailFormation() {
             {avis.total > 0 && (
               <span><FontAwesomeIcon icon={faStar} className="dp-icon" /> {avis.moyenne}/5 ({avis.total} avis)</span>
             )}
+          </div>
+          <div className="dp-hero-actions">
+            {estInscrit ? (
+              <Link to={`/apprendre/${id}`} className="btn-create">Reprendre la formation</Link>
+            ) : peutSInscrire ? (
+              <button type="button" className="btn-create" onClick={gererSuivre} disabled={inscriptionEnCours}>
+                {inscriptionEnCours ? "Inscription..." : "S'inscrire gratuitement"}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -338,7 +358,7 @@ function DetailFormation() {
               {message && <p className="dp-message">{message}</p>}
               {estInscrit ? (
                 <Link to={`/apprendre/${id}`} className="dp-cta dp-cta--start">
-                  Continuer
+                  Reprendre la formation
                 </Link>
               ) : peutSInscrire ? (
                 <button
@@ -347,7 +367,7 @@ function DetailFormation() {
                   onClick={gererSuivre}
                   disabled={inscriptionEnCours}
                 >
-                  {inscriptionEnCours ? "Inscription..." : "Commencer"}
+                  {inscriptionEnCours ? "Inscription..." : "S'inscrire gratuitement"}
                 </button>
               ) : null}
               <Link to="/formations" className="dp-cta dp-cta--back">

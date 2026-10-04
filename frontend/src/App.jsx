@@ -12,10 +12,14 @@ import Formations from "./pages/Formations";
 import Profil from "./pages/Profil";
 import NotFound from "./pages/NotFound";
 import RouteProtegee from "./components/RouteProtegee";
+import Toaster from "./components/ui/Toaster";
+import ConfirmDialog from "./components/ui/ConfirmDialog";
+import RemonterEnHaut from "./components/ui/RemonterEnHaut";
 import { verifierSession } from "./services/session";
 import "./styles/premium-refresh.css";
 import "./styles/Bouton.css";
 import "./styles/theme-sobre.css";
+import "./styles/theme-interactions.css";
 
 // Hook partagé pour vérifier la session utilisateur
 function useVerifierSession() {
@@ -52,6 +56,16 @@ function useVerifierSession() {
   return resultatSession;
 }
 
+// Lien d'évitement : place le focus clavier sur le contenu principal de la page.
+function allerAuContenu(evenement) {
+  evenement.preventDefault();
+  const contenu = document.querySelector("main");
+  if (contenu) {
+    contenu.setAttribute("tabindex", "-1");
+    contenu.focus();
+  }
+}
+
 // Redirige l'utilisateur vers son tableau de bord selon son rôle.
 function RedirectionAccueil() {
   const resultatSession = useVerifierSession();
@@ -71,6 +85,10 @@ function RedirectionAccueil() {
 export default function App() {
   return (
     <BrowserRouter>
+      <a href="#" className="lien-evitement" onClick={allerAuContenu}>Aller au contenu</a>
+      <RemonterEnHaut />
+      <Toaster />
+      <ConfirmDialog />
       <Routes>
         <Route path="/" element={<Accueil />} />
         <Route path="/formations" element={<Formations />} />

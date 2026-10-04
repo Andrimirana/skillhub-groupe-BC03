@@ -23,6 +23,7 @@ import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { creerFormation, listerCategories } from "../services/formationsApi";
 import "../styles/layout.css";
+import { confirmer, messageErreurApi, notifierErreur, notifierSucces } from "../services/feedback";
 
 const STORAGE_KEY = "skillhub_course_builder_draft";
 
@@ -225,8 +226,14 @@ function CreerAtelier() {
     });
   };
 
-  const supprimerModule = (index) => {
-    if (!window.confirm("Supprimer ce module ?")) return;
+  const supprimerModule = async (index) => {
+    const accord = await confirmer({
+      titre: "Supprimer ce module ?",
+      message: "Ses leçons seront retirées de la formation.",
+      libelleConfirmer: "Supprimer",
+      danger: true,
+    });
+    if (!accord) return;
     setFormulaire((etat) => ({ ...etat, modules: etat.modules.filter((_, i) => i !== index) }));
   };
 
@@ -252,8 +259,13 @@ function CreerAtelier() {
     }));
   };
 
-  const supprimerLecon = (moduleIndex, leconIndex) => {
-    if (!window.confirm("Supprimer cette leçon ?")) return;
+  const supprimerLecon = async (moduleIndex, leconIndex) => {
+    const accord = await confirmer({
+      titre: "Supprimer cette leçon ?",
+      libelleConfirmer: "Supprimer",
+      danger: true,
+    });
+    if (!accord) return;
     setFormulaire((etat) => ({
       ...etat,
       modules: etat.modules.map((module, i) => (
@@ -329,11 +341,24 @@ function CreerAtelier() {
 
     if (Object.keys(prochains).length > 0) {
       setErreurs(prochains);
-      setEtape(0);
+      const cles = Object.keys(prochains);
+      const etapeErreur = cles.some((cle) => ["titre", "description", "category", "image_url", "duration"].includes(cle))
+        ? 0
+        : cles.some((cle) => cle.startsWith("question-")) ? 2 : 1;
+      setEtape(etapeErreur);
+      notifierErreur(`Avant de publier : ${prochains[cles[0]]}${cles.length > 1 ? ` (et ${cles.length - 1} autre${cles.length > 2 ? "s" : ""} point${cles.length > 2 ? "s" : ""} à compléter)` : ""}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    if (statut === "Publié" && !window.confirm("Publier cette formation ?")) return;
+    if (statut === "Publié") {
+      const accord = await confirmer({
+        titre: "Publier cette formation ?",
+        message: "Elle sera visible dans le catalogue et les apprenants pourront s'y inscrire.",
+        libelleConfirmer: "Publier",
+      });
+      if (!accord) return;
+    }
 
     setChargement(true);
     setErreurs({});
@@ -368,10 +393,13 @@ function CreerAtelier() {
       if (statut === "Publié") {
         setSucces(formationCreee);
       } else {
+        notifierSucces("Brouillon enregistré.");
         navigate("/dashboard/formateur", { replace: true });
       }
     } catch (e) {
-      setErreurs({ general: e.response?.data?.message || "Impossible d’enregistrer cette formation." });
+      const message = messageErreurApi(e, "Impossible d’enregistrer cette formation.");
+      setErreurs({ general: message });
+      notifierErreur(message);
     } finally {
       setChargement(false);
     }
@@ -409,6 +437,8 @@ function CreerAtelier() {
                   key={item.titre}
                   className={`builder-step ${index === etape ? "is-active" : ""} ${index < etape ? "is-done" : ""}`}
                   onClick={() => setEtape(index)}
+                  aria-label={`Étape ${index + 1} : ${item.titre}`}
+                  aria-current={index === etape ? "step" : undefined}
                 >
                   <span>{index < etape ? <FontAwesomeIcon icon={faCheck} /> : index + 1}</span>
                   <div>

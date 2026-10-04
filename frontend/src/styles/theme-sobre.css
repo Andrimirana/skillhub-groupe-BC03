@@ -1,45 +1,50 @@
 /*
- * Theme sobre SkillHub
- * Chargee en dernier : palette neutre, un seul bleu, pas de degrades,
- * boutons de meme taille et bien alignes.
+ * Theme SkillHub
+ * Chargee en dernier : fond clair et chaleureux, une couleur principale pour les actions,
+ * une couleur d'accent pour l'encouragement, composants harmonises et animations legeres.
  */
 
 :root {
-  --primary: #2f5bd3;
-  --primary-dark: #2449ad;
-  --primary-light: #eef2fb;
-  --accent: #2f5bd3;
-  --accent-dark: #2449ad;
-  --accent-light: #eef2fb;
-  --success: #15803d;
-  --warning: #b45309;
-  --danger: #dc2626;
-  --background: #f7f8fa;
+  --primary: #3b5bdb;
+  --primary-dark: #2f4ac0;
+  --primary-light: #eef1fd;
+  --accent: #e8913a;
+  --accent-dark: #c9741f;
+  --accent-light: #fdf1e5;
+  --success: #2f855a;
+  --warning: #b7791f;
+  --danger: #d64545;
+  --background: #faf9f7;
   --surface: #ffffff;
-  --surface-soft: #f3f4f6;
-  --surface-blue: #f3f4f6;
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --shadow: 0 1px 3px rgba(17, 24, 39, 0.06);
-  --shadow-strong: 0 4px 12px rgba(17, 24, 39, 0.08);
-  --gradient-primary: #2f5bd3;
+  --surface-soft: #f4f2ee;
+  --surface-blue: #f4f2ee;
+  --text-main: #1f2328;
+  --text-muted: #646a73;
+  --border: #e7e3dc;
+  --shadow: 0 1px 2px rgba(31, 35, 40, 0.05), 0 1px 3px rgba(31, 35, 40, 0.04);
+  --shadow-strong: 0 6px 18px rgba(31, 35, 40, 0.08);
+  --gradient-primary: #3b5bdb;
   --gradient-soft: #ffffff;
-  --gradient-hero: #f3f4f6;
+  --gradient-hero: #f4f2ee;
   --radius-sm: 8px;
   --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 14px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
   --btn-hauteur: 42px;
+  --focus: 0 0 0 3px rgba(59, 91, 219, 0.35);
+  --transition: 0.16s ease;
+  --police-texte: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --police-titre: "Plus Jakarta Sans", "Inter", "Segoe UI", system-ui, sans-serif;
 }
 
 [data-theme="dark"] {
-  --primary: #7b9cf0;
-  --primary-dark: #6487e8;
-  --primary-light: rgba(123, 156, 240, 0.12);
-  --accent: #7b9cf0;
-  --accent-dark: #6487e8;
-  --accent-light: rgba(123, 156, 240, 0.12);
+  --primary: #8098f0;
+  --primary-dark: #6b85ea;
+  --primary-light: rgba(128, 152, 240, 0.14);
+  --accent: #f0a65c;
+  --accent-dark: #e8913a;
+  --accent-light: rgba(240, 166, 92, 0.14);
+  --focus: 0 0 0 3px rgba(128, 152, 240, 0.45);
   --background: #0f1115;
   --surface: #171a21;
   --surface-soft: #1f232c;
@@ -530,7 +535,11 @@ html body .hero .hero-titre .progresse,
 
 .f-card-footer > *,
 .dp-reco-footer > * {
-  flex: 1 1 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.f-card-footer {
+  flex-wrap: wrap !important;
 }
 
 .dp-card .dp-cta {
@@ -945,8 +954,7 @@ html body .hero .hero-titre .progresse,
 .learn-navigation button,
 .learn-actions button,
 .learn-modal-actions button,
-.learn-collapse-btn,
-.learn-sidebar-toggle {
+.learn-collapse-btn {
   min-height: var(--btn-hauteur);
   display: inline-flex;
   align-items: center;

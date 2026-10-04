@@ -6,6 +6,10 @@ import { listerFormationsApprenant, listerMesFormations } from "../services/form
 import { recupererUtilisateur } from "../services/auth";
 import "../styles/layout.css";
 import "../styles/atelierCard.css";
+import { Link } from "react-router-dom";
+import { faBookOpen, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import EmptyState from "../components/EmptyState";
+import SkeletonGrid from "../components/SkeletonGrid";
 
 const IMAGES_FORMATIONS = [
   "/assets/images/learning/learning-hero.jpg",
@@ -56,9 +60,23 @@ function Ateliers() {
             </p>
           </div>
 
-          {erreurChargement && <p className="error">{erreurChargement}</p>}
+          {chargement && <SkeletonGrid count={3} />}
+          {!chargement && erreurChargement && (
+            <EmptyState
+              icon={faTriangleExclamation}
+              title="Impossible de charger vos formations"
+              description="Vérifiez votre connexion puis rechargez la page."
+            />
+          )}
           {!chargement && !erreurChargement && formations.length === 0 && (
-            <p>{estFormateur ? "Aucune formation publiée pour le moment." : "Aucune formation suivie pour le moment."}</p>
+            <EmptyState
+              icon={faBookOpen}
+              title={estFormateur ? "Aucune formation publiée pour le moment" : "Vous ne suivez encore aucune formation"}
+              description={estFormateur ? "Créez votre première formation pour la proposer aux apprenants." : "Parcourez le catalogue et inscrivez-vous en un clic."}
+              action={estFormateur
+                ? <Link to="/creer-atelier" className="btn-create">Créer une formation</Link>
+                : <Link to="/formations" className="btn-create">Découvrir le catalogue</Link>}
+            />
           )}
 
           <div className="atelier-list">

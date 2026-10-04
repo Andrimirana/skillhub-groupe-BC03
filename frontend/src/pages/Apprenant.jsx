@@ -27,6 +27,8 @@ import {
 import { recupererUtilisateur } from "../services/auth";
 import "../styles/layout.css";
 import "../styles/atelierCard.css";
+import { confirmer, messageErreurApi, notifierErreur, notifierSucces } from "../services/feedback";
+import { messageProgression, moduleEstTermine } from "../utils/progression";
 
 const IMAGES_FORMATIONS = [
   "/assets/images/learning/learning-hero.jpg",
@@ -34,10 +36,6 @@ const IMAGES_FORMATIONS = [
   "/assets/images/learning/learning-notes.jpg",
   "/assets/images/learning/learning-team.jpg",
 ];
-
-function getCleModule(module) {
-  return String(module?.id ?? module?.titre ?? "");
-}
 
 function Apprenant() {
   const navigate = useNavigate();
@@ -86,7 +84,7 @@ function Apprenant() {
   const prenom = (utilisateur?.nom || utilisateur?.email || "apprenant").split(" ")[0];
   const totalModules = formationsSuivies.reduce((total, formation) => total + (formation.modules?.length || 0), 0);
   const modulesTermines = formationsSuivies.reduce(
-    (total, formation) => total + (formation.completed_modules?.length || 0),
+    (total, formation) => total + (formation.modules || []).filter((module) => moduleEstTermine(module, formation.completed_modules || [])).length,
     0,
   );
   const modulesRestants = Math.max(totalModules - modulesTermines, 0);
@@ -96,14 +94,12 @@ function Apprenant() {
   const formationsTerminees = formationsSuivies.filter((formation) => (formation.progression ?? 0) >= 100).length;
   const formationsEnCours = formationsSuivies.filter((formation) => (formation.progression ?? 0) < 100);
   const formationActive = formationsEnCours[0] || formationsSuivies[0] || null;
-  const prochainModule = formationActive?.modules?.find((module) => {
-    const modulesFaits = new Set((formationActive.completed_modules || []).map(String));
-    return !modulesFaits.has(getCleModule(module));
-  });
+  const prochainModule = formationActive?.modules?.find(
+    (module) => !moduleEstTermine(module, formationActive.completed_modules || []),
+  );
   const prochainsModules = formationsSuivies.flatMap((formation) => {
-    const modulesFaits = new Set((formation.completed_modules || []).map(String));
     return (formation.modules || [])
-      .filter((module) => !modulesFaits.has(getCleModule(module)))
+      .filter((module) => !moduleEstTermine(module, formation.completed_modules || []))
       .slice(0, 1)
       .map((module) => ({ module, formation }));
   }).slice(0, 4);
@@ -152,26 +148,34 @@ function Apprenant() {
       ]);
       setFormationsSuivies(suivies);
       setCatalogue(toutes);
+      notifierSucces("Formation ajoutée à votre parcours. Bonne découverte !");
     } catch (e) {
-      setErreurChargement(e.response?.data?.message || "Impossible de suivre cette formation.");
+      notifierErreur(messageErreurApi(e, "Impossible de suivre cette formation."));
     } finally {
       setActionEnCours(null);
     }
   };
 
   const gererNePlusSuivre = async (idFormation) => {
-    const confirmer = window.confirm("Voulez-vous vraiment vous désinscrire de cette formation ?");
+    const formation = formationsSuivies.find((item) => item.id === idFormation);
+    const accord = await confirmer({
+      titre: "Ne plus suivre cette formation ?",
+      message: `Votre progression dans « ${formation?.titre || "cette formation"} » sera perdue.`,
+      libelleConfirmer: "Ne plus suivre",
+      danger: true,
+    });
 
-    if (!confirmer) {
+    if (!accord) {
       return;
     }
 
     try {
       setActionEnCours(`desinscrire-${idFormation}`);
       await desinscrireFormation(idFormation);
-      setFormationsSuivies((precedentes) => precedentes.filter((formation) => formation.id !== idFormation));
+      setFormationsSuivies((precedentes) => precedentes.filter((item) => item.id !== idFormation));
+      notifierSucces("Vous ne suivez plus cette formation.");
     } catch (e) {
-      setErreurChargement(e.response?.data?.message || "Impossible de vous désinscrire.");
+      notifierErreur(messageErreurApi(e, "Impossible de vous désinscrire."));
     } finally {
       setActionEnCours(null);
     }
@@ -189,7 +193,9 @@ function Apprenant() {
             <div className="dashboard-hero-copy">
               <span className="dashboard-eyebrow">Espace apprenant</span>
               <h3>Bonjour, {prenom}</h3>
-              <p>Continuez votre progression et avancez à votre rythme.</p>
+              <p>{formationsSuivies.length === 0
+                ? "Choisissez une première formation et commencez à apprendre à votre rythme."
+                : messageProgression(progressionMoyenne, modulesRestants)}</p>
               <div className="dashboard-hero-actions">
                 {formationActive ? (
                   <button type="button" className="btn-create" onClick={() => navigate(`/apprendre/${formationActive.id}`)}>
@@ -204,7 +210,7 @@ function Apprenant() {
             <div className="dashboard-hero-card dashboard-progress-card">
               <span>{progressionMoyenne}%</span>
               <small>progression globale</small>
-              <div className="dashboard-progress-track">
+              <div className="dashboard-progress-track" role="progressbar" aria-valuenow={progressionMoyenne} aria-valuemin={0} aria-valuemax={100} aria-label="Progression globale">
                 <div style={{ width: `${progressionMoyenne}%` }} />
               </div>
               {formationActive && <em>{formationActive.titre}</em>}
@@ -252,7 +258,7 @@ function Apprenant() {
                         <div className="dashboard-progress-track">
                           <div style={{ width: `${formationActive.progression ?? 0}%` }} />
                         </div>
-                        <small>{formationActive.completed_modules?.length || 0}/{formationActive.modules?.length || 0} modules terminés</small>
+                        <small>{(formationActive.modules || []).filter((module) => moduleEstTermine(module, formationActive.completed_modules || [])).length}/{formationActive.modules?.length || 0} modules terminés</small>
                       </div>
                       <button type="button" className="btn-create" onClick={() => navigate(`/apprendre/${formationActive.id}`)}>
                         Continuer

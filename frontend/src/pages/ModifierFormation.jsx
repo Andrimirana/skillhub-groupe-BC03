@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { detailFormation, listerCategories, modifierFormation } from "../services/formationsApi";
 import "../styles/layout.css";
+import { messageErreurApi, notifierErreur, notifierSucces } from "../services/feedback";
 
 const MODULE_VIDE = { titre: "", contenu: "" };
 
@@ -154,12 +155,14 @@ function ModifierFormation() {
       });
 
       setSucces("Formation modifiée avec succès.");
+      notifierSucces("Modifications enregistrées.");
       setTimeout(() => {
         navigate("/dashboard/formateur", { replace: true });
       }, 650);
     } catch (e) {
-      const message = e.response?.data?.message || "Impossible de modifier cette formation.";
+      const message = messageErreurApi(e, "Impossible de modifier cette formation.");
       setErreur(message);
+      notifierErreur(message);
     } finally {
       setSauvegardeEnCours(false);
     }

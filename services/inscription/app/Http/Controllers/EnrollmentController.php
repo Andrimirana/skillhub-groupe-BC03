@@ -269,6 +269,59 @@ class EnrollmentController extends Controller
         ]);
     }
 
+    // Statistiques des formations d'un formateur : inscrits, progression moyenne et dernières inscriptions.
+    public function statistiquesFormateur(Request $requete): JsonResponse
+    {
+        $utilisateurAuth = $requete->input('auth_user');
+
+        if (($utilisateurAuth['role'] ?? '') !== 'formateur') {
+            return response()->json(['message' => 'Seuls les formateurs peuvent consulter ces statistiques.'], 403);
+        }
+
+        $ids = collect(explode(',', (string) $requete->query('ids', '')))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->take(200)
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return response()->json(['formations' => [], 'inscriptions_recentes' => []]);
+        }
+
+        $inscriptions = Enrollment::query()->whereIn('formation_id', $ids)->get();
+
+        $formations = $ids->map(function (int $id) use ($inscriptions): array {
+            $liste = $inscriptions->where('formation_id', $id);
+
+            return [
+                'formation_id'        => $id,
+                'inscrits'            => $liste->count(),
+                'progression_moyenne' => $liste->isEmpty() ? 0 : (int) round($liste->avg('progression')),
+                'termines'            => $liste->where('progression', '>=', 100)->count(),
+                'note_moyenne'        => $liste->whereNotNull('avis_note')->isEmpty()
+                    ? null
+                    : round($liste->whereNotNull('avis_note')->avg('avis_note'), 1),
+            ];
+        });
+
+        $recentes = $inscriptions
+            ->sortByDesc('date_inscription')
+            ->take(6)
+            ->map(fn (Enrollment $inscription): array => [
+                'formation_id'     => $inscription->formation_id,
+                'nom'              => $inscription->utilisateur_nom ?: 'Apprenant SkillHub',
+                'progression'      => $inscription->progression,
+                'date_inscription' => optional($inscription->date_inscription)->toIso8601String(),
+            ])
+            ->values();
+
+        return response()->json([
+            'formations'            => $formations->values(),
+            'inscriptions_recentes' => $recentes,
+        ]);
+    }
+
     private function presenterAvis(Enrollment $inscription): array
     {
         return [
