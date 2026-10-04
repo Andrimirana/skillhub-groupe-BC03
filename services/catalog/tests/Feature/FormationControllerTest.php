@@ -70,6 +70,7 @@ class FormationControllerTest extends TestCase
             'date'        => '2026-09-01',
             'duration'    => 20,
             'level'       => 'beginner',
+            'modules'     => [['titre' => 'Introduction', 'contenu' => 'Bases de Laravel']],
         ];
 
         $reponse = $this->withToken('jeton-test')->postJson('/api/formations', $donneesFormation);
@@ -196,14 +197,14 @@ class FormationControllerTest extends TestCase
         $reponse->assertOk()->assertJsonCount(1);
     }
 
-    // Vérifie qu'un formateur connecté ne voit dans la liste publique que ses propres formations.
-    public function test_formateur_sees_only_own_formations_in_public_list(): void
+    // Vérifie qu'un formateur connecté ne voit dans ses formations que les siennes.
+    public function test_formateur_sees_only_own_formations_in_my_formations(): void
     {
         $this->simulerConnexion($this->profilFormateur);
         Formation::factory()->create(['user_id' => 1, 'titre' => 'Mine']);
         Formation::factory()->create(['user_id' => 99, 'titre' => 'Others']);
 
-        $reponse = $this->withToken('jeton-test')->getJson('/api/formations');
+        $reponse = $this->withToken('jeton-test')->getJson('/api/my-formations');
         $reponse->assertOk()->assertJsonCount(1);
     }
 

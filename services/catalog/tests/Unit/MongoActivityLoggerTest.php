@@ -20,7 +20,7 @@ class MongoActivityLoggerTest extends TestCase
 
     public function test_log_catches_exception_on_invalid_uri(): void
     {
-        if (! class_exists(\MongoDB\Client::class)) {
+        if (! class_exists(\MongoDB\Driver\Manager::class)) {
             $this->markTestSkipped('Extension MongoDB non disponible.');
         }
 

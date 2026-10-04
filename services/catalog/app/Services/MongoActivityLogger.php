@@ -3,7 +3,7 @@
 /**
  * Fichier : MongoActivityLogger.php
  * Rôle    : Enregistre les événements métier dans MongoDB pour traçabilité et audit.
- * Modifié : 2026-05-08
+ * Modifié : 2026-10-04
  */
 
 namespace App\Services;
@@ -19,33 +19,58 @@ class MongoActivityLogger
      */
     public function log(string $evenement, array $donnees = []): void
     {
-        $client = $this->client();
+        $manager = $this->manager();
 
-        if ($client === null) {
+        if ($manager === null) {
             return;
         }
 
         try {
             // Chaque log inclut automatiquement un horodatage ISO 8601 et un timestamp Unix pour faciliter les tris
-            $client->selectDatabase($this->database())
-                ->selectCollection($this->collection())
-                ->insertOne([
-                    'event'      => $evenement,
-                    ...$donnees,
-                    'timestamp'  => CarbonImmutable::now()->toIso8601String(),
-                    'created_at' => CarbonImmutable::now()->getTimestampMs(),
-                ]);
+            $ecriture = new \MongoDB\Driver\BulkWrite();
+            $ecriture->insert([
+                'event'      => $evenement,
+                ...$donnees,
+                'timestamp'  => CarbonImmutable::now()->toIso8601String(),
+                'created_at' => CarbonImmutable::now()->getTimestampMs(),
+            ]);
+
+            $manager->executeBulkWrite($this->espaceDeNoms(), $ecriture);
         } catch (Throwable $e) {
             error_log('[MongoActivityLogger] ' . $e->getMessage());
         }
     }
 
     /**
-     * Retourne un client MongoDB partagé, ou null si MongoDB n'est pas disponible.
+     * Recherche des documents dans la collection configurée.
+     * Retourne un tableau vide si MongoDB n'est pas disponible.
      */
-    public function client(): ?\MongoDB\Client
+    public function find(array $filtre, array $options = []): array
     {
-        if (! \class_exists(\MongoDB\Client::class)) {
+        $manager = $this->manager();
+
+        if ($manager === null) {
+            return [];
+        }
+
+        try {
+            $curseur = $manager->executeQuery($this->espaceDeNoms(), new \MongoDB\Driver\Query($filtre, $options));
+            $curseur->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+
+            return $curseur->toArray();
+        } catch (Throwable $e) {
+            error_log('[MongoActivityLogger] ' . $e->getMessage());
+
+            return [];
+        }
+    }
+
+    /**
+     * Retourne une connexion MongoDB via l'extension PHP mongodb, ou null si elle n'est pas disponible.
+     */
+    public function manager(): ?\MongoDB\Driver\Manager
+    {
+        if (! \class_exists(\MongoDB\Driver\Manager::class)) {
             return null;
         }
 
@@ -56,7 +81,7 @@ class MongoActivityLogger
         }
 
         try {
-            return new \MongoDB\Client($uri);
+            return new \MongoDB\Driver\Manager($uri, ['serverSelectionTimeoutMS' => 2000]);
         } catch (Throwable $e) {
             error_log('[MongoActivityLogger] connexion impossible : ' . $e->getMessage());
 
@@ -72,5 +97,10 @@ class MongoActivityLogger
     public function collection(): string
     {
         return (string) (env('MONGO_COLLECTION') ?: env('MONGODB_COLLECTION', 'activity_logs'));
+    }
+
+    private function espaceDeNoms(): string
+    {
+        return $this->database() . '.' . $this->collection();
     }
 }

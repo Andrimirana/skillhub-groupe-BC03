@@ -9,29 +9,50 @@ class MongoActivityLogger
 {
     public function log(string $evenement, array $donnees = []): void
     {
-        $client = $this->client();
+        $manager = $this->manager();
 
-        if ($client === null) {
+        if ($manager === null) {
             return;
         }
 
         try {
-            $client->selectDatabase($this->database())
-                ->selectCollection($this->collection())
-                ->insertOne([
-                    'event'      => $evenement,
-                    ...$donnees,
-                    'timestamp'  => CarbonImmutable::now()->toIso8601String(),
-                    'created_at' => CarbonImmutable::now()->getTimestampMs(),
-                ]);
+            $ecriture = new \MongoDB\Driver\BulkWrite();
+            $ecriture->insert([
+                'event'      => $evenement,
+                ...$donnees,
+                'timestamp'  => CarbonImmutable::now()->toIso8601String(),
+                'created_at' => CarbonImmutable::now()->getTimestampMs(),
+            ]);
+
+            $manager->executeBulkWrite($this->espaceDeNoms(), $ecriture);
         } catch (Throwable $e) {
             error_log('[MongoActivityLogger] ' . $e->getMessage());
         }
     }
 
-    public function client(): ?\MongoDB\Client
+    public function find(array $filtre, array $options = []): array
     {
-        if (! \class_exists(\MongoDB\Client::class)) {
+        $manager = $this->manager();
+
+        if ($manager === null) {
+            return [];
+        }
+
+        try {
+            $curseur = $manager->executeQuery($this->espaceDeNoms(), new \MongoDB\Driver\Query($filtre, $options));
+            $curseur->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+
+            return $curseur->toArray();
+        } catch (Throwable $e) {
+            error_log('[MongoActivityLogger] ' . $e->getMessage());
+
+            return [];
+        }
+    }
+
+    public function manager(): ?\MongoDB\Driver\Manager
+    {
+        if (! \class_exists(\MongoDB\Driver\Manager::class)) {
             return null;
         }
 
@@ -42,7 +63,7 @@ class MongoActivityLogger
         }
 
         try {
-            return new \MongoDB\Client($uri);
+            return new \MongoDB\Driver\Manager($uri, ['serverSelectionTimeoutMS' => 2000]);
         } catch (Throwable $e) {
             error_log('[MongoActivityLogger] connexion impossible : ' . $e->getMessage());
 
@@ -58,5 +79,10 @@ class MongoActivityLogger
     public function collection(): string
     {
         return (string) (env('MONGO_COLLECTION') ?: env('MONGODB_COLLECTION', 'activity_logs'));
+    }
+
+    private function espaceDeNoms(): string
+    {
+        return $this->database() . '.' . $this->collection();
     }
 }

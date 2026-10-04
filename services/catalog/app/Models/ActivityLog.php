@@ -10,7 +10,7 @@ use Carbon\CarbonImmutable;
  *
  * Pas un modèle Eloquent : MongoDB n'est pas une base relationnelle.
  * Cette classe est un simple POPO avec quelques helpers statiques pour
- * lire la collection via le client MongoDB officiel.
+ * lire la collection via l'extension PHP mongodb.
  */
 class ActivityLog
 {
@@ -28,29 +28,15 @@ class ActivityLog
      */
     public static function forCourse(int $courseId, int $limite = 50): array
     {
-        $logger = app(MongoActivityLogger::class);
-        $client = $logger->client();
+        $documents = app(MongoActivityLogger::class)->find(
+            ['course_id' => $courseId],
+            [
+                'sort'  => ['created_at' => -1, 'timestamp' => -1],
+                'limit' => $limite,
+            ],
+        );
 
-        if ($client === null) {
-            return [];
-        }
-
-        $curseur = $client->selectDatabase($logger->database())
-            ->selectCollection($logger->collection())
-            ->find(
-                ['course_id' => $courseId],
-                [
-                    'sort'  => ['created_at' => -1, 'timestamp' => -1],
-                    'limit' => $limite,
-                ],
-            );
-
-        $resultats = [];
-        foreach ($curseur as $document) {
-            $resultats[] = self::normaliserDocument($document);
-        }
-
-        return $resultats;
+        return array_map(fn ($document) => self::normaliserDocument($document), $documents);
     }
 
     /**

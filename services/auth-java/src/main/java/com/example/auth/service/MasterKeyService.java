@@ -99,6 +99,10 @@ public class MasterKeyService {
     /**
      * Déchiffre un mot de passe chiffré AES-256-GCM.
      *
+     * <p>Accepte aussi l'ancien format du service auth Laravel
+     * {@code Base64(iv):Base64(ciphertext):Base64(tag)}, chiffré avec la même clé,
+     * pour que les comptes déjà créés puissent toujours se connecter.</p>
+     *
      * @param chiffre la chaîne chiffrée au format {@code v1:Base64(iv):Base64(ciphertext)}
      * @return le mot de passe en clair
      * @throws IllegalStateException si le format est invalide ou si le tag GCM est altéré
@@ -107,13 +111,25 @@ public class MasterKeyService {
         try {
             // On découpe la chaîne stockée en 3 parties.
             String[] parties = chiffre.split(":");
-            // On vérifie le format : préfixe "v1" + 3 parties.
-            if (parties.length != 3 || !PREFIXE_FORMAT.equals(parties[0])) {
+            if (parties.length != 3) {
                 throw new IllegalStateException("Format de mot de passe chiffré invalide");
             }
-            // On décode l'IV et le ciphertext depuis le Base64.
-            byte[] iv          = Base64.getDecoder().decode(parties[1]);
-            byte[] textChiffre = Base64.getDecoder().decode(parties[2]);
+
+            byte[] iv;
+            byte[] textChiffre;
+            if (PREFIXE_FORMAT.equals(parties[0])) {
+                // Format actuel : v1:iv:ciphertext (le tag est déjà à la fin du ciphertext).
+                iv          = Base64.getDecoder().decode(parties[1]);
+                textChiffre = Base64.getDecoder().decode(parties[2]);
+            } else {
+                // Ancien format Laravel : iv:ciphertext:tag, on recolle le tag à la fin.
+                iv = Base64.getDecoder().decode(parties[0]);
+                byte[] texte = Base64.getDecoder().decode(parties[1]);
+                byte[] tag   = Base64.getDecoder().decode(parties[2]);
+                textChiffre = new byte[texte.length + tag.length];
+                System.arraycopy(texte, 0, textChiffre, 0, texte.length);
+                System.arraycopy(tag, 0, textChiffre, texte.length, tag.length);
+            }
 
             // On configure le déchiffrement AES-GCM avec le même IV.
             Cipher dechiffreur = Cipher.getInstance(ALGORITHME);

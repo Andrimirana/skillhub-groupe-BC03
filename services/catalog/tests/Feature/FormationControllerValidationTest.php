@@ -53,12 +53,15 @@ class FormationControllerValidationTest extends TestCase
         $reponse = $this->withToken('token')->postJson('/api/formations', [
             'titre' => 'Formation Laravel',
             'description' => 'Description complète',
-            'duree' => 20,
-            'niveau' => 'expert-avancé', // Invalid niveau
+            'category' => 'dev',
+            'date' => '2026-09-01',
+            'modules' => [['titre' => 'Module 1', 'contenu' => 'Contenu']],
+            'duration' => 20,
+            'level' => 'expert-avancé', // Niveau invalide
         ]);
 
         $reponse->assertStatus(422);
-        $reponse->assertJsonValidationErrors(['niveau']);
+        $reponse->assertJsonValidationErrors(['level']);
     }
 
     // Vérifie qu'une durée négative est refusée par la validation à la création.
@@ -69,12 +72,15 @@ class FormationControllerValidationTest extends TestCase
         $reponse = $this->withToken('token')->postJson('/api/formations', [
             'titre' => 'Formation PHP',
             'description' => 'Description',
-            'duree' => -5,
-            'niveau' => 'intermédiaire',
+            'category' => 'dev',
+            'date' => '2026-09-01',
+            'modules' => [['titre' => 'Module 1', 'contenu' => 'Contenu']],
+            'duration' => -5,
+            'level' => 'intermediaire',
         ]);
 
         $reponse->assertStatus(422);
-        $reponse->assertJsonValidationErrors(['duree']);
+        $reponse->assertJsonValidationErrors(['duration']);
     }
 
     // Vérifie qu'un titre dépassant la longueur maximale est refusé à la mise à jour.
@@ -151,8 +157,11 @@ class FormationControllerValidationTest extends TestCase
         $data = [
             'titre' => 'Formation Vue.js 3',
             'description' => 'Apprenez Vue.js 3 avec la Composition API',
-            'duree' => 25,
-            'niveau' => 'intermédiaire',
+            'category' => 'dev',
+            'date' => '2026-09-01',
+            'modules' => [['titre' => 'Module 1', 'contenu' => 'Contenu']],
+            'duration' => 25,
+            'level' => 'intermediaire',
         ];
 
         $reponse = $this->withToken('token')->postJson('/api/formations', $data);
@@ -181,11 +190,11 @@ class FormationControllerValidationTest extends TestCase
     // Vérifie que le filtrage par niveau renvoie le bon nombre de formations.
     public function test_filter_formations_by_niveau(): void
     {
-        Formation::factory()->create(['titre' => 'Formation 1', 'niveau' => 'débutant']);
-        Formation::factory()->create(['titre' => 'Formation 2', 'niveau' => 'débutant']);
-        Formation::factory()->create(['titre' => 'Formation 3', 'niveau' => 'avancé']);
+        Formation::factory()->create(['titre' => 'Formation 1', 'level' => 'beginner']);
+        Formation::factory()->create(['titre' => 'Formation 2', 'level' => 'beginner']);
+        Formation::factory()->create(['titre' => 'Formation 3', 'level' => 'advanced']);
 
-        $reponse = $this->getJson('/api/formations?niveau=débutant');
+        $reponse = $this->getJson('/api/formations?level=beginner');
 
         $reponse->assertOk();
         $reponse->assertJsonCount(2);
