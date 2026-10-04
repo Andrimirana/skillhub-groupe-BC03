@@ -1,0 +1,346 @@
+/*
+ * Touches de couleur SkillHub
+ * Chargee en dernier : photo du hero, teintes douces sur les icones,
+ * etiquettes et cartes, sans surcharger l'interface.
+ */
+
+:root {
+  --teinte-bleu: #3b5bdb;
+  --teinte-bleu-fond: #eef1fd;
+  --teinte-orange: #d9772b;
+  --teinte-orange-fond: #fdf0e4;
+  --teinte-vert: #2f855a;
+  --teinte-vert-fond: #e8f5ee;
+  --teinte-violet: #7048e8;
+  --teinte-violet-fond: #f1edfd;
+  --teinte-rose: #c2417a;
+  --teinte-rose-fond: #fbebf2;
+}
+
+[data-theme="dark"] {
+  --teinte-bleu: #8098f0;
+  --teinte-bleu-fond: rgba(128, 152, 240, 0.14);
+  --teinte-orange: #f0a65c;
+  --teinte-orange-fond: rgba(240, 166, 92, 0.14);
+  --teinte-vert: #5fc48f;
+  --teinte-vert-fond: rgba(95, 196, 143, 0.14);
+  --teinte-violet: #a48cf5;
+  --teinte-violet-fond: rgba(164, 140, 245, 0.14);
+  --teinte-rose: #e57aa8;
+  --teinte-rose-fond: rgba(229, 122, 168, 0.14);
+}
+
+/* ---------- Hero de l'accueil : photo avec voile pour garder le texte lisible ---------- */
+
+#contenu .hero[aria-labelledby="hero-title"],
+.hero[aria-labelledby="hero-title"] {
+  position: relative !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(120deg, rgba(20, 27, 61, 0.78) 0%, rgba(43, 58, 140, 0.55) 55%, rgba(217, 119, 43, 0.35) 100%),
+    url("/assets/images/learning/learning-hero.jpg") center / cover no-repeat !important;
+  border-bottom: none !important;
+}
+
+.hero .illustration {
+  position: absolute !important;
+  z-index: 0;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.hero .illu1 {
+  top: auto !important;
+  right: 5% !important;
+  bottom: 12% !important;
+  left: auto !important;
+}
+
+.hero .illu2 {
+  top: 16% !important;
+  right: auto !important;
+  left: 5% !important;
+}
+
+.hero .illustration img {
+  width: 170px !important;
+  height: 112px !important;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.85) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+.hero .hero-titre,
+.hero .hero-texte,
+.hero .hero-boutons {
+  position: relative;
+  z-index: 1;
+}
+
+html body .hero .hero-titre,
+.hero .hero-titre {
+  color: #ffffff !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.25) !important;
+}
+
+html body .hero .hero-titre .progresse {
+  color: #ffc58a !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+#contenu .hero[aria-labelledby="hero-title"] .hero-texte,
+#contenu .hero[aria-labelledby="hero-title"] p {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.25) !important;
+}
+
+.hero-boutons .btn-formateur {
+  border-color: #ffffff !important;
+  background: #ffffff !important;
+  color: var(--teinte-bleu) !important;
+}
+
+.hero-boutons .btn-formateur:hover {
+  border-color: #eef1fd !important;
+  background: #eef1fd !important;
+  color: #2f4ac0 !important;
+}
+
+.hero-boutons .btn-apprenant {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+}
+
+.hero-boutons .btn-apprenant:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 1000px) {
+  .hero .illustration {
+    display: none !important;
+  }
+}
+
+/* ---------- Etiquettes au-dessus des titres ---------- */
+
+.section-kicker,
+.dashboard-eyebrow,
+.profile-kicker {
+  border-color: transparent !important;
+  background: var(--teinte-bleu-fond) !important;
+  color: var(--teinte-bleu) !important;
+}
+
+/* ---------- Comment ca marche : une couleur par public ---------- */
+
+.guide-formateurs .guide-role,
+.guide-icon-wrapper--formateur {
+  background: var(--teinte-bleu-fond) !important;
+  color: var(--teinte-bleu) !important;
+  border-color: transparent !important;
+}
+
+.guide-apprenants .guide-role,
+.guide-icon-wrapper--apprenant {
+  background: var(--teinte-orange-fond) !important;
+  color: var(--teinte-orange) !important;
+  border-color: transparent !important;
+}
+
+.guide-formateurs .guide-carte {
+  border-top: 3px solid var(--teinte-bleu) !important;
+}
+
+.guide-apprenants .guide-carte {
+  border-top: 3px solid var(--teinte-orange) !important;
+}
+
+/* Nos valeurs : petit trait de couleur */
+.valeurs-liste li {
+  border-left-color: var(--teinte-orange) !important;
+}
+
+/* ---------- Temoignages ---------- */
+
+.temoignages-gauche {
+  background: var(--teinte-bleu) !important;
+  color: #ffffff !important;
+  border-right: none !important;
+}
+
+.temoignages-gauche h2,
+.temoignages-gauche .section-kicker {
+  color: #ffffff !important;
+}
+
+.temoignages-gauche .section-kicker {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.temoignages-gauche .temoignage-btn {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.temoignages-gauche .temoignage-btn--actif,
+.temoignages-gauche .temoignage-btn:hover {
+  background: #ffffff !important;
+  color: var(--teinte-bleu) !important;
+}
+
+.temoignage-initiales {
+  background: var(--teinte-orange-fond) !important;
+  color: var(--teinte-orange) !important;
+}
+
+/* ---------- Cartes de resume : une teinte par indicateur ---------- */
+
+.summary_card--blue .summary_icon {
+  background: var(--teinte-bleu-fond) !important;
+  color: var(--teinte-bleu) !important;
+}
+
+.summary_card--cyan .summary_icon {
+  background: var(--teinte-orange-fond) !important;
+  color: var(--teinte-orange) !important;
+}
+
+.summary_card--turquoise .summary_icon {
+  background: var(--teinte-violet-fond) !important;
+  color: var(--teinte-violet) !important;
+}
+
+.summary_card--green .summary_icon {
+  background: var(--teinte-vert-fond) !important;
+  color: var(--teinte-vert) !important;
+}
+
+/* ---------- Tableaux de bord : bandeau d'accueil teinte ---------- */
+
+.dashboard-hero,
+.dashboard-hero--formateur,
+.builder-hero {
+  background:
+    linear-gradient(120deg, var(--teinte-bleu-fond) 0%, var(--surface) 55%, var(--teinte-orange-fond) 100%) !important;
+}
+
+.dashboard-hero-card,
+.builder-progress-card {
+  background: var(--surface) !important;
+}
+
+/* ---------- Badges du catalogue : couleurs variees ---------- */
+
+.carte-badge {
+  background: var(--teinte-violet-fond);
+  color: var(--teinte-violet);
+}
+
+.f-card:nth-child(4n + 1) .carte-badge:first-child {
+  background: var(--teinte-bleu-fond);
+  color: var(--teinte-bleu);
+}
+
+.f-card:nth-child(4n + 2) .carte-badge:first-child {
+  background: var(--teinte-orange-fond);
+  color: var(--teinte-orange);
+}
+
+.f-card:nth-child(4n + 3) .carte-badge:first-child {
+  background: var(--teinte-vert-fond);
+  color: var(--teinte-vert);
+}
+
+.f-card:nth-child(4n) .carte-badge:first-child {
+  background: var(--teinte-rose-fond);
+  color: var(--teinte-rose);
+}
+
+.carte-badge--niveau {
+  background: var(--surface-soft) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Niveau sur la page formation */
+.dp-level--beginner {
+  background: var(--teinte-vert-fond) !important;
+  color: var(--teinte-vert) !important;
+  border-color: transparent !important;
+}
+
+.dp-level--intermediaire {
+  background: var(--teinte-orange-fond) !important;
+  color: var(--teinte-orange) !important;
+  border-color: transparent !important;
+}
+
+.dp-level--advanced {
+  background: var(--teinte-rose-fond) !important;
+  color: var(--teinte-rose) !important;
+  border-color: transparent !important;
+}
+
+.dp-icon,
+.dp-icon--green {
+  color: var(--teinte-bleu) !important;
+}
+
+/* ---------- Avatars et icones ---------- */
+
+.sidebar-avatar,
+.public-navbar-profile,
+.public-profile-avatar,
+.profile-avatar {
+  background: var(--teinte-bleu-fond) !important;
+  color: var(--teinte-bleu) !important;
+}
+
+.f-stat-icon {
+  color: var(--teinte-orange) !important;
+}
+
+.empty-state-icon {
+  background: var(--teinte-orange-fond) !important;
+  color: var(--teinte-orange) !important;
+}
+
+/* Progression : du bleu vers le vert pour encourager */
+.barre-progression > div,
+.dashboard-progress-track > div,
+.progress-fill,
+.progression-bar-fill {
+  background: linear-gradient(90deg, var(--teinte-bleu), var(--teinte-vert)) !important;
+}
+
+/* ---------- Footer : liseré de couleur ---------- */
+
+.footer {
+  border-top: 4px solid var(--teinte-orange) !important;
+}
+
+.footer-liste a:hover,
+.footer-social-liens a:hover {
+  color: #ffc58a !important;
+}
+
+/* Bandeau du catalogue : meme photo, texte en blanc */
+#contenu .hero[aria-labelledby="hero-title"] .title h1,
+#contenu .hero[aria-labelledby="hero-title"] h1 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.25) !important;
+}
+
+#contenu .hero[aria-labelledby="hero-title"] .title p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#contenu .hero[aria-labelledby="hero-title"] #search-bar {
+  border-color: transparent !important;
+  background: #ffffff !important;
+  color: #1f2328 !important;
+}

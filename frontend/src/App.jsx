@@ -20,6 +20,7 @@ import "./styles/premium-refresh.css";
 import "./styles/Bouton.css";
 import "./styles/theme-sobre.css";
 import "./styles/theme-interactions.css";
+import "./styles/theme-couleurs.css";
 
 // Hook partagé pour vérifier la session utilisateur
 function useVerifierSession() {
