@@ -165,12 +165,6 @@ function Accueil() {
 
       <main id="contenu">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="illustration illu1">
-            <img src="/assets/images/learning/learning-laptop.jpg" alt="" aria-hidden="true" />
-          </div>
-          <div className="illustration illu2">
-            <img src="/assets/images/learning/learning-notes.jpg" alt="" aria-hidden="true" />
-          </div>
           <h1 className="hero-titre" id="hero-title">
             Apprenez. <span className="progresse">Progressez</span>.<br />Réussissez ensemble.
           </h1>

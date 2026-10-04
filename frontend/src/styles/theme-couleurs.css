@@ -42,36 +42,6 @@
   border-bottom: none !important;
 }
 
-.hero .illustration {
-  position: absolute !important;
-  z-index: 0;
-  display: block !important;
-  opacity: 1 !important;
-  pointer-events: none;
-}
-
-.hero .illu1 {
-  top: auto !important;
-  right: 5% !important;
-  bottom: 12% !important;
-  left: auto !important;
-}
-
-.hero .illu2 {
-  top: 16% !important;
-  right: auto !important;
-  left: 5% !important;
-}
-
-.hero .illustration img {
-  width: 170px !important;
-  height: 112px !important;
-  object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.85) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
-}
-
 .hero .hero-titre,
 .hero .hero-texte,
 .hero .hero-boutons {
@@ -117,12 +87,6 @@ html body .hero .hero-titre .progresse {
 .hero-boutons .btn-apprenant:hover {
   background: rgba(255, 255, 255, 0.22) !important;
   color: #ffffff !important;
-}
-
-@media (max-width: 1000px) {
-  .hero .illustration {
-    display: none !important;
-  }
 }
 
 /* ---------- Etiquettes au-dessus des titres ---------- */
