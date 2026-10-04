@@ -44,6 +44,7 @@ function Topbar() {
     try {
       await deconnecter();
     } catch {
+      // La session locale est supprimee meme si l'API ne repond pas
     } finally {
       supprimerSession();
       navigate("/", { replace: true });
