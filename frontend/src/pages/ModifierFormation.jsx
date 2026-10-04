@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
-import { detailFormation, modifierFormation } from "../services/formationsApi";
+import { detailFormation, listerCategories, modifierFormation } from "../services/formationsApi";
 import "../styles/layout.css";
 
 const MODULE_VIDE = { titre: "", contenu: "" };
@@ -13,6 +13,7 @@ function ModifierFormation() {
   const [chargement, setChargement] = useState(true);
   const [sauvegardeEnCours, setSauvegardeEnCours] = useState(false);
   const [erreur, setErreur] = useState("");
+  const [categoriesExistantes, setCategoriesExistantes] = useState([]);
   const [succes, setSucces] = useState("");
   const [formationChargee, setFormationChargee] = useState(false);
   const [formulaire, setFormulaire] = useState({
@@ -25,6 +26,18 @@ function ModifierFormation() {
     image_url: "",
     modules: [{ ...MODULE_VIDE }],
   });
+
+  const optionsCategories = useMemo(
+    () => [...new Set(["Développement web", "Design", "Marketing", "Management", "Data", "DevOps", ...categoriesExistantes, formulaire.category].filter(Boolean))],
+    [categoriesExistantes, formulaire.category],
+  );
+
+  // Catégories proposées : catégories par défaut, catégories du catalogue et catégorie actuelle
+  useEffect(() => {
+    listerCategories()
+      .then((donnees) => setCategoriesExistantes((donnees || []).map((categorie) => categorie.nom)))
+      .catch(() => setCategoriesExistantes([]));
+  }, []);
 
   useEffect(() => {
     const chargerFormation = async () => {
@@ -188,11 +201,9 @@ function ModifierFormation() {
                   <label>
                     Catégorie
                     <select value={formulaire.category} onChange={(event) => gererChangement("category", event.target.value)}>
-                      <option value="Développement web">Développement web</option>
-                      <option value="Data">Data</option>
-                      <option value="Design">Design</option>
-                      <option value="Marketing">Marketing</option>
-                      <option value="DevOps">DevOps</option>
+                      {optionsCategories.map((categorie) => (
+                        <option key={categorie} value={categorie}>{categorie}</option>
+                      ))}
                     </select>
                   </label>
 

@@ -39,4 +39,9 @@ return [
         'url' => env('AUTH_SERVICE_URL', 'http://localhost:8001'),
     ],
 
+    // Cle partagee pour les appels internes entre microservices
+    'internal' => [
+        'key' => env('INTERNAL_SERVICE_KEY', 'skillhub-interne-dev'),
+    ],
+
 ];

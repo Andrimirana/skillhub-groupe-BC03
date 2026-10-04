@@ -21,7 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
-import { creerFormation } from "../services/formationsApi";
+import { creerFormation, listerCategories } from "../services/formationsApi";
 import "../styles/layout.css";
 
 const STORAGE_KEY = "skillhub_course_builder_draft";
@@ -86,6 +86,8 @@ const creerQuiz = () => ({
   afficherCorrections: true,
   questions: [creerQuestion()],
 });
+
+const CATEGORIES_PAR_DEFAUT = ["Développement web", "Design", "Marketing", "Management", "Data", "DevOps"];
 
 const etatInitial = {
   titre: "",
@@ -160,6 +162,19 @@ function CreerAtelier() {
   const [chargement, setChargement] = useState(false);
   const [statutSauvegarde, setStatutSauvegarde] = useState("Toutes les modifications sont enregistrées");
   const [succes, setSucces] = useState(null);
+  const [categoriesExistantes, setCategoriesExistantes] = useState([]);
+
+  // Ajoute à la liste les catégories déjà utilisées dans le catalogue
+  useEffect(() => {
+    listerCategories()
+      .then((donnees) => setCategoriesExistantes((donnees || []).map((categorie) => categorie.nom)))
+      .catch(() => setCategoriesExistantes([]));
+  }, []);
+
+  const optionsCategories = useMemo(
+    () => [...new Set([...CATEGORIES_PAR_DEFAUT, ...categoriesExistantes, formulaire.category].filter(Boolean))],
+    [categoriesExistantes, formulaire.category],
+  );
 
   useEffect(() => {
     setStatutSauvegarde("Enregistrement en cours...");
@@ -423,12 +438,9 @@ function CreerAtelier() {
                     <label>
                       Catégorie
                       <select value={formulaire.category} onChange={(event) => changerChamp("category", event.target.value)}>
-                        <option value="Développement web">Développement web</option>
-                        <option value="Design">Design</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Management">Management</option>
-                        <option value="Data">Data</option>
-                        <option value="DevOps">DevOps</option>
+                        {optionsCategories.map((categorie) => (
+                          <option key={categorie} value={categorie}>{categorie}</option>
+                        ))}
                       </select>
                     </label>
 

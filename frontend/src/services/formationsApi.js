@@ -56,6 +56,11 @@ export async function supprimerFormation(idFormation) {
   return reponse.data;
 }
 
+export async function listerCategories() {
+  const reponse = await catalogApi.get("/categories");
+  return reponse.data;
+}
+
 // --- Service Inscription (port 8003) ---
 
 export async function inscrireFormation(idFormation) {
@@ -82,5 +87,20 @@ export async function mettreAJourProgressionFormation(idFormation, donnees) {
     `/formations/${idFormation}/progression`,
     donnees,
   );
+  return reponse.data;
+}
+
+export async function donnerAvis(idFormation, note, commentaire) {
+  const reponse = await inscriptionApi.put(`/formations/${idFormation}/avis`, { note, commentaire });
+  return reponse.data;
+}
+
+export async function listerAvisRecents(limite = 8) {
+  const reponse = await inscriptionApi.get("/avis", { params: { limit: limite } });
+  return reponse.data;
+}
+
+export async function listerAvisFormation(idFormation) {
+  const reponse = await inscriptionApi.get(`/formations/${idFormation}/avis`);
   return reponse.data;
 }

@@ -3507,3 +3507,23 @@ body.no-scroll {
     padding-top: clamp(230px, 24vh, 300px);
     padding-bottom: clamp(190px, 20vh, 260px);
 }
+
+/* Avis réels : initiales à la place de la photo et note en étoiles */
+.temoignage-initiales {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.etoile {
+    color: #d1d5db;
+    margin-right: 2px;
+}
+
+.etoile--pleine {
+    color: #f59e0b;
+}

@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookOpen, faClock, faTriangleExclamation, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
@@ -10,15 +10,6 @@ import EmptyState from "../components/EmptyState";
 import SkeletonGrid from "../components/SkeletonGrid";
 import "../styles/formations-page.css";
 
-const CATEGORIES = ["", "dev", "design", "business", "marketing"];
-const LABELS_CATEGORIES = {
-  "": "Toutes",
-  dev: "Développement",
-  design: "Design",
-  business: "Business",
-  marketing: "Marketing",
-};
-
 const IMAGES_FORMATIONS = [
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
@@ -27,33 +18,6 @@ const IMAGES_FORMATIONS = [
   "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
 ];
-
-function mapperCategorie(category) {
-  const valeur = (category || "").toLowerCase();
-
-  if (valeur.includes("développement") || valeur.includes("developpement") || valeur.includes("web")) {
-    return "dev";
-  }
-
-  if (valeur.includes("design")) {
-    return "design";
-  }
-
-  if (valeur.includes("marketing")) {
-    return "marketing";
-  }
-
-  if (
-    valeur.includes("business")
-    || valeur.includes("management")
-    || valeur.includes("data")
-    || valeur.includes("devops")
-  ) {
-    return "business";
-  }
-
-  return "dev";
-}
 
 function libelleHeures(nombreHeures) {
   const heures = Number(nombreHeures || 0);
@@ -86,7 +50,7 @@ function Formations() {
     const niveauUrl = searchParams.get("niveau") || "";
     const rechercheUrl = searchParams.get("recherche") || "";
 
-    setCategorie(CATEGORIES.includes(categorieUrl) ? categorieUrl : "");
+    setCategorie(categorieUrl);
     setNiveau(niveauUrl);
     setRecherche(rechercheUrl);
   }, [searchParams]);
@@ -109,7 +73,7 @@ function Formations() {
           description: item.description || "",
           formateur: item.formateur || "N/A",
           duree: Number(item.duration || 0),
-          categorie: mapperCategorie(item.category),
+          categorie: item.category || "",
           level: item.level || "beginner",
           apprenants: Number(item.apprenants || 0),
           vues: Number(item.vues || 0),
@@ -141,6 +105,11 @@ function Formations() {
     };
   }, []);
 
+  const categoriesDisponibles = useMemo(
+    () => [...new Set(formations.map((formation) => formation.categorie).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    [formations],
+  );
+
   useEffect(() => {
     const temporisation = globalThis.setTimeout(() => {
       const query = recherche.trim().toLowerCase();
@@ -166,7 +135,7 @@ function Formations() {
   }, [recherche, categorie, niveau, formations]);
 
   const fermerModal = () => setModalOuverte(false);
-  const soumettreModal = (e) => { e.preventDefault(); navigate("/inscription"); };
+  const soumettreModal = (e) => { e.preventDefault(); setModalOuverte(false); setAuthModal("inscription"); };
   const commencerFormation = (idFormation) => {
     if (!estConnecte()) {
       setFormationDemandee(idFormation);
@@ -213,8 +182,9 @@ function Formations() {
             <h2 id="filtre-title">Filtrer par :</h2>
             <label htmlFor="categoryFilter">Catégorie</label>
             <select id="categoryFilter" name="category" value={categorie} onChange={(event) => setCategorie(event.target.value)}>
-              {CATEGORIES.map((option) => (
-                <option key={option || "all"} value={option}>{LABELS_CATEGORIES[option]}</option>
+              <option value="">Toutes</option>
+              {categoriesDisponibles.map((option) => (
+                <option key={option} value={option}>{option}</option>
               ))}
             </select>
             <label htmlFor="levelFilter">Niveau</label>
@@ -352,10 +322,11 @@ function Formations() {
           <div className="footer_categ">
             <h2 className="footer-titre">Catégories</h2>
             <ul className="footer-liste">
-              <li><Link to="/formations?categorie=dev">Développement web</Link></li>
-              <li><Link to="/formations?categorie=design">Design</Link></li>
-              <li><Link to="/formations?categorie=marketing">Marketing</Link></li>
-              <li><Link to="/formations?categorie=business">Management</Link></li>
+              {categoriesDisponibles.slice(0, 4).map((option) => (
+                <li key={option}>
+                  <Link to={`/formations?categorie=${encodeURIComponent(option)}`}>{option}</Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="footer-social">
@@ -377,7 +348,7 @@ function Formations() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2026 SkillHub MCCI - Projet fil rouge Licence. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} SkillHub MCCI - Projet fil rouge Licence. Tous droits réservés.</p>
         </div>
       </footer>
     </>

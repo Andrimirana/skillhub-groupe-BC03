@@ -11,6 +11,7 @@ import {
   LessonNavigation,
   ModuleCompletedModal,
 } from "../components/learning/LearningPageComponents";
+import AvisForm from "../components/learning/AvisForm";
 import {
   detailFormation,
   inscrireFormation,
@@ -88,6 +89,7 @@ function SuiviFormation() {
   const [moduleDone, setModuleDone] = useState(null);
   const [courseDone, setCourseDone] = useState(false);
   const [videoProgress, setVideoProgress] = useState({});
+  const [avisInitial, setAvisInitial] = useState({ note: null, commentaire: "" });
 
   const flatLessons = useMemo(
     () => (formation?.modules || []).flatMap((module) => module.lessons.map((lesson) => ({ ...lesson, module }))),
@@ -197,6 +199,7 @@ function SuiviFormation() {
 
         setFormation(normalized);
         setCompleted(nextCompleted);
+        setAvisInitial({ note: target.avis_note ?? null, commentaire: target.avis_commentaire ?? "" });
 
         const lessons = normalized.modules.flatMap((module) => module.lessons);
         const lastKey = target.last_lesson_key && lessons.some((lesson) => lesson.key === target.last_lesson_key)
@@ -301,6 +304,13 @@ function SuiviFormation() {
               <h2>Aucune leçon disponible</h2>
             </article>
           )}
+
+          <AvisForm
+            key={`${id}-${avisInitial.note}`}
+            idFormation={id}
+            noteInitiale={avisInitial.note}
+            commentaireInitial={avisInitial.commentaire}
+          />
         </section>
       </div>
 

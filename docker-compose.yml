@@ -88,6 +88,7 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-api:8080}
+      INTERNAL_SERVICE_KEY: ${INTERNAL_SERVICE_KEY:-skillhub-interne-dev}
       MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017}
       MONGO_DATABASE: ${MONGO_DATABASE:-skillhub_logs}
       MONGO_COLLECTION: ${MONGO_COLLECTION:-activity_logs}
@@ -135,6 +136,7 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD:-skillhub_pass}
       JWT_SECRET: ${JWT_SECRET:-secret_dev}
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-api:8080}
+      INTERNAL_SERVICE_KEY: ${INTERNAL_SERVICE_KEY:-skillhub-interne-dev}
       CATALOG_SERVICE_URL: ${CATALOG_SERVICE_URL:-http://catalog_api:8000}
       MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017}
       MONGO_DATABASE: ${MONGO_DATABASE:-skillhub_logs}

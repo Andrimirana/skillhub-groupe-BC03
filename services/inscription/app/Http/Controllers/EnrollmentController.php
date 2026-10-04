@@ -42,11 +42,16 @@ class EnrollmentController extends Controller
             'utilisateur_id' => $utilisateurAuth['id'],
             'formation_id'   => $idFormation,
         ], [
+            'utilisateur_nom'  => $utilisateurAuth['nom'] ?? null,
             'progression'      => 0,
             'completed_modules'=> [],
             'last_lesson_key'  => null,
             'date_inscription' => now(),
         ]);
+
+        if ($inscription->wasRecentlyCreated) {
+            $this->synchroniserApprenants($idFormation);
+        }
 
 
         // Enregistrement de l'activité d'inscription dans MongoDB
@@ -79,6 +84,8 @@ class EnrollmentController extends Controller
             ->where('utilisateur_id', $utilisateurAuth['id'])
             ->where('formation_id', $idFormation)
             ->delete();
+
+        $this->synchroniserApprenants($idFormation);
 
         return response()->json(['message' => 'Désinscription effectuée.']);
     }
@@ -135,6 +142,8 @@ class EnrollmentController extends Controller
                 'completed_modules'=> $inscription->completed_modules ?? [],
                 'last_lesson_key'  => $inscription->last_lesson_key,
                 'date_inscription' => optional($inscription->date_inscription)->toIso8601String(),
+                'avis_note'        => $inscription->avis_note,
+                'avis_commentaire' => $inscription->avis_commentaire,
             ];
         });
 
@@ -189,5 +198,102 @@ class EnrollmentController extends Controller
             'completed_modules'  => $inscription->completed_modules ?? [],
             'last_lesson_key'    => $inscription->last_lesson_key,
         ]);
+    }
+    // Enregistre ou modifie l'avis d'un apprenant inscrit à la formation.
+    public function donnerAvis(Request $requete, int $idFormation): JsonResponse
+    {
+        $utilisateurAuth = $requete->input('auth_user');
+
+        if (($utilisateurAuth['role'] ?? '') !== 'apprenant') {
+            return response()->json(['message' => 'Seuls les apprenants peuvent laisser un avis.'], 403);
+        }
+
+        $donneesValidees = $requete->validate([
+            'note'        => ['required', 'integer', 'min:1', 'max:5'],
+            'commentaire' => ['required', 'string', 'min:3', 'max:1000'],
+        ]);
+
+        $inscription = Enrollment::query()
+            ->where('utilisateur_id', $utilisateurAuth['id'])
+            ->where('formation_id', $idFormation)
+            ->first();
+
+        if (! $inscription) {
+            return response()->json(['message' => 'Vous devez suivre cette formation pour laisser un avis.'], 404);
+        }
+
+        $inscription->update([
+            'utilisateur_nom'  => $utilisateurAuth['nom'] ?? $inscription->utilisateur_nom,
+            'avis_note'        => $donneesValidees['note'],
+            'avis_commentaire' => trim($donneesValidees['commentaire']),
+            'avis_date'        => now(),
+        ]);
+
+        $this->mongoLogger->log('course_review', [
+            'user_id'   => $utilisateurAuth['id'],
+            'course_id' => $idFormation,
+            'note'      => $donneesValidees['note'],
+        ]);
+
+        return response()->json($this->presenterAvis($inscription));
+    }
+
+    // Derniers avis laissés sur toutes les formations (page d'accueil).
+    public function avisRecents(Request $requete): JsonResponse
+    {
+        $limite = min(max((int) $requete->query('limit', 8), 1), 20);
+
+        $avis = Enrollment::query()
+            ->whereNotNull('avis_note')
+            ->orderByDesc('avis_date')
+            ->limit($limite)
+            ->get()
+            ->map(fn (Enrollment $inscription) => $this->presenterAvis($inscription));
+
+        return response()->json($avis->values());
+    }
+
+    // Avis d'une formation avec la note moyenne.
+    public function avisFormation(int $idFormation): JsonResponse
+    {
+        $avis = Enrollment::query()
+            ->where('formation_id', $idFormation)
+            ->whereNotNull('avis_note')
+            ->orderByDesc('avis_date')
+            ->get();
+
+        return response()->json([
+            'moyenne' => $avis->isEmpty() ? null : round($avis->avg('avis_note'), 1),
+            'total'   => $avis->count(),
+            'avis'    => $avis->map(fn (Enrollment $inscription) => $this->presenterAvis($inscription))->values(),
+        ]);
+    }
+
+    private function presenterAvis(Enrollment $inscription): array
+    {
+        return [
+            'formation_id' => $inscription->formation_id,
+            'nom'          => $inscription->utilisateur_nom ?: 'Apprenant SkillHub',
+            'note'         => $inscription->avis_note,
+            'commentaire'  => $inscription->avis_commentaire,
+            'date'         => optional($inscription->avis_date)->toIso8601String(),
+            'progression'  => $inscription->progression,
+        ];
+    }
+
+    // Envoie au service Catalog le nombre réel d'apprenants inscrits à la formation.
+    private function synchroniserApprenants(int $idFormation): void
+    {
+        $total = Enrollment::query()->where('formation_id', $idFormation)->count();
+
+        try {
+            Http::withHeaders(['X-Service-Key' => (string) config('services.internal.key')])
+                ->timeout(3)
+                ->put(config('services.catalog.url') . "/api/internal/formations/{$idFormation}/apprenants", [
+                    'apprenants' => $total,
+                ]);
+        } catch (\Throwable $e) {
+            error_log('[synchroniserApprenants] ' . $e->getMessage());
+        }
     }
 }

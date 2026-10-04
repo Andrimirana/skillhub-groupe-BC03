@@ -204,6 +204,39 @@ class FormationController extends Controller
         ];
     }
 
+    // Liste des catégories existantes avec le nombre de formations de chacune.
+    public function categories(): JsonResponse
+    {
+        $categories = Formation::query()
+            ->selectRaw('category as nom, count(*) as total')
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->groupBy('category')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($ligne) => ['nom' => $ligne->nom, 'total' => (int) $ligne->total]);
+
+        return response()->json($categories);
+    }
+
+    // Met à jour le nombre d'apprenants inscrits (appel interne du service Inscription).
+    public function mettreAJourApprenants(Request $requete, Formation $formation): JsonResponse
+    {
+        $cleAttendue = (string) config('services.internal.key');
+
+        if ($cleAttendue === '' || ! hash_equals($cleAttendue, (string) $requete->header('X-Service-Key'))) {
+            return response()->json(['message' => 'Non autorisé.'], 401);
+        }
+
+        $donnees = $requete->validate([
+            'apprenants' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $formation->update(['apprenants_count' => $donnees['apprenants']]);
+
+        return response()->json(['id' => $formation->id, 'apprenants' => $formation->apprenants_count]);
+    }
+
     private function presenterFormation(Formation $formation, bool $inclureUserId): array
     {
         $donnees = [

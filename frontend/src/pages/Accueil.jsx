@@ -1,39 +1,12 @@
 ﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChalkboard, faBullhorn, faMagnifyingGlass, faGraduationCap, faChevronLeft, faChevronRight, faClock, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
+import { faChalkboard, faBullhorn, faMagnifyingGlass, faGraduationCap, faChevronLeft, faChevronRight, faClock, faUserGraduate, faStar } from "@fortawesome/free-solid-svg-icons";
 import { recupererUtilisateur } from "../services/auth";
-import { listerFormations } from "../services/formationsApi";
+import { listerAvisRecents, listerCategories, listerFormations } from "../services/formationsApi";
 import PublicNavbar from "../components/PublicNavbar";
 import AuthModal from "../components/AuthModal";
 import "../styles/accueil.css";
-
-const TEMOIGNAGES = [
-  {
-    nom: "Nandrianina",
-    role: "Apprenante depuis 1 mois",
-    photo: "/assets/images/profile1.jfif",
-    texte: "SkillHub m'a permis d'avancer rapidement. Les modules sont clairs et bien structurés.",
-  },
-  {
-    nom: "Maholy",
-    role: "Apprenante depuis 3 mois",
-    photo: "/assets/images/profile1.jfif",
-    texte: "J'ai adoré la progression module par module. Je me sens vraiment accompagnée.",
-  },
-  {
-    nom: "Irene",
-    role: "Formatrice certifiée",
-    photo: "/assets/images/profile1.jfif",
-    texte: "Les ateliers sont très bien structurés. Une expérience enrichissante pour mes élèves.",
-  },
-  {
-    nom: "Mathieu",
-    role: "Apprenant depuis 6 mois",
-    photo: "/assets/images/profile1.jfif",
-    texte: "Une plateforme claire et efficace. J'ai progressé plus vite que prévu.",
-  },
-];
 
 const IMAGES_APPRENTISSAGE = [
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
@@ -49,6 +22,15 @@ function libelleHeures(nombreHeures) {
   return `${heures || 1} heure${heures > 1 ? "s" : ""} de cours`;
 }
 
+function initiales(nom) {
+  return (nom || "?")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((mot) => mot[0].toUpperCase())
+    .join("");
+}
+
 // Page d'accueil principale du site
 function Accueil() {
   const [authModal, setAuthModal] = useState(null);
@@ -58,6 +40,8 @@ function Accueil() {
   const [directionFormations, setDirectionFormations] = useState("");
   const [formationsMisesEnAvant, setFormationsMisesEnAvant] = useState([]);
   const [erreurFormations, setErreurFormations] = useState(false);
+  const [temoignages, setTemoignages] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   // Récupère l'utilisateur connecté et prépare les liens principaux
   const utilisateur = recupererUtilisateur();
@@ -87,6 +71,18 @@ function Accueil() {
     return () => { actif = false; };
   }, []);
 
+  // Charge les derniers avis laissés par les apprenants et les catégories du catalogue
+  useEffect(() => {
+    let actif = true;
+    listerAvisRecents(8)
+      .then((donnees) => { if (actif) setTemoignages(Array.isArray(donnees) ? donnees : []); })
+      .catch(() => { if (actif) setTemoignages([]); });
+    listerCategories()
+      .then((donnees) => { if (actif) setCategories(Array.isArray(donnees) ? donnees.slice(0, 4) : []); })
+      .catch(() => { if (actif) setCategories([]); });
+    return () => { actif = false; };
+  }, []);
+
   // Animation d'apparition des éléments au scroll
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return;
@@ -109,17 +105,17 @@ function Accueil() {
       observer.observe(element);
     });
     return () => { observer.disconnect(); };
-  }, [formationsMisesEnAvant]);
+  }, [formationsMisesEnAvant, temoignages]);
 
   // Fait défiler automatiquement les témoignages
   useEffect(() => {
-    if (!TEMOIGNAGES.length) return;
+    if (temoignages.length < 2) return;
     const timer = window.setTimeout(() => {
       setDirectionTemoignages("next");
-      setPointActif((precedent) => (precedent + 1) % TEMOIGNAGES.length);
+      setPointActif((precedent) => (precedent + 1) % temoignages.length);
     }, 5200);
     return () => { window.clearTimeout(timer); };
-  }, [pointActif]);
+  }, [pointActif, temoignages]);
 
   // Fait défiler automatiquement les formations populaires
   useEffect(() => {
@@ -132,13 +128,14 @@ function Accueil() {
   }, [formationActive, formationsMisesEnAvant]);
 
   const changerTemoignage = (direction) => {
+    if (!temoignages.length) return;
     setDirectionTemoignages(direction);
     setPointActif((p) => {
       if (direction === "prev") {
-        return (p - 1 + TEMOIGNAGES.length) % TEMOIGNAGES.length;
+        return (p - 1 + temoignages.length) % temoignages.length;
       }
 
-      return (p + 1) % TEMOIGNAGES.length;
+      return (p + 1) % temoignages.length;
     });
   };
 
@@ -302,6 +299,7 @@ function Accueil() {
         </div>
       </section>
 
+      {temoignages.length > 0 && (
       <section className="temoignages" id="temoignages" aria-labelledby="temoignages-title">
         <div className="temoignages-inner">
           <div className="temoignages-gauche">
@@ -325,22 +323,29 @@ function Accueil() {
             </div>
           </div>
           <div className={`temoignages-cartes${directionTemoignages ? ` carousel-${directionTemoignages}` : ""}`} aria-live="polite">
-            {[0, 1].map((offset) => {
-              const index = (pointActif + offset) % TEMOIGNAGES.length;
-              const t = TEMOIGNAGES[index];
+            {[0, 1].slice(0, Math.min(2, temoignages.length)).map((offset) => {
+              const index = (pointActif + offset) % temoignages.length;
+              const t = temoignages[index];
+              const formation = formationsMisesEnAvant.find((item) => item.id === t.formation_id);
               return (
-                <article className="temoignage-card" key={`${t.nom}-${offset}`}>
+                <article className="temoignage-card" key={`${t.nom}-${t.formation_id}-${offset}`}>
                   <span className="temoignage-guillemet" aria-hidden="true">"</span>
-                  <img src={t.photo} className="temoignage-profil" alt="" />
+                  <span className="temoignage-profil temoignage-initiales" aria-hidden="true">{initiales(t.nom)}</span>
                   <h3 className="temoignage-nom">{t.nom}</h3>
-                  <p className="temoignage-role">{t.role}</p>
-                  <p className="temoignage-texte">{t.texte}</p>
+                  <p className="temoignage-role">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <FontAwesomeIcon key={i} icon={faStar} className={i < t.note ? "etoile etoile--pleine" : "etoile"} aria-hidden="true" />
+                    ))}
+                    {formation ? ` ${formation.titre}` : ""}
+                  </p>
+                  <p className="temoignage-texte">{t.commentaire}</p>
                 </article>
               );
             })}
           </div>
         </div>
       </section>
+      )}
 
       <section className="valeurs featured-formations" aria-labelledby="formations-mises-en-avant-title">
         <div className="valeurs-header">
@@ -414,17 +419,18 @@ function Accueil() {
             <ul className="footer-liste">
               <li><Link to="/">Accueil</Link></li>
               <li><Link to="/formations">Cours</Link></li>
-              <li><a href="#temoignages">Communauté</a></li>
+              {temoignages.length > 0 && <li><a href="#temoignages">Communauté</a></li>}
               <li><a href="#guide">À propos</a></li>
             </ul>
           </nav>
           <div className="footer_categ">
             <h2 className="footer-titre">Catégories</h2>
             <ul className="footer-liste">
-              <li><Link to="/formations?categorie=dev">Développement web</Link></li>
-              <li><Link to="/formations?categorie=design">Design</Link></li>
-              <li><Link to="/formations?categorie=marketing">Marketing</Link></li>
-              <li><Link to="/formations?categorie=business">Management</Link></li>
+              {categories.map((categorie) => (
+                <li key={categorie.nom}>
+                  <Link to={`/formations?categorie=${encodeURIComponent(categorie.nom)}`}>{categorie.nom}</Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="footer-social">
@@ -446,7 +452,7 @@ function Accueil() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2026 SkillHub MCCI - Projet fil rouge Licence. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} SkillHub MCCI - Projet fil rouge Licence. Tous droits réservés.</p>
         </div>
       </footer>
     </>

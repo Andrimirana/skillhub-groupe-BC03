@@ -292,4 +292,40 @@ class FormationControllerTest extends TestCase
         $reponse->assertStatus(422)->assertJsonValidationErrors(['level']);
     }
 
+    // Vérifie que la liste des catégories vient des formations en base.
+    public function test_categories_are_listed_from_formations(): void
+    {
+        Formation::factory()->count(2)->create(['category' => 'Design']);
+        Formation::factory()->create(['category' => 'Data']);
+
+        $this->getJson('/api/categories')
+            ->assertOk()
+            ->assertJsonCount(2)
+            ->assertJsonPath('0.nom', 'Design')
+            ->assertJsonPath('0.total', 2);
+    }
+
+    // Vérifie que le service Inscription peut mettre à jour le nombre d'apprenants avec la clé interne.
+    public function test_internal_learner_count_update(): void
+    {
+        $formation = Formation::factory()->create(['apprenants_count' => 0]);
+
+        $this->withHeaders(['X-Service-Key' => config('services.internal.key')])
+            ->putJson("/api/internal/formations/{$formation->id}/apprenants", ['apprenants' => 7])
+            ->assertOk();
+
+        $this->assertDatabaseHas('formations', ['id' => $formation->id, 'apprenants_count' => 7]);
+    }
+
+    // Vérifie qu'une mauvaise clé interne est refusée.
+    public function test_internal_learner_count_rejects_wrong_key(): void
+    {
+        $formation = Formation::factory()->create(['apprenants_count' => 0]);
+
+        $this->withHeaders(['X-Service-Key' => 'mauvaise-cle'])
+            ->putJson("/api/internal/formations/{$formation->id}/apprenants", ['apprenants' => 7])
+            ->assertUnauthorized();
+
+        $this->assertDatabaseHas('formations', ['id' => $formation->id, 'apprenants_count' => 0]);
+    }
 }

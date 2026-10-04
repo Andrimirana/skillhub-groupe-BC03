@@ -13,11 +13,15 @@ class Enrollment extends Model
 
     protected $fillable = [
         'utilisateur_id',
+        'utilisateur_nom',
         'formation_id',
         'progression',
         'completed_modules',
         'last_lesson_key',
         'date_inscription',
+        'avis_note',
+        'avis_commentaire',
+        'avis_date',
     ];
 
     protected function casts(): array
@@ -26,6 +30,8 @@ class Enrollment extends Model
             'progression'      => 'integer',
             'completed_modules'=> 'array',
             'date_inscription' => 'datetime',
+            'avis_note'        => 'integer',
+            'avis_date'        => 'datetime',
         ];
     }
 }

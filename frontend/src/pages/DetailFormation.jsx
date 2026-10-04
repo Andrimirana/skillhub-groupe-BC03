@@ -8,12 +8,14 @@ import {
   faEye,
   faFolderOpen,
   faLayerGroup,
+  faStar,
   faUserGraduate,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   detailFormation,
   inscrireFormation,
+  listerAvisFormation,
   listerFormations,
   listerFormationsApprenant,
 } from "../services/formationsApi";
@@ -56,6 +58,7 @@ function DetailFormation() {
   const [onglet, setOnglet] = useState("modules");
   const [moduleOuvert, setModuleOuvert] = useState(null);
   const [authModal, setAuthModal] = useState(null);
+  const [avis, setAvis] = useState({ moyenne: null, total: 0, avis: [] });
 
   const utilisateur = recupererUtilisateur();
   const peutSInscrire = !utilisateur || utilisateur.role === "apprenant";
@@ -84,6 +87,14 @@ function DetailFormation() {
           setRecommandations(similaires);
         } catch {
           setRecommandations([]);
+        }
+
+        try {
+          const donneesAvis = await listerAvisFormation(id);
+          if (!actif) return;
+          setAvis(donneesAvis || { moyenne: null, total: 0, avis: [] });
+        } catch {
+          setAvis({ moyenne: null, total: 0, avis: [] });
         }
 
         if (estConnecte() && peutSInscrire) {
@@ -200,6 +211,9 @@ function DetailFormation() {
             <span><FontAwesomeIcon icon={faUserGraduate} className="dp-icon" /> {formation.formateur || "SkillHub"}</span>
             <span><FontAwesomeIcon icon={faUsers} className="dp-icon" /> {formation.apprenants ?? 0} apprenants</span>
             <span><FontAwesomeIcon icon={faClock} className="dp-icon" /> {libelleHeures(formation.duration ?? formation.duree)}</span>
+            {avis.total > 0 && (
+              <span><FontAwesomeIcon icon={faStar} className="dp-icon" /> {avis.moyenne}/5 ({avis.total} avis)</span>
+            )}
           </div>
         </div>
       </div>
@@ -223,6 +237,14 @@ function DetailFormation() {
                 onClick={() => setOnglet("description")}
               >
                 Description
+              </button>
+              <button
+                role="tab"
+                aria-selected={onglet === "avis"}
+                className={`dp-tab ${onglet === "avis" ? "active" : ""}`}
+                onClick={() => setOnglet("avis")}
+              >
+                Avis ({avis.total})
               </button>
             </div>
 
@@ -253,6 +275,31 @@ function DetailFormation() {
                   </li>
                 ))}
               </ol>
+            )}
+
+            {onglet === "avis" && (
+              <div className="dp-desc-panel">
+                {avis.total === 0 ? (
+                  <p className="dp-empty">Aucun avis pour le moment. Les apprenants inscrits peuvent en laisser un depuis la page du cours.</p>
+                ) : (
+                  <ul className="dp-avis-liste">
+                    {avis.avis.map((item) => (
+                      <li key={`${item.nom}-${item.date}`} className="dp-avis">
+                        <div className="dp-avis-entete">
+                          <strong>{item.nom}</strong>
+                          <span className="dp-avis-note" aria-label={`${item.note} sur 5`}>
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <FontAwesomeIcon key={i} icon={faStar} className={i < item.note ? "etoile etoile--pleine" : "etoile"} aria-hidden="true" />
+                            ))}
+                          </span>
+                        </div>
+                        <p>{item.commentaire}</p>
+                        {item.date && <small>{new Date(item.date).toLocaleDateString("fr-FR")}</small>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
 
             {onglet === "description" && (

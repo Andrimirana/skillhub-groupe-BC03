@@ -10,6 +10,10 @@ Route::get('/formations',                   [FormationController::class, 'index'
 Route::get('/formations/{formation}',       [FormationController::class, 'show']);
 Route::get('/formations/{formation}/modules', [ModuleController::class, 'index']);
 Route::get('/formations/{formationId}/logs', [ActivityLogController::class, 'getByFormation']);
+Route::get('/categories',                   [FormationController::class, 'categories']);
+
+// Route interne — appelée par le service Inscription avec la clé partagée
+Route::put('/internal/formations/{formation}/apprenants', [FormationController::class, 'mettreAJourApprenants']);
 
 // Routes privées — token validé via le service Auth
 Route::middleware('auth.service')->group(function (): void {
